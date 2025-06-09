@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>English Task - Match and Choose</title>
+  <style>
+    body {
+      font-family: 'Comic Neue', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #FFD1DC, #E2D1F9);
+      color: #333;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .task {
+      background-color: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .task h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #0d47a1;
+    }
+
+    .question {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    select {
+      padding: 0.3rem;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .correct {
+      background-color: #c8e6c9 !important;
+      color: green;
+      font-weight: bold;
+    }
+
+    .incorrect {
+      background-color: #ffcdd2 !important;
+      color: red;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+      select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>English Learning Tasks</h1>
+
+  <!-- Задание C -->
+  <div class="task" id="taskC">
+    <h2>Task C: Соедини начала предложений с окончаниями</h2>
+    <ol>
+      <li class="question">It's important to 
+        <select data-answer="c">
+          <option value="">-- Выбери вариант --</option>
+          <option value="a">a. landfills.</option>
+          <option value="b">b. use less plastic.</option>
+          <option value="c">c. reduce waste.</option>
+          <option value="d">d. water.</option>
+          <option value="e">e. the nature</option>
+        </select>
+      </li>
+      <li class="question">We should save 
+        <select data-answer="d">
+          <option value="">-- Выбери вариант --</option>
+          <option value="a">a. landfills.</option>
+          <option value="b">b. use less plastic.</option>
+          <option value="c">c. reduce waste.</option>
+          <option value="d">d. water.</option>
+          <option value="e">e. the nature</option>
+        </select>
+      </li>
+      <li class="question">Recycling helps 
+        <select data-answer="c">
+          <option value="">-- Выбери вариант --</option>
+          <option value="a">a. landfills.</option>
+          <option value="b">b. use less plastic.</option>
+          <option value="c">c. reduce waste.</option>
+          <option value="d">d. water.</option>
+          <option value="e">e. the nature</option>
+        </select>
+      </li>
+      <li class="question">Animals can't live on 
+        <select data-answer="a">
+          <option value="">-- Выбери вариант --</option>
+          <option value="a">a. landfills.</option>
+          <option value="b">b. use less plastic.</option>
+          <option value="c">c. reduce waste.</option>
+          <option value="d">d. water.</option>
+          <option value="e">e. the nature</option>
+        </select>
+      </li>
+      <li class="question">It's better to 
+        <select data-answer="b">
+          <option value="">-- Выбери вариант --</option>
+          <option value="a">a. landfills.</option>
+          <option value="b">b. use less plastic.</option>
+          <option value="c">c. reduce waste.</option>
+          <option value="d">d. water.</option>
+          <option value="e">e. the nature</option>
+        </select>
+      </li>
+    </ol>
+    <button onclick="checkAnswers('taskC')">Проверить задание C</button>
+  </div>
+
+  <!-- Задание D -->
+  <div class="task" id="taskD">
+    <h2>Task D: Выбери правильное слово</h2>
+    <ol>
+      <li class="question">I want to (reuse/throw) trash I create.
+        <select data-answer="reuse">
+          <option value="">-- Выбери вариант --</option>
+          <option value="reuse">reuse</option>
+          <option value="throw">throw</option>
+        </select>
+      </li>
+      <li class="question">The city has many (parks/gardens) for people to enjoy.
+        <select data-answer="parks">
+          <option value="">-- Выбери вариант --</option>
+          <option value="parks">parks</option>
+          <option value="gardens">gardens</option>
+        </select>
+      </li>
+      <li class="question">It is good to (clean/trash) the air.
+        <select data-answer="clean">
+          <option value="">-- Выбери вариант --</option>
+          <option value="clean">clean</option>
+          <option value="trash">trash</option>
+        </select>
+      </li>
+      <li class="question">We should (waste/save) water to help the environment.
+        <select data-answer="save">
+          <option value="">-- Выбери вариант --</option>
+          <option value="waste">waste</option>
+          <option value="save">save</option>
+        </select>
+      </li>
+      <li class="question">(A landfill/Resource) is harmful to wildlife and animals.
+        <select data-answer="A landfill">
+          <option value="">-- Выбери вариант --</option>
+          <option value="A landfill">A landfill</option>
+          <option value="Resource">Resource</option>
+        </select>
+      </li>
+      <li class="question">It's important to (throw/reduce) trash.
+        <select data-answer="reduce">
+          <option value="">-- Выбери вариант --</option>
+          <option value="throw">throw</option>
+          <option value="reduce">reduce</option>
+        </select>
+      </li>
+    </ol>
+    <button onclick="checkAnswers('taskD')">Проверить задание D</button>
+  </div>
+
+  <script>
+    function checkAnswers(taskId) {
+      const task = document.getElementById(taskId);
+      const selects = task.querySelectorAll("select");
+      
+      selects.forEach(select => {
+        const correctAnswer = select.getAttribute("data-answer");
+        const userAnswer = select.value;
+
+        if (!userAnswer) return;
+
+        if (userAnswer === correctAnswer) {
+          select.classList.add("correct");
+          select.classList.remove("incorrect");
+        } else {
+          select.classList.add("incorrect");
+          select.classList.remove("correct");
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
