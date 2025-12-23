@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Vocabulary: Family Relations</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; color: var(--primary); }
+        p { color: #7f8c8d; margin-top: 5px; }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: fadeIn 0.5s; }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            background: #ebf5fb;
+        }
+
+        .option-btn.correct {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.wrong {
+            background-color: var(--error);
+            color: white;
+            border-color: var(--error);
+        }
+
+        #result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .score-circle {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 20px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <header>
+        <h1>Family Relations</h1>
+        <p>Complete the sentences with the correct term.</p>
+    </header>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-area">
+        </div>
+
+    <div id="result-screen">
+        <h2>Quiz Complete!</h2>
+        <div class="score-circle" id="final-score">0/10</div>
+        <p id="score-comment"></p>
+        <button class="restart-btn" onclick="location.reload()">Take Quiz Again</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "My father's brother is my...", options: ["Uncle", "Nephew", "Cousin"], correct: 0 },
+        { q: "My sister's daughter is my...", options: ["Niece", "Nephew", "Aunt"], correct: 0 },
+        { q: "My mother's sister is my...", options: ["Aunt", "Grandmother", "Cousin"], correct: 0 },
+        { q: "My father's mother is my...", options: ["Grandmother", "Mother-in-law", "Aunt"], correct: 0 },
+        { q: "My aunt's daughter is my...", options: ["Cousin", "Sister", "Niece"], correct: 0 },
+        { q: "My mother's father is my...", options: ["Grandfather", "Uncle", "Stepfather"], correct: 0 },
+        { q: "My brother's son is my...", options: ["Nephew", "Niece", "Cousin"], correct: 0 },
+        { q: "My sister's husband is my...", options: ["Brother-in-law", "Son-in-law", "Stepbrother"], correct: 0 },
+        { q: "My husband's mother is my...", options: ["Mother-in-law", "Step-mother", "Aunt"], correct: 0 },
+        { q: "My father's new wife is my...", options: ["Stepmother", "Aunt", "Mother-in-law"], correct: 0 }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    const quizArea = document.getElementById('quiz-area');
+    const progressBar = document.getElementById('progress-bar');
+
+    function initQuiz() {
+        questions.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = `question-card ${index === 0 ? 'active' : ''}`;
+            card.id = `q-${index}`;
+            
+            card.innerHTML = `
+                <div class="question-text">${index + 1}. ${item.q}</div>
+                <div class="options-grid">
+                    ${item.options.map((opt, i) => `
+                        <button class="option-btn" onclick="checkAnswer(${index}, ${i}, this)">${opt}</button>
+                    `).join('')}
+                </div>
+            `;
+            quizArea.appendChild(card);
+        });
+        updateProgress();
+    }
+
+    window.checkAnswer = function(qIdx, choiceIdx, btn) {
+        const btns = btn.parentElement.querySelectorAll('.option-btn');
+        btns.forEach(b => b.style.pointerEvents = 'none'); // Prevent double clicking
+
+        if (choiceIdx === questions[qIdx].correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            btns[questions[qIdx].correct].classList.add('correct');
+        }
+
+        setTimeout(() => {
+            nextQuestion();
+        }, 1200);
+    };
+
+    function nextQuestion() {
+        document.getElementById(`q-${currentIdx}`).classList.remove('active');
+        currentIdx++;
+        
+        if (currentIdx < questions.length) {
+            document.getElementById(`q-${currentIdx}`).classList.add('active');
+            updateProgress();
+        } else {
+            showResults();
+        }
+    }
+
+    function updateProgress() {
+        const percent = ((currentIdx) / questions.length) * 100;
+        progressBar.style.width = percent + "%";
+    }
+
+    function showResults() {
+        quizArea.style.display = 'none';
+        progressBar.parentElement.style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+        
+        const comment = document.getElementById('score-comment');
+        if (score === 10) comment.innerText = "Perfect! You know your family relations very well.";
+        else if (score > 7) comment.innerText = "Great job! You have a strong grasp of these terms.";
+        else comment.innerText = "Good effort. Review the relations and try again to get a perfect score.";
+    }
+
+    initQuiz();
+</script>
+
+</body>
+</html>
