@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNAF: Security Terminal - Re-Ordered</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --monitor-green: #2ecc71;
+            --danger-red: #ff3e3e;
+            --terminal-bg: #05070a;
+            --text-main: #ffffff;
+        }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            z-index: 10;
+            background-size: 100% 4px;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .monitor {
+            width: 95%;
+            max-width: 900px;
+            height: 720px;
+            background: var(--terminal-bg);
+            border: 6px solid #444;
+            border-radius: 10px;
+            padding: 40px;
+            position: relative;
+            box-shadow: inset 0 0 100px #000, 0 0 25px rgba(46, 204, 113, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 2rem;
+            color: var(--monitor-green);
+            border-bottom: 3px solid var(--monitor-green);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            color: #aaa;
+        }
+
+        .power-bar {
+            width: 250px;
+            height: 25px;
+            border: 2px solid var(--monitor-green);
+            background: #111;
+        }
+
+        #power-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--monitor-green);
+            transition: width 0.4s ease;
+        }
+
+        .terminal-screen {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border: 2px solid #333;
+        }
+
+        .status-msg {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--danger-red);
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 2.1rem;
+            margin-bottom: 40px;
+            line-height: 1.3;
+            color: var(--text-main);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-opt {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 2px solid #555;
+            padding: 20px;
+            font-family: inherit;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-opt:hover {
+            border-color: var(--monitor-green);
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .btn-opt.correct {
+            background: var(--monitor-green) !important;
+            color: #000 !important;
+            border-color: var(--monitor-green);
+        }
+
+        .btn-opt.wrong {
+            background: var(--danger-red) !important;
+            color: #fff !important;
+            border-color: var(--danger-red);
+        }
+
+        .feedback-pop {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4.5rem;
+            z-index: 20;
+            display: none;
+            text-shadow: 0 0 15px #000;
+        }
+
+        #end-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .big-clock { font-size: 10rem; color: var(--monitor-green); margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="feedback-pop" id="feedback-text">CORRECT</div>
+
+<div class="monitor">
+    <div id="game-ui">
+        <div class="header">
+            <span>SEC_MONITOR: CAM_02</span>
+            <span id="clock-display">12:00 AM</span>
+        </div>
+
+        <div class="stats-row">
+            <span>LOG: <span id="log-label" style="color:var(--monitor-green)">INTERROGATION</span></span>
+            <div style="display:flex; align-items:center; gap:15px;">
+                POWER: 
+                <div class="power-bar"><div id="power-fill"></div></div>
+            </div>
+        </div>
+
+        <div class="terminal-screen">
+            <div class="status-msg" id="msg-label">AWAITING SYSTEM INPUT...</div>
+            <div class="question-text" id="q-text">SYSTEM LOADING...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+    </div>
+
+    <div id="end-screen">
+        <h1 style="font-size:3rem">SHIFT SURVIVED</h1>
+        <div class="big-clock">06:00 AM</div>
+        <button class="btn-opt" onclick="location.reload()" style="width:300px; text-align:center; margin: 0 auto;">START NEXT NIGHT</button>
+    </div>
+</div>
+
+<script>
+    const allTasks = [
+        // EXERCISE 2: INTERROGATION & RESPONSES
+        { q: "What do giraffes eat?", o: ["Leaves", "It's Neo", "In gardens"], c: 0, type: "INTERROGATION" },
+        { q: "What colour is a panda?", o: ["Yes, I do", "Black and white", "Fruit"], c: 1, type: "INTERROGATION" },
+        { q: "When do cats sleep?", o: ["Leaves", "During the day", "Yes, I do"], c: 1, type: "INTERROGATION" },
+        { q: "What is your cat's name?", o: ["It's Neo", "A goat", "Fish"], c: 0, type: "INTERROGATION" },
+        { q: "Do you like koalas?", o: ["In our homes", "Yes, I do!", "Beak"], c: 1, type: "INTERROGATION" },
+        
+        // EXERCISE 2: DESCRIPTIONS
+        { q: "A snake has a long beautiful _______ and no legs.", o: ["Neck", "Body", "Trunk"], c: 1, type: "DESCRIPTION" },
+        { q: "Monkeys like eating _______.", o: ["Grass", "Fruit", "Small animals"], c: 1, type: "DESCRIPTION" },
+        { q: "The Indian cobra is a very _______ snake.", o: ["Clever", "Dangerous", "Furry"], c: 1, type: "DESCRIPTION" },
+        { q: "A crocodile moves fast with its _______.", o: ["Tail", "Teeth", "Legs"], c: 2, type: "DESCRIPTION" },
+        { q: "What does your pet _______? - He likes meat.", o: ["Eat", "Look like", "Food"], c: 0, type: "DESCRIPTION" },
+        { q: "Indian people use _______ to carry heavy things.", o: ["Tigers", "Rhinos", "Elephants"], c: 2, type: "DESCRIPTION" },
+        { q: "The peacock has got long beautiful _______.", o: ["Legs", "Fur", "Feathers"], c: 2, type: "DESCRIPTION" },
+        { q: "Lions don't eat _______.", o: ["People", "Meat", "Grass"], c: 2, type: "DESCRIPTION" },
+        { q: "My budgie has got a little yellow _______.", o: ["Mane", "Beak", "Paws"], c: 1, type: "DESCRIPTION" },
+        { q: "There are cows, sheep and _______ on his farm.", o: ["A cobra", "A goat", "A bear"], c: 1, type: "DESCRIPTION" },
+
+        // EXERCISE 1: GRAMMAR
+        { q: "Insects __________ gardens clean.", o: ["keeps", "keep", "doesn't keep"], c: 1, type: "GRAMMAR" },
+        { q: "A giraffe __________ leaves from trees.", o: ["eat", "don't eat", "eats"], c: 2, type: "GRAMMAR" },
+        { q: "Humans __________ in trees.", o: ["don't live", "doesn't live", "lives"], c: 0, type: "GRAMMAR" },
+        { q: "Lions __________ during the day.", o: ["doesn't sleep", "sleeps", "sleep"], c: 2, type: "GRAMMAR" },
+        { q: "Koalas __________ water.", o: ["drinks", "don't drink", "doesn't drink"], c: 1, type: "GRAMMAR" },
+
+        // EXERCISE 1: ODD ONE OUT
+        { q: "ODD ONE OUT: Identify the impostor.", o: ["peacock", "hen", "duck", "tortoise"], c: 3, type: "LOGIC" },
+        { q: "ODD ONE OUT: Identify the impostor.", o: ["goldfish", "tiger", "lion", "leopard"], c: 0, type: "LOGIC" },
+        { q: "ODD ONE OUT: Identify the impostor.", o: ["leg", "insect", "beak", "tail"], c: 1, type: "LOGIC" },
+        { q: "ODD ONE OUT: Identify the impostor.", o: ["penguin", "sheep", "cow", "deer"], c: 0, type: "LOGIC" },
+        { q: "ODD ONE OUT: Identify the impostor.", o: ["rabbit", "dog", "parrot", "crocodile"], c: 3, type: "LOGIC" }
+    ];
+
+    let currentIdx = 0;
+    let power = 100;
+
+    function renderTask() {
+        const task = allTasks[currentIdx];
+        document.getElementById('log-label').innerText = task.type;
+        document.getElementById('q-text').innerText = task.q;
+        document.getElementById('clock-display').innerText = `${currentIdx < 4 ? '12' : '0'+Math.floor(currentIdx/4)}:00 AM`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        task.o.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-opt';
+            btn.innerText = opt.toUpperCase();
+            btn.onclick = () => handleInput(idx, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function handleInput(choice, btn) {
+        const task = allTasks[currentIdx];
+        const allBtns = document.querySelectorAll('.btn-opt');
+        const feedback = document.getElementById('feedback-text');
+        
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        if (choice === task.c) {
+            btn.classList.add('correct');
+            feedback.innerText = "SYSTEM SECURED";
+            feedback.style.color = "var(--monitor-green)";
+        } else {
+            btn.classList.add('wrong');
+            allBtns[task.c].classList.add('correct');
+            feedback.innerText = "SYSTEM ERROR";
+            feedback.style.color = "var(--danger-red)";
+            power -= 10;
+            document.getElementById('power-fill').style.width = power + '%';
+        }
+
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+            currentIdx++;
+            if (currentIdx < allTasks.length && power > 0) {
+                renderTask();
+            } else if (power <= 0) {
+                alert("CRITICAL POWER FAILURE.");
+                location.reload();
+            } else {
+                document.getElementById('game-ui').style.display = 'none';
+                document.getElementById('end-screen').style.display = 'block';
+            }
+        }, 1300);
+    }
+
+    renderTask();
+</script>
+</body>
+</html>
