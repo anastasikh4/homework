@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English File: The 4-Verb Challenge</title>
+    <style>
+        :root {
+            --ef-blue: #004b87;
+            --ef-light-blue: #e7f3ff;
+            --ef-gray: #f4f4f4;
+            --ef-text: #333;
+            --ef-border: #ccc;
+            --correct: #28a745;
+            --wrong: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--ef-gray);
+            color: var(--ef-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: white;
+            border: 1px solid var(--ef-border);
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            border-bottom: 3px solid var(--ef-blue);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--ef-blue);
+            margin: 0;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+        }
+
+        .instruction {
+            font-style: italic;
+            margin-bottom: 20px;
+            background: var(--ef-light-blue);
+            padding: 15px;
+            border-left: 5px solid var(--ef-blue);
+            line-height: 1.5;
+        }
+
+        .verb-bank {
+            text-align: center;
+            padding: 15px;
+            border: 2px dashed var(--ef-blue);
+            margin-bottom: 25px;
+            background: #fff;
+        }
+
+        .verb-tag {
+            display: inline-block;
+            background: var(--ef-blue);
+            color: white;
+            padding: 5px 12px;
+            margin: 3px;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+
+        .prompt-box {
+            font-size: 1.2rem;
+            background: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: white;
+            border: 1px solid var(--ef-border);
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .opt-btn:hover { background: #f0f7ff; border-color: var(--ef-blue); }
+        .opt-btn.correct { background: var(--correct) !important; color: white; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; color: white; border-color: var(--wrong); }
+
+        .progress-bar { width: 100%; height: 8px; background: #eee; margin-bottom: 20px; border-radius: 4px; overflow: hidden; }
+        #fill { height: 100%; background: var(--ef-blue); width: 0%; transition: width 0.4s; }
+
+        #result-screen { display: none; text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="game-view">
+        <div class="header">
+            <h1>Grammar & Vocabulary Challenge</h1>
+            <span id="q-counter">1 / 6</span>
+        </div>
+
+        <div class="progress-bar"><div id="fill"></div></div>
+
+        <div class="instruction">
+            <strong>Critical Check:</strong> Each question uses 4 different verbs. Find the one that is logically and grammatically perfect.
+        </div>
+
+        <div class="verb-bank">
+            <span class="verb-tag">be</span> <span class="verb-tag">do</span> 
+            <span class="verb-tag">get up</span> <span class="verb-tag">go</span> 
+            <span class="verb-tag">have</span> <span class="verb-tag">see</span> 
+            <span class="verb-tag">sleep</span> <span class="verb-tag">take</span>
+        </div>
+
+        <div class="question-block">
+            <div class="prompt-box" id="prompt-txt">Loading...</div>
+            <div class="options-list" id="options-area"></div>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h2 style="color: var(--ef-blue)">EXERCISE COMPLETE</h2>
+        <h1 id="score-display">0/6</h1>
+        <button class="opt-btn" onclick="location.reload()" style="margin: 0 auto; display: block;">Restart Shift</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            p: "My mother / shopping (every morning)",
+            o: [
+                "My mother takes shopping every morning.",
+                "My mother has shopping every morning.",
+                "My mother goes shopping every morning.",
+                "My mother does shopping every morning.",
+                "My mother every morning goes shopping."
+            ],
+            c: 2
+        },
+        {
+            p: "I / for eight hours. (hardly ever)",
+            o: [
+                "I hardly ever take for eight hours.",
+                "I hardly ever have for eight hours.",
+                "I sleep hardly ever for eight hours.",
+                "I hardly ever sleep for eight hours.",
+                "I hardly ever do for eight hours."
+            ],
+            c: 3
+        },
+        {
+            p: "We / our friends (every weekend)",
+            o: [
+                "We every weekend see our friends.",
+                "We take our friends every weekend.",
+                "We see our friends every weekend.",
+                "We go our friends every weekend.",
+                "We do our friends every weekend."
+            ],
+            c: 2
+        },
+        {
+            p: "I / at quarter to seven. (usually)",
+            o: [
+                "I usually go up at quarter to seven.",
+                "I usually take at quarter to seven.",
+                "I usually get up at quarter to seven.",
+                "I usually have at quarter to seven.",
+                "I get up usually at quarter to seven."
+            ],
+            c: 2
+        },
+        {
+            p: "My children / happy. (always)",
+            o: [
+                "My children always are happy.",
+                "My children are always happy.",
+                "My children always have happy.",
+                "My children always do happy.",
+                "My children always see happy."
+            ],
+            c: 1
+        },
+        {
+            p: "She / the dog for a walk (three times a day)",
+            o: [
+                "She takes the dog for a walk three times a day.",
+                "She goes the dog for a walk three times a day.",
+                "She three times a day takes the dog for a walk.",
+                "She does the dog for a walk three times a day.",
+                "She has the dog for a walk three times a day."
+            ],
+            c: 0
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('prompt-txt').innerText = q.p;
+        document.getElementById('q-counter').innerText = `${currentIdx + 1} / ${questions.length}`;
+        document.getElementById('fill').style.width = ((currentIdx) / questions.length) * 100 + "%";
+
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+
+        q.o.forEach((text, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerHTML = `<span style="margin-right:15px; color:#999; font-weight:bold;">${String.fromCharCode(65 + i)}</span> ${text}`;
+            btn.onclick = () => check(i, btn);
+            area.appendChild(btn);
+        });
+    }
+
+    function check(idx, btn) {
+        const correct = questions[currentIdx].c;
+        const btns = document.querySelectorAll('.opt-btn');
+        btns.forEach(b => b.style.pointerEvents = 'none');
+
+        if (idx === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            btns[correct].classList.add('correct');
+        }
+
+        setTimeout(() => {
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }, 1500);
+    }
+
+    function showResult() {
+        document.getElementById('game-view').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('score-display').innerText = `${score} / ${questions.length}`;
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
