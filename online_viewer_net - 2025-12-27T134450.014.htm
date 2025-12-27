@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English File: The /h/ Sound Challenge</title>
+    <style>
+        :root {
+            --ef-blue: #3b82f6;
+            --ef-purple: #8b5cf6;
+            --ef-dark: #1e293b;
+            --correct: #10b981;
+            --wrong: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f8fafc;
+            color: var(--ef-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        /* High Visibility Audio Button */
+        .audio-wrapper {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 35px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+
+        .audio-wrapper p {
+            margin: 0 0 15px 0;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-play-btn {
+            background: white;
+            color: var(--ef-blue);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Exercise Styles */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f1f5f9;
+            border: 2px dashed var(--ef-blue);
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .word-tag {
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--ef-blue);
+            border: 1px solid var(--ef-blue);
+        }
+
+        .sentence-item {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone {
+            min-height: 45px;
+            border-bottom: 3px solid var(--ef-dark);
+            margin: 15px 0;
+            font-size: 1.3rem;
+            color: var(--ef-purple);
+            font-weight: 500;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .scramble-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .word-pill {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .word-pill:hover { border-color: var(--ef-blue); background: #eff6ff; }
+        .word-pill.used { opacity: 0.2; pointer-events: none; }
+
+        .controls { margin-top: 10px; display: flex; gap: 15px; }
+        .reset-link { color: #64748b; font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+
+        .status-label { font-weight: bold; font-size: 0.9rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: var(--ef-blue); margin: 0;">English File Practice</h1>
+        <p style="color: #64748b;">Pronunciation & Word Order: The /h/ Sound</p>
+    </header>
+
+    <div class="audio-wrapper">
+        <p>🔊 LISTENING SESSION</p>
+        <button class="main-play-btn" id="audioBtn">
+            <span id="icon">▶</span> <span id="text">PLAY SOUNDTRACK</span>
+        </button>
+        <audio id="player" src="soundtrack.mp3"></audio>
+    </div>
+
+    <div class="word-bank">
+        <span class="word-tag">hairdresser</span> <span class="word-tag">happy</span>
+        <span class="word-tag">home</span> <span class="word-tag">hospital</span>
+        <span class="word-tag">hour</span> <span class="word-tag">Hungary</span>
+    </div>
+
+    <div id="exercise-list"></div>
+</div>
+
+<script>
+    const player = document.getElementById('player');
+    const audioBtn = document.getElementById('audioBtn');
+    const icon = document.getElementById('icon');
+    const btnText = document.getElementById('text');
+
+    audioBtn.addEventListener('click', () => {
+        if (player.paused) {
+            player.play();
+            icon.innerText = "⏸";
+            btnText.innerText = "PAUSE SOUNDTRACK";
+        } else {
+            player.pause();
+            icon.innerText = "▶";
+            btnText.innerText = "PLAY SOUNDTRACK";
+        }
+    });
+
+    const tasks = [
+        { id: 1, target: "Her husband is from Hungary", words: ["from", "Hungary", "is", "husband", "Her"] },
+        { id: 2, target: "My headphones are at home", words: ["at", "home", "are", "headphones", "My"] },
+        { id: 3, target: "His mother is in hospital", words: ["in", "hospital", "is", "mother", "His"] },
+        { id: 4, target: "Lunch is half an hour", words: ["hour", "half", "is", "Lunch", "an"] },
+        { id: 5, target: "Helen is a hairdresser", words: ["hairdresser", "Helen", "a", "is"] },
+        { id: 6, target: "The children are healthy and happy", words: ["healthy", "are", "happy", "The", "and", "children"] }
+    ];
+
+    let state = tasks.map(() => []);
+
+    function draw() {
+        const list = document.getElementById('exercise-list');
+        list.innerHTML = tasks.map((t, i) => `
+            <div class="sentence-item">
+                <span style="color: #94a3b8; font-weight: bold;">SENTENCE ${t.id}</span>
+                <div class="drop-zone" id="drop-${i}">${state[i].join(' ')}</div>
+                <div class="scramble-zone">
+                    ${t.words.map(w => `
+                        <div class="word-pill ${state[i].includes(w) ? 'used' : ''}" 
+                             onclick="pick(${i}, '${w}')">${w}</div>
+                    `).join('')}
+                </div>
+                <div class="controls">
+                    <span class="reset-link" onclick="clearLine(${i})">Reset line</span>
+                </div>
+                <div id="msg-${i}" class="status-label"></div>
+            </div>
+        `).join('');
+    }
+
+    window.pick = (qIdx, word) => {
+        state[qIdx].push(word);
+        draw();
+        
+        if(state[qIdx].length === tasks[qIdx].words.length) {
+            const msg = document.getElementById(`msg-${qIdx}`);
+            if(state[qIdx].join(' ') === tasks[qIdx].target) {
+                msg.innerText = "✓ CORRECT";
+                msg.style.color = "var(--correct)";
+            } else {
+                msg.innerText = "× INCORRECT ORDER";
+                msg.style.color = "var(--wrong)";
+            }
+        }
+    };
+
+    window.clearLine = (qIdx) => {
+        state[qIdx] = [];
+        draw();
+    };
+
+    draw();
+</script>
+</body>
+</html>
