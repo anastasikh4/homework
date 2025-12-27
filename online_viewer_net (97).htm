@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English File: Adverbs of Frequency</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --ef-blue: #3b82f6;
+            --ef-purple: #a855f7;
+            --text-white: #f8fafc;
+            --correct-green: #22c55e;
+            --wrong-red: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-white);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: var(--ef-blue);
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .instruction {
+            background: rgba(168, 85, 247, 0.1);
+            border-left: 4px solid var(--ef-purple);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .sentence-display {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .btn-check { background: var(--ef-blue); color: white; }
+        .btn-cross { background: var(--ef-purple); color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        .correction-area {
+            margin-top: 20px;
+            display: none;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .variant-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-white);
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .variant-btn:hover { background: rgba(255,255,255,0.15); }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .correct-style { color: var(--correct-green); }
+        .wrong-style { color: var(--wrong-red); }
+
+        #progress-bar {
+            height: 4px;
+            background: var(--ef-blue);
+            width: 0%;
+            position: fixed;
+            top: 0; left: 0;
+            transition: 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="container">
+    <div class="header">
+        <h1>2 GRAMMAR: POSITION OF ADVERBS</h1>
+    </div>
+
+    <div class="instruction">
+        Are the sentences right (✓) or wrong (X)? If wrong, choose the best correct variant.
+    </div>
+
+    <div id="exercise-mount"></div>
+
+    <div id="result-screen" style="display:none; text-align:center;">
+        <h2 style="color: var(--ef-purple);">EXERCISE COMPLETE</h2>
+        <button class="btn btn-check" onclick="location.reload()">RESTART</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { s: "Mike drives sometimes to work.", right: false, variants: ["Sometimes Mike drives to work.", "Mike sometimes drives to work.", "Mike drives to work sometimes."], best: 1 },
+        { s: "My girlfriend is never late.", right: true },
+        { s: "They every summer go to Italy.", right: false, variants: ["Every summer they go to Italy.", "They go to Italy every summer.", "They go every summer to Italy."], best: 1 },
+        { s: "Ellie three times a day drinks coffee.", right: false, variants: ["Ellie drinks coffee three times a day.", "Three times a day Ellie drinks coffee.", "Ellie drinks three times a day coffee."], best: 0 },
+        { s: "My brother hardly ever has a shave.", right: true },
+        { s: "We twice a week study English.", right: false, variants: ["Twice a week we study English.", "We study English twice a week.", "We twice week study English."], best: 1 },
+        { s: "I always am stressed.", right: false, variants: ["I am stressed always.", "Always I am stressed.", "I am always stressed."], best: 2 },
+        { s: "I see my grandparents every weekend.", right: true }
+    ];
+
+    let current = 0;
+
+    function renderQuestion() {
+        if(current >= data.length) {
+            document.getElementById('exercise-mount').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            return;
+        }
+
+        const q = data[current];
+        const container = document.getElementById('exercise-mount');
+        
+        const html = `
+            <div class="question-card">
+                <div class="sentence-display">${current + 3}. ${q.s}</div>
+                <div class="btn-group" id="main-btns">
+                    <button class="btn btn-check" onclick="handleDecision(true)">RIGHT (✓)</button>
+                    <button class="btn btn-cross" onclick="handleDecision(false)">WRONG (X)</button>
+                </div>
+                <div id="correction-section" class="correction-area">
+                    <p style="color: var(--ef-blue)">Select the best correct variant:</p>
+                    <div id="variant-list"></div>
+                </div>
+                <div id="feedback-${current}" class="feedback"></div>
+            </div>
+        `;
+        container.innerHTML = html;
+        document.getElementById('progress-bar').style.width = ((current)/data.length)*100 + "%";
+    }
+
+    function handleDecision(isRight) {
+        const q = data[current];
+        const feedback = document.getElementById(`feedback-${current}`);
+        feedback.style.display = 'block';
+
+        if(isRight === q.right) {
+            if(isRight) {
+                feedback.innerHTML = "✓ CORRECT! This sentence follows the grammar rules.";
+                feedback.className = "feedback correct-style";
+                nextQuestion();
+            } else {
+                feedback.innerHTML = "X Correct! This sentence is wrong. Now fix it:";
+                feedback.className = "feedback correct-style";
+                showCorrection();
+            }
+        } else {
+            feedback.innerHTML = isRight ? "X Incorrect. This sentence has a word order error." : "X Incorrect. This sentence is actually grammatically perfect.";
+            feedback.className = "feedback wrong-style";
+            if(!q.right && isRight) setTimeout(showCorrection, 1000);
+            else nextQuestion();
+        }
+    }
+
+    function showCorrection() {
+        const q = data[current];
+        document.getElementById('correction-section').style.display = 'block';
+        const list = document.getElementById('variant-list');
+        list.innerHTML = '';
+        
+        q.variants.forEach((v, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'variant-btn';
+            btn.innerText = v;
+            btn.onclick = () => {
+                if(i === q.best) {
+                    btn.style.borderColor = "var(--correct-green)";
+                    btn.style.color = "var(--correct-green)";
+                    setTimeout(nextQuestion, 1000);
+                } else {
+                    btn.style.borderColor = "var(--wrong-red)";
+                    btn.style.color = "var(--wrong-red)";
+                }
+            };
+            list.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() {
+        setTimeout(() => {
+            current++;
+            renderQuestion();
+        }, 1500);
+    }
+
+    renderQuestion();
+</script>
+</body>
+</html>
