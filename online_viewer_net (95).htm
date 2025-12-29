@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TH Zombie Craft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --zombie-green: #4d6e27; --rotten-flesh: #b35d5d; 
+            --stone: #4a4a4a; --night-sky: #1a1a2e;
+            --soft-color: #00ffff; --hard-color: #ffcc00; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Comic Neue', sans-serif; background-color: var(--night-sky);
+            height: 100vh; display: flex; flex-direction: column; align-items: center; overflow: hidden; color: white;
+        }
+        /* Font sized 15% smaller than previous version */
+        h1 { font-size: 3.8rem; margin: 1vh 0; text-shadow: 4px 4px 0px #000; color: var(--zombie-green); }
+        
+        .container {
+            width: 95vw; max-width: 900px; height: 78vh; background: #2d2d2d;
+            border: 10px solid #111; padding: 2vh; text-align: center;
+            box-shadow: inset -8px -8px 0px #000; position: relative;
+        }
+        .stats-bar { font-size: 2.1rem; color: #ff0044; margin-bottom: 1vh; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5vh; }
+        
+        .card { 
+            background: var(--stone); border: 5px solid #000; height: 13vh;
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 3rem; cursor: pointer; box-shadow: inset -4px -4px 0px #222;
+        }
+        .card.active { background: var(--rotten-flesh); }
+        .card.hidden { opacity: 0; pointer-events: none; }
+        
+        .mc-btn {
+            font-family: 'Comic Neue', sans-serif; font-weight: bold; font-size: 2.3rem; 
+            padding: 8px 20px; color: white; background: var(--zombie-green);
+            border: 6px solid #111; cursor: pointer; margin: 10px; text-shadow: 2px 2px 0px #000;
+        }
+        .mc-btn:active { transform: translateY(4px); }
+        .btn-audio { background-color: #7d4a91; width: 80%; }
+        
+        .hl-soft { color: var(--soft-color); text-decoration: underline; }
+        .hl-hard { color: var(--hard-color); text-decoration: underline; }
+        
+        .slot { display: inline-block; width: 65px; height: 75px; background: #111; border-bottom: 5px solid var(--zombie-green); margin: 5px; font-size: 3.2rem; line-height: 75px; }
+        .letter-btn { background: var(--stone); min-width: 60px; font-size: 2rem; }
+
+        .zombie { width: 70px; height: 70px; background: #618c32; margin: 1vh auto; border: 5px solid #000; position: relative; }
+        .z-eye { width: 12px; height: 8px; background: #000; position: absolute; top: 18px; }
+        .z-eye.left { left: 10px; } .z-eye.right { right: 10px; }
+        
+        /* Updated Reward Indicator to Blue Crystal */
+        #thumb { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 15vh; z-index: 1000; transition: 0.3s; pointer-events: none; }
+        #thumb.pop { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>ZOMBIE TH!</h1>
+    <div class="stats-bar">BRAINS: <span id="xp">0</span> 🧠</div>
+    <div id="thumb">💎</div> <div class="container">
+        <div id="scr-start">
+            <p style="font-size: 2.1rem; margin: 3vh;">Survival Mode</p>
+            <button class="mc-btn" onclick="startMatch(1)">START</button>
+        </div>
+
+        <div id="scr-match" class="hidden">
+            <h2 id="match-title" style="font-size: 2.2rem; margin-bottom: 1vh;">MATCHING</h2>
+            <div class="grid" id="grid"></div>
+        </div>
+
+        <div id="scr-choose" class="hidden">
+            <h2 id="choose-title" style="font-size: 2.2rem;">HEAR THE DIFFERENCE</h2>
+            <button class="mc-btn btn-audio" onclick="playTarget()">🔊 HEAR TARGET</button>
+            <div id="choice-area"></div>
+        </div>
+
+        <div id="scr-build" class="hidden">
+            <h2 style="font-size: 2.2rem;">CRAFT THE WORD</h2>
+            <button class="mc-btn btn-audio" onclick="playTarget()">🔊 HEAR WORD</button>
+            <div id="slots-area" style="margin: 15px 0;"></div>
+            <div id="letter-bank"></div>
+        </div>
+
+        <div id="scr-win" class="hidden">
+            <h2 style="color: #00ff00; font-size: 4rem;">SURVIVED!</h2>
+            <button class="mc-btn" onclick="location.reload()">START</button>
+        </div>
+
+        <div class="zombie"><div class="z-eye left"></div><div class="z-eye right"></div></div>
+    </div>
+
+<script>
+    let xp = 0; let wordIdx = 0; let target = ""; let maleVoice = null; let guess = "";
+
+    function initVoices() {
+        const voices = window.speechSynthesis.getVoices();
+        maleVoice = voices.find(v => v.name.includes('David') || v.name.includes('Male') || v.name.includes('Mark')) || voices[0];
+    }
+    window.speechSynthesis.onvoiceschanged = initVoices; initVoices();
+
+    const matchSet1 = ["thin", "that", "bath", "then"];
+    const matchSet2 = ["this", "both", "them", "path"];
+    
+    const choiceSet = [
+        { word: "thin", traps: ["then", "this"] },
+        { word: "that", traps: ["than", "thud"] },
+        { word: "bath", traps: ["both", "path"] },
+        { word: "this", traps: ["thus", "them"] },
+        { word: "moth", traps: ["math", "myth"] },
+        { word: "then", traps: ["than", "thin"] },
+        { word: "with", traps: ["wish", "will"] },
+        { word: "path", traps: ["bath", "math"] }
+    ];
+
+    const buildSet = ["thin", "that", "math", "them", "both", "this"];
+
+    function speak(t) {
+        window.speechSynthesis.cancel();
+        const m = new SpeechSynthesisUtterance(t);
+        if (maleVoice) m.voice = maleVoice;
+        m.rate = 0.7; window.speechSynthesis.speak(m);
+    }
+    function playTarget() { speak(target); }
+    function addXP(n) { xp += n; document.getElementById('xp').innerText = xp; }
+    function showThumb() {
+        const t = document.getElementById('thumb');
+        t.classList.add('pop');
+        setTimeout(() => t.classList.remove('pop'), 600);
+    }
+
+    function formatWord(w) {
+        const softs = ["thin", "bath", "both", "math", "moth", "myth", "path", "with"];
+        return w.replace(/th/gi, `<span class="${softs.includes(w) ? 'hl-soft' : 'hl-hard'}">th</span>`);
+    }
+
+    function startMatch(lvl) {
+        document.getElementById('scr-start').classList.add('hidden');
+        document.getElementById('scr-match').classList.remove('hidden');
+        document.getElementById('match-title').innerText = "MATCH LEVEL " + lvl;
+        const grid = document.getElementById('grid'); grid.innerHTML = '';
+        let words = (lvl === 1) ? matchSet1 : matchSet2;
+        let deck = [];
+        words.forEach(w => { deck.push({t:'audio', v:w}, {t:'text', v:w}); });
+        deck.sort(() => Math.random() - 0.5);
+        let first = null;
+        deck.forEach(c => {
+            const div = document.createElement('div'); div.className = 'card';
+            div.innerHTML = c.t === 'audio' ? '🔊' : formatWord(c.v);
+            div.onclick = () => {
+                if(c.t === 'audio') speak(c.v);
+                if(div.classList.contains('hidden') || div.classList.contains('active')) return;
+                div.classList.add('active');
+                if(!first) first = {div, c};
+                else {
+                    if(first.c.v === c.v && first.c.t !== c.t) {
+                        showThumb(); addXP(100);
+                        setTimeout(() => {
+                            first.div.classList.add('hidden'); div.classList.add('hidden');
+                            if(document.querySelectorAll('.card:not(.hidden)').length === 0) {
+                                if(lvl === 1) startMatch(2); else startChoice();
+                            }
+                            first = null;
+                        }, 500);
+                    } else {
+                        setTimeout(() => { first.div.classList.remove('active'); div.classList.remove('active'); first = null; }, 400);
+                    }
+                }
+            };
+            grid.appendChild(div);
+        });
+    }
+
+    function startChoice() {
+        document.getElementById('scr-match').classList.add('hidden');
+        document.getElementById('scr-choose').classList.remove('hidden');
+        wordIdx = 0; loadChoice();
+    }
+    function loadChoice() {
+        if(wordIdx >= choiceSet.length) { startBuild(); return; }
+        target = choiceSet[wordIdx].word;
+        document.getElementById('choose-title').innerText = `CHOOSE ${wordIdx + 1}/8`;
+        const area = document.getElementById('choice-area'); area.innerHTML = '';
+        let opts = [target, ...choiceSet[wordIdx].traps].sort(() => Math.random() - 0.5);
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = 'mc-btn';
+            b.innerText = o.toUpperCase(); b.onclick = () => {
+                if(o === target) { showThumb(); addXP(200); wordIdx++; setTimeout(loadChoice, 700); }
+                else { speak(o); b.style.opacity = "0.3"; }
+            };
+            area.appendChild(b);
+        });
+    }
+
+    function startBuild() {
+        document.getElementById('scr-choose').classList.add('hidden');
+        document.getElementById('scr-build').classList.remove('hidden');
+        wordIdx = 0; loadBuild();
+    }
+    function loadBuild() {
+        if(wordIdx >= buildSet.length) {
+            document.getElementById('scr-build').classList.add('hidden');
+            document.getElementById('scr-win').classList.remove('hidden');
+            return;
+        }
+        target = buildSet[wordIdx]; guess = "";
+        const sArea = document.getElementById('slots-area');
+        const lBank = document.getElementById('letter-bank');
+        sArea.innerHTML = ''; lBank.innerHTML = '';
+        
+        for(let i=0; i<target.length; i++) {
+            const s = document.createElement('div'); s.className = 'slot'; s.id = 'slot-' + i;
+            sArea.appendChild(s);
+        }
+
+        target.split('').sort(() => Math.random() - 0.5).forEach(char => {
+            const b = document.createElement('button'); b.className = 'mc-btn letter-btn';
+            b.innerText = char.toUpperCase();
+            b.onclick = () => {
+                if(guess.length < target.length) {
+                    document.getElementById('slot-' + guess.length).innerText = char.toUpperCase();
+                    guess += char; b.style.visibility = 'hidden';
+                    if(guess.length === target.length) {
+                        if(guess === target) { showThumb(); addXP(300); wordIdx++; setTimeout(loadBuild, 1000); }
+                        else { setTimeout(loadBuild, 500); }
+                    }
+                }
+            };
+            lBank.appendChild(b);
+        });
+        playTarget();
+    }
+</script>
+</body>
+</html>
