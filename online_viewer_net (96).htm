@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Mas Grammar: Mega Fireworks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mc-red: #be0000; --mc-green: #387c44;
+            --mc-gold: #f9d71c; --night-blue: #0a1931;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Comic Neue', sans-serif; background-color: var(--night-blue);
+            color: white; display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden; position: relative;
+        }
+
+        /* Full Screen Fireworks Overlay */
+        #fw-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2000;
+        }
+
+        .snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .snowflake { position: absolute; color: white; font-size: 1.2rem; top: -20px; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+
+        .a4-landscape {
+            width: 297mm; height: 210mm; background: #f0f0f0; border: 12px solid #555;
+            position: relative; color: #333; display: flex; flex-direction: column; padding: 30px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); z-index: 5;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 6px solid var(--mc-red); padding-bottom: 10px; }
+        
+        .visual-row {
+            display: flex; align-items: center; gap: 40px; background: white;
+            padding: 15px; border-radius: 20px; border: 4px solid var(--mc-green);
+            width: 60%; margin: 20px auto; justify-content: center;
+        }
+        .grammar-pic { font-size: 6rem; }
+        .pos-text { font-size: 2.2rem; color: var(--mc-green); font-weight: bold; }
+        
+        .slot-line { 
+            border-bottom: 5px solid var(--mc-red); min-width: 120px; height: 60px; 
+            display: inline-block; margin: 0 10px; font-size: 2rem; color: #000;
+            text-align: center; vertical-align: bottom;
+        }
+        .word-chip { 
+            background: var(--mc-gold); color: #000; padding: 10px 20px; margin: 5px; 
+            cursor: pointer; display: inline-block; border: 4px solid #000; font-size: 1.8rem;
+            box-shadow: 3px 3px 0px #888;
+        }
+
+        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        .card {
+            height: 140px; background: var(--mc-green); border: 4px solid #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: white; cursor: pointer; text-align: center; padding: 10px;
+        }
+        .card.flipped { background: white; color: black; }
+        .card.matched { visibility: hidden; }
+
+        .mc-btn {
+            font-family: 'Comic Neue', sans-serif; font-weight: bold; font-size: 2rem; 
+            padding: 10px 40px; color: white; background: var(--mc-red); border: 6px solid #000; cursor: pointer;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="snow-container" id="snow"></div>
+    <canvas id="fw-canvas"></canvas>
+
+    <div class="a4-landscape">
+        <div class="header">
+            <h1 style="color:var(--mc-red)">X-MAS GRAMMAR</h1>
+            <div id="status" style="font-size: 1.5rem; color: var(--mc-green);">LEVEL 1: LEARNING</div>
+            <div style="font-size: 1.5rem;">Gifts: <span id="xp">0</span> 🎁</div>
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <div id="scr-start">
+                <button class="mc-btn" onclick="startApp()">START</button>
+            </div>
+
+            <div id="scr-unscramble" class="hidden" style="text-align: center; width: 100%;">
+                <div class="visual-row">
+                    <div class="grammar-pic" id="u-emoji">😊</div>
+                    <div class="pos-text" id="u-pos">I am happy.</div>
+                </div>
+                <div id="u-slots" style="margin: 20px 0;"></div>
+                <div id="u-choices"></div>
+            </div>
+
+            <div id="scr-match" class="hidden" style="width: 100%;">
+                <h2 style="text-align: center; color: var(--mc-red); margin-bottom:10px;">MATCH THE SMILEY TO THE QUESTION</h2>
+                <div class="card-grid" id="card-grid"></div>
+            </div>
+
+            <div id="scr-win" class="hidden">
+                <h2 style="font-size: 4rem; color: var(--mc-green);">QUEST COMPLETE!</h2>
+                <button class="mc-btn" onclick="location.reload()">REPLAY</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- SNOW ---
+    const snowContainer = document.getElementById('snow');
+    for (let i = 0; i < 40; i++) {
+        const flake = document.createElement('div');
+        flake.className = 'snowflake'; flake.innerHTML = '❄';
+        flake.style.left = Math.random() * 100 + 'vw';
+        flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        flake.style.opacity = Math.random();
+        snowContainer.appendChild(flake);
+    }
+
+    // --- MEGA FIREWORKS ---
+    const canvas = document.getElementById('fw-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y; this.color = color;
+            // Double the velocity for bigger reach
+            this.vel = { x: (Math.random() - 0.5) * 18, y: (Math.random() - 0.5) * 18 };
+            this.alpha = 1; this.friction = 0.94;
+            this.size = Math.random() * 5 + 4; // Double sized particles (prev was ~2-3)
+        }
+        draw() {
+            ctx.globalAlpha = this.alpha;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color; ctx.fill();
+        }
+        update() {
+            this.vel.x *= this.friction; this.vel.y *= this.friction;
+            this.x += this.vel.x; this.y += this.vel.y; this.alpha -= 0.015;
+        }
+    }
+
+    function createFirework(side) {
+        // Offset from the center
+        const centerX = canvas.width / 2;
+        const x = side === 'left' ? centerX - 150 : centerX + 150;
+        const y = canvas.height / 2;
+        const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        for (let i = 0; i < 40; i++) particles.push(new Particle(x, y, color));
+    }
+
+    function animateFireworks() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles = particles.filter(p => p.alpha > 0);
+        particles.forEach(p => { p.update(); p.draw(); });
+        if (particles.length > 0) requestAnimationFrame(animateFireworks);
+    }
+
+    function triggerWinEffect() {
+        // Dual burst: Left and Right of center
+        createFirework('left');
+        createFirework('right');
+        animateFireworks();
+    }
+
+    // --- GAME LOGIC ---
+    let xp = 0; let gIdx = 0; let currentLevel = 1; let gGuess = [];
+    const grammarSet = [
+        { pos: "I am happy.", quest: ["Am", "I", "happy?"], emoji: "😊" },
+        { pos: "He is sad.", quest: ["Is", "he", "sad?"], emoji: "😢" },
+        { pos: "They are happy.", quest: ["Are", "they", "happy?"], emoji: "😊😊" },
+        { pos: "She is small.", quest: ["Is", "she", "small?"], emoji: "👧" }
+    ];
+
+    function startApp() {
+        document.getElementById('scr-start').classList.add('hidden');
+        document.getElementById('scr-unscramble').classList.remove('hidden');
+        loadUnscramble();
+    }
+
+    function loadUnscramble() {
+        if(gIdx >= grammarSet.length) {
+            if(currentLevel === 1) {
+                currentLevel = 2; gIdx = 0;
+                document.getElementById('status').innerText = "LEVEL 2: MEMORY";
+                loadUnscramble(); return;
+            } else { startMatchLevel(1); return; }
+        }
+        gGuess = [];
+        const item = grammarSet[gIdx];
+        document.getElementById('u-emoji').innerText = item.emoji;
+        const posEl = document.getElementById('u-pos');
+        posEl.innerText = item.pos;
+        posEl.style.opacity = (currentLevel === 2) ? "0" : "1";
+
+        document.getElementById('u-slots').innerHTML = item.quest.map(() => `<span class="slot-line"></span>`).join('');
+        const choices = document.getElementById('u-choices');
+        choices.innerHTML = "";
+        [...item.quest].sort(() => Math.random() - 0.5).forEach(w => {
+            const btn = document.createElement('div');
+            btn.className = 'word-chip'; btn.innerText = w;
+            btn.onclick = () => {
+                if(btn.style.opacity === "0.3") return;
+                const slots = document.querySelectorAll('.slot-line');
+                slots[gGuess.length].innerText = w;
+                gGuess.push(w); btn.style.opacity = "0.3";
+                if(gGuess.length === item.quest.length) {
+                    if(JSON.stringify(gGuess) === JSON.stringify(item.quest)) {
+                        xp += 100; document.getElementById('xp').innerText = xp;
+                        triggerWinEffect(); gIdx++; setTimeout(loadUnscramble, 1200);
+                    } else { setTimeout(loadUnscramble, 600); }
+                }
+            };
+            choices.appendChild(btn);
+        });
+    }
+
+    let matchLvl = 1; let flippedCards = [];
+    function startMatchLevel(lvl) {
+        matchLvl = lvl;
+        document.getElementById('scr-unscramble').classList.add('hidden');
+        document.getElementById('scr-match').classList.remove('hidden');
+        document.getElementById('status').innerText = "LEVEL 3: CARDS (" + lvl + "/2)";
+        let subset = lvl === 1 ? grammarSet.slice(0, 3) : grammarSet;
+        let pairs = [];
+        subset.forEach(item => {
+            pairs.push({v: item.emoji, m: item.pos}, {v: item.quest.join(' '), m: item.pos});
+        });
+        pairs.sort(() => Math.random() - 0.5);
+        const grid = document.getElementById('card-grid'); grid.innerHTML = "";
+        pairs.forEach(p => {
+            const c = document.createElement('div'); c.className = 'card'; c.innerText = "🎄";
+            c.onclick = () => {
+                if(flippedCards.length < 2 && !c.classList.contains('flipped')) {
+                    c.classList.add('flipped'); c.innerText = p.v;
+                    flippedCards.push({el: c, data: p});
+                    if(flippedCards.length === 2) {
+                        if(flippedCards[0].data.m === flippedCards[1].data.m) {
+                            setTimeout(() => {
+                                triggerWinEffect();
+                                flippedCards.forEach(f => f.el.classList.add('matched'));
+                                flippedCards = [];
+                                if(document.querySelectorAll('.card:not(.matched)').length === 0) {
+                                    if(matchLvl === 1) startMatchLevel(2);
+                                    else {
+                                        document.getElementById('scr-match').classList.add('hidden');
+                                        document.getElementById('scr-win').classList.remove('hidden');
+                                    }
+                                }
+                            }, 600);
+                        } else {
+                            setTimeout(() => { flippedCards.forEach(f => { f.el.classList.remove('flipped'); f.el.innerText = "🎄"; }); flippedCards = []; }, 800);
+                        }
+                    }
+                }
+            };
+            grid.appendChild(c);
+        });
+    }
+</script>
+</body>
+</html>
