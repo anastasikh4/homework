@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNAF: Security Shift 3.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fnaf-red: #8b0000; --fnaf-purple: #4b0082;
+            --fnaf-gold: #daa520; --office-gray: #2b2b2b;
+            --monitor-green: #00ff41; --mc-green: #387c44;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Comic Neue', sans-serif; background: #000;
+            color: white; display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        #fw-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        
+        .a4-landscape {
+            width: 297mm; height: 210mm; background: var(--office-gray);
+            border: 10px solid #111; position: relative; display: flex;
+            flex-direction: column; padding: 20px; box-shadow: inset 0 0 100px #000;
+        }
+        .header { display: flex; justify-content: space-between; padding: 10px; border-bottom: 4px solid var(--fnaf-red); }
+        .monitor-screen {
+            flex: 1; margin-top: 15px; background: #1a1a1a; border: 10px solid #333;
+            padding: 20px; position: relative; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .cam-img { height: 280px; width: auto; border: 2px solid var(--monitor-green); margin-bottom: 15px; align-self: center; }
+        
+        .question-text { font-size: 1.8rem; color: var(--fnaf-gold); margin-bottom: 15px; text-align: center; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .option-btn {
+            background: #333; border: 3px solid #555; color: white; padding: 12px;
+            font-size: 1.3rem; cursor: pointer; font-family: 'Comic Neue';
+        }
+
+        .slot-area { margin: 20px 0; min-height: 60px; border-bottom: 2px solid var(--fnaf-red); display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .chip { background: var(--fnaf-purple); padding: 10px 20px; border: 2px solid white; cursor: pointer; font-size: 1.4rem; }
+        
+        .nav-btn { padding: 10px 30px; background: var(--fnaf-red); color: white; border: none; cursor: pointer; font-size: 1.2rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<canvas id="fw-canvas"></canvas>
+
+<div class="a4-landscape">
+    <div class="header">
+        <h1 id="top-title">SECURITY MONITOR: CAM 01</h1>
+        <div style="color: var(--monitor-green); font-size: 1.5rem;">POWER: <span id="power">100</span>%</div>
+    </div>
+
+    <div class="monitor-screen">
+        <img id="main-img" class="cam-img" src="" alt="FNAF Camera">
+        
+        <div id="quiz-ui">
+            <p class="question-text" id="q-text"></p>
+            <div class="options-grid" id="options"></div>
+        </div>
+
+        <div id="unscramble-ui" class="hidden">
+            <p class="question-text">SYSTEM OVERRIDE: REPAIR DATA</p>
+            <div class="slot-area" id="slots"></div>
+            <div id="chips" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;"></div>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+        <div id="progress" style="color: var(--fnaf-gold);">Task 1/11</div>
+        <button class="nav-btn" id="next-btn" style="visibility: hidden;" onclick="nextStep()">CONTINUE</button>
+    </div>
+</div>
+
+<script>
+    // --- FIREWORKS ---
+    const canvas = document.getElementById('fw-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y; this.color = color;
+            this.vel = { x: (Math.random() - 0.5) * 25, y: (Math.random() - 0.5) * 25 };
+            this.alpha = 1; this.friction = 0.94; this.size = Math.random() * 6 + 5;
+        }
+        draw() { ctx.globalAlpha = this.alpha; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
+        update() { this.vel.x *= this.friction; this.vel.y *= this.friction; this.x += this.vel.x; this.y += this.vel.y; this.alpha -= 0.015; }
+    }
+    function triggerWin() {
+        const cx = canvas.width / 2;
+        const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        for (let i = 0; i < 50; i++) { particles.push(new Particle(cx - 180, canvas.height/2, color)); particles.push(new Particle(cx + 180, canvas.height/2, color)); }
+        animate();
+    }
+    function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles = particles.filter(p => p.alpha > 0); particles.forEach(p => { p.update(); p.draw(); }); if(particles.length > 0) requestAnimationFrame(animate); }
+
+    // --- GAME DATA ---
+    const tasks = [
+        { type: 'mc', img: "https://i.ytimg.com/vi/ryVcahVWQ8U/maxresdefault.jpg", text: "This chicken ______ yellow feathers.", opts: ["have", "has", "doesn't", "don't"], correct: 1 },
+        { type: 'mc', img: "https://i.ytimg.com/vi/ADKKnOD6c2Y/maxresdefault.jpg", text: "One animatronic ______ a hat.", opts: ["has got", "have got", "has", "have"], correct: 0 },
+        { type: 'mc', img: "https://avatars.mds.yandex.net/get-mpic/16373023/2a00000197a6306c8e38e8044b90da9e56dd/orig", text: "The rabbit ______ in the hall.", opts: ["run", "runs", "running", "is run"], correct: 1 },
+        { type: 'mc', img: "https://i.ytimg.com/vi/cO3Z6Nmsgz8/maxresdefault.jpg", text: "The rabbit has brown paws, but he ______ have red ears.", opts: ["don't", "has", "doesn't", "not"], correct: 2 },
+        { type: 'mc', img: "https://i.ytimg.com/vi/8IpzMDOy4lM/maxresdefault.jpg", text: "Workers ______ sleep at night.", opts: ["doesn't", "isn't", "don't", "aren't"], correct: 2 },
+        { type: 'mc', img: "https://i.ytimg.com/vi/7w8wAbLgHZI/hqdefault.jpg", text: "These animals ______ angry.", opts: ["doesn't look", "don't look", "not look", "doesn't looks"], correct: 1 },
+        
+        // UNSCRAMBLE (5-6 words each)
+        { type: 'un', img: "https://i.ytimg.com/vi/xhpp1rIRoDE/maxresdefault.jpg", ans: ["The", "brown", "bear", "has", "black", "eyes."] },
+        { type: 'un', img: "https://i.ytimg.com/vi/B_dGsRRejU0/maxresdefault.jpg", ans: ["White", "rabbit", "is", "at", "night."] },
+        { type: 'un', img: "https://i.ytimg.com/vi/Levyq2WP1iw/maxresdefault.jpg", ans: ["They", "are", "in", "the", "afternoon."] },
+        { type: 'un', img: "https://i.ytimg.com/vi/qXEp54rkazs/hq720_2.jpg", ans: ["The", "yellow", "chicken", "stands", "here."] },
+        { type: 'un', img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/ss_49915306285cd7c567620c1c10e300a068089e35.1920x1080.jpg", ans: ["It", "is", "12", "am", "at", "night."] }
+    ];
+
+    let currentIdx = 0; let power = 100; let currentGuess = [];
+
+    function loadTask() {
+        const t = tasks[currentIdx];
+        document.getElementById('main-img').src = t.img;
+        document.getElementById('progress').innerText = `Task ${currentIdx + 1}/11`;
+        document.getElementById('next-btn').style.visibility = 'hidden';
+
+        if(t.type === 'mc') {
+            document.getElementById('quiz-ui').classList.remove('hidden');
+            document.getElementById('unscramble-ui').classList.add('hidden');
+            document.getElementById('q-text').innerText = t.text;
+            const optDiv = document.getElementById('options');
+            optDiv.innerHTML = t.opts.map((o, i) => `<button class="option-btn" onclick="checkMC(${i}, this)">${o}</button>`).join('');
+        } else {
+            document.getElementById('quiz-ui').classList.add('hidden');
+            document.getElementById('unscramble-ui').classList.remove('hidden');
+            currentGuess = [];
+            const slots = document.getElementById('slots');
+            slots.innerHTML = t.ans.map(() => `<span style="font-size:1.8rem; color:var(--monitor-green); border-bottom: 2px solid white; min-width:60px; text-align:center;">?</span>`).join(' ');
+            const chips = document.getElementById('chips');
+            const shuffled = [...t.ans].sort(() => Math.random() - 0.5);
+            chips.innerHTML = shuffled.map(w => `<div class="chip" onclick="addWord('${w}', this)">${w}</div>`).join('');
+        }
+    }
+
+    function checkMC(idx, btn) {
+        if(idx === tasks[currentIdx].correct) {
+            btn.style.background = "var(--mc-green)"; triggerWin();
+            document.getElementById('next-btn').style.visibility = 'visible';
+        } else {
+            btn.style.background = "var(--fnaf-red)"; power -= 5;
+            document.getElementById('power').innerText = power;
+        }
+    }
+
+    function addWord(word, btn) {
+        if(btn.style.opacity === "0.3") return;
+        const t = tasks[currentIdx];
+        const slots = document.getElementById('slots').children;
+        slots[currentGuess.length].innerText = word;
+        currentGuess.push(word);
+        btn.style.opacity = "0.3";
+        if(currentGuess.length === t.ans.length) {
+            if(JSON.stringify(currentGuess) === JSON.stringify(t.ans)) { triggerWin(); document.getElementById('next-btn').style.visibility = 'visible'; }
+            else { setTimeout(() => loadTask(), 800); }
+        }
+    }
+
+    function nextStep() { currentIdx++; if(currentIdx < tasks.length) loadTask(); else alert("YOU SURVIVED THE SHIFT!"); }
+
+    loadTask();
+</script>
+</body>
+</html>
