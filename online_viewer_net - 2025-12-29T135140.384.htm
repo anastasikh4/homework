@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNAF: Translation Override</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fnaf-red: #8b0000; --fnaf-purple: #4b0082;
+            --fnaf-gold: #daa520; --monitor-green: #00ff41;
+            --office-gray: #2b2b2b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Comic Neue', sans-serif; background: #000;
+            color: white; display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        #fw-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        
+        .a4-landscape {
+            width: 297mm; height: 210mm; background: var(--office-gray);
+            border: 10px solid #111; position: relative; display: flex;
+            flex-direction: column; padding: 25px; box-shadow: inset 0 0 100px #000;
+        }
+        .header { display: flex; justify-content: space-between; border-bottom: 4px solid var(--fnaf-red); padding-bottom: 10px; }
+        
+        .monitor-screen {
+            flex: 1; margin-top: 15px; background: #1a1a1a; border: 8px solid #333;
+            padding: 20px; overflow-y: auto; position: relative;
+        }
+
+        .test-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+
+        .test-item {
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;
+            border-left: 5px solid var(--fnaf-purple);
+        }
+
+        .phrase-label { font-size: 1.2rem; color: var(--fnaf-gold); margin-bottom: 8px; }
+
+        select {
+            width: 100%; font-family: 'Comic Neue'; font-size: 1.1rem;
+            background: #222; color: #fff; border: 2px solid #555; padding: 5px;
+        }
+
+        select.correct { border-color: var(--monitor-green); color: var(--monitor-green); }
+        select.wrong { border-color: var(--fnaf-red); color: var(--fnaf-red); }
+
+        .footer { text-align: center; margin-top: 20px; }
+        .verify-btn {
+            background: var(--fnaf-red); color: white; border: none;
+            padding: 10px 50px; font-size: 1.8rem; cursor: pointer; font-family: 'Comic Neue';
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="fw-canvas"></canvas>
+
+<div class="a4-landscape">
+    <div class="header">
+        <h1>TRANSLATION OVERRIDE: PHASES 1 & 2</h1>
+        <div style="color: var(--monitor-green); font-size: 1.5rem;">ENC: ACTIVATED</div>
+    </div>
+
+    <div class="monitor-screen">
+        <div class="test-grid">
+            <div class="test-item">
+                <p class="phrase-label">1. It was a weird night</p>
+                <select class="q-select" data-ans="Это была странная ночь.">
+                    <option value="">Choose Translation...</option>
+                    <option value="Звучит хорошо.">Звучит хорошо.</option>
+                    <option value="Это была странная ночь.">Это была странная ночь.</option>
+                    <option value="Кого встречал?">Кого встречал?</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">2. Have you met them?</p>
+                <select class="q-select" data-ans="Ты их встречал?">
+                    <option value="">Choose Translation...</option>
+                    <option value="Ты их встречал?">Ты их встречал?</option>
+                    <option value="Не думаю.">Не думаю.</option>
+                    <option value="Что ты сказал?">Что ты сказал?</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">3. Met who?</p>
+                <select class="q-select" data-ans="Кого встречал?">
+                    <option value="">Choose Translation...</option>
+                    <option value="Кого встречал?">Кого встречал?</option>
+                    <option value="Хочешь потанцевать?">Хочешь потанцевать? </option>
+                    <option value="Просто выполняй работу.">Просто выполняй работу.</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">4. I don't think so</p>
+                <select class="q-select" data-ans="Не думаю.">
+                    <option value="">Choose Translation...</option>
+                    <option value="Теперь ты официально.">Теперь ты официально.</option>
+                    <option value="Звучит хорошо.">Звучит хорошо.</option>
+                    <option value="Не думаю.">Не думаю.</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">5. What did you say?</p>
+                <select class="q-select" data-ans="Что ты сказал?">
+                    <option value="">Choose Translation...</option>
+                    <option value="Что ты сказал?">Что ты сказал?</option>
+                    <option value="Некоторые дети пропали.">Некоторые дети пропали.</option>
+                    <option value="Ты их встречал?">Ты их встречал?</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">6. Хочешь потанцевать?</p>
+                <select class="q-select" data-ans="Wanna dance?">
+                    <option value="">Choose English...</option>
+                    <option value="Just do your job">Just do your job</option>
+                    <option value="Wanna dance?">Wanna dance?</option>
+                    <option value="Sounds good">Sounds good</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">7. Некоторые дети пропали.</p>
+                <select class="q-select" data-ans="Some kids went missing">
+                    <option value="">Choose English...</option>
+                    <option value="Some kids went missing">Some kids went missing</option>
+                    <option value="Now you're official">Now you're official</option>
+                    <option value="It was a weird night">It was a weird night</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">8. Теперь ты официально.</p>
+                <select class="q-select" data-ans="Now you're official">
+                    <option value="">Choose English...</option>
+                    <option value="Have you met them?">Have you met them?</option>
+                    <option value="Now you're official">Now you're official</option>
+                    <option value="Met who?">Met who?</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">9. Просто выполняй свою работу.</p>
+                <select class="q-select" data-ans="Just do your job">
+                    <option value="">Choose English...</option>
+                    <option value="Just do your job">Just do your job</option>
+                    <option value="What did you say?">What did you say?</option>
+                    <option value="I don't think so">I don't think so</option>
+                </select>
+            </div>
+
+            <div class="test-item">
+                <p class="phrase-label">10. Звучит хорошо.</p>
+                <select class="q-select" data-ans="Sounds good">
+                    <option value="">Choose English...</option>
+                    <option value="It was a weird night">It was a weird night</option>
+                    <option value="Sounds good">Sounds good</option>
+                    <option value="Wanna dance?">Wanna dance?</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="verify-btn" onclick="checkAll()">VERIFY SYSTEM</button>
+            <p id="final-result" style="margin-top:10px; font-size: 1.5rem;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- FIREWORKS ---
+    const canvas = document.getElementById('fw-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y; this.color = color;
+            this.vel = { x: (Math.random() - 0.5) * 22, y: (Math.random() - 0.5) * 22 };
+            this.alpha = 1; this.friction = 0.94; this.size = 8;
+        }
+        draw() { ctx.globalAlpha = this.alpha; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
+        update() { this.vel.x *= this.friction; this.vel.y *= this.friction; this.x += this.vel.x; this.y += this.vel.y; this.alpha -= 0.015; }
+    }
+    function triggerWin() {
+        const color = "#00ff41";
+        for (let i = 0; i < 50; i++) {
+            particles.push(new Particle(canvas.width/2 - 200, canvas.height/2, color));
+            particles.push(new Particle(canvas.width/2 + 200, canvas.height/2, color));
+        }
+        animate();
+    }
+    function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles = particles.filter(p => p.alpha > 0); particles.forEach(p => { p.update(); p.draw(); }); if(particles.length > 0) requestAnimationFrame(animate); }
+
+    // --- CHECKER ---
+    function checkAll() {
+        const selects = document.querySelectorAll('.q-select');
+        let score = 0;
+        selects.forEach(s => {
+            if(s.value === s.getAttribute('data-ans')) {
+                s.classList.add('correct'); s.classList.remove('wrong'); score++;
+            } else {
+                s.classList.add('wrong'); s.classList.remove('correct');
+            }
+        });
+        
+        const result = document.getElementById('final-result');
+        if(score === 10) {
+            result.innerText = "ACCESS GRANTED: ALL PHRASES RECOVERED!";
+            result.style.color = "var(--monitor-green)";
+            triggerWin();
+        } else {
+            result.innerText = `ACCESS DENIED: ${10 - score} ERRORS DETECTED.`;
+            result.style.color = "var(--fnaf-red)";
+        }
+    }
+</script>
+</body>
+</html>
