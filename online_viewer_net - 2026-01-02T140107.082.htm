@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs: Color Check</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            font-family: 'Raleway', sans-serif;
+            color: #f8fafc;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        h1 { text-align: center; color: #38bdf8; font-weight: 900; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; }
+        
+        .verb-card {
+            background: #ffffff;
+            color: #1e293b;
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 16px;
+            border: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .russian-word { font-size: 20px; font-weight: 700; color: #7c3aed; margin-bottom: 15px; }
+        
+        .scrambled-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            min-height: 40px;
+            flex-wrap: wrap;
+        }
+        .word-btn {
+            background: #38bdf8;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            transition: 0.2s;
+        }
+        .word-btn:hover { background: #0ea5e9; transform: scale(1.05); }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        .slot {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            height: 55px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            color: #1e293b;
+            font-size: 15px;
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        /* State Styles */
+        .slot.filled { border-style: solid; border-color: #38bdf8; }
+        
+        .slot.correct-pos { background: #22c55e !important; border-color: #16a34a !important; color: white !important; }
+        .slot.wrong-pos { background: #ef4444 !important; border-color: #dc2626 !important; color: white !important; }
+        
+        .card-completed { border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Verb Color Master</h1>
+    <p class="subtitle">Click words to fill slots. Wrong placements turn red immediately when the row is full!</p>
+
+    <div id="quiz-root"></div>
+</div>
+
+<script>
+    const verbList = [
+        { ru: "Быть", v1: "be", v2: "was", v3: "been" },
+        { ru: "Становиться", v1: "become", v2: "became", v3: "become" },
+        { ru: "Начинать", v1: "begin", v2: "began", v3: "begun" },
+        { ru: "Дуть", v1: "blow", v2: "blew", v3: "blown" },
+        { ru: "Ломать", v1: "break", v2: "broke", v3: "broken" },
+        { ru: "Строить", v1: "build", v2: "built", v3: "built" },
+        { ru: "Гореть", v1: "burn", v2: "burnt", v3: "burnt" },
+        { ru: "Выбирать", v1: "choose", v2: "chose", v3: "chosen" },
+        { ru: "Приходить", v1: "come", v2: "came", v3: "come" },
+        { ru: "Делать", v1: "do", v2: "did", v3: "done" },
+        { ru: "Рисовать", v1: "draw", v2: "drew", v3: "drawn" },
+        { ru: "Мечтать", v1: "dream", v2: "dreamt", v3: "dreamt" },
+        { ru: "Пить", v1: "drink", v2: "drank", v3: "drunk" },
+        { ru: "Водить", v1: "drive", v2: "drove", v3: "driven" },
+        { ru: "Есть", v1: "eat", v2: "ate", v3: "eaten" },
+        { ru: "Падать", v1: "fall", v2: "fell", v3: "fallen" },
+        { ru: "Чувствовать", v1: "feel", v2: "felt", v3: "felt" },
+        { ru: "Получать", v1: "get", v2: "got", v3: "got" },
+        { ru: "Слышать", v1: "hear", v2: "heard", v3: "heard" },
+        { ru: "Хранить", v1: "keep", v2: "kept", v3: "kept" },
+        { ru: "Знать", v1: "know", v2: "knew", v3: "known" },
+        { ru: "Вести", v1: "lead", v2: "led", v3: "led" },
+        { ru: "Учить", v1: "learn", v2: "learnt", v3: "learnt" },
+        { ru: "Оставлять", v1: "leave", v2: "left", v3: "left" },
+        { ru: "Терять", v1: "lose", v2: "lost", v3: "lost" },
+        { ru: "Делать (создавать)", v1: "make", v2: "made", v3: "made" },
+        { ru: "Встречать", v1: "meet", v2: "met", v3: "met" },
+        { ru: "Бежать", v1: "run", v2: "ran", v3: "run" },
+        { ru: "Говорить", v1: "say", v2: "said", v3: "said" },
+        { ru: "Видеть", v1: "see", v2: "saw", v3: "seen" }
+    ];
+
+    const root = document.getElementById('quiz-root');
+
+    verbList.forEach((verb, i) => {
+        const scrambled = [verb.v1, verb.v2, verb.v3].sort(() => Math.random() - 0.5);
+        
+        const card = document.createElement('div');
+        card.className = 'verb-card';
+        card.id = `card-${i}`;
+        card.innerHTML = `
+            <div class="russian-word">${i+1}. ${verb.ru}</div>
+            <div class="scrambled-area" id="pool-${i}">
+                ${scrambled.map(w => `<button class="word-btn" onclick="moveToSlot('${w}', ${i}, this)">${w}</button>`).join('')}
+            </div>
+            <div class="input-row">
+                <div class="slot" id="slot-${i}-0" data-ans="${verb.v1}" onclick="returnToPool(${i}, 0)"></div>
+                <div class="slot" id="slot-${i}-1" data-ans="${verb.v2}" onclick="returnToPool(${i}, 1)"></div>
+                <div class="slot" id="slot-${i}-2" data-ans="${verb.v3}" onclick="returnToPool(${i}, 2)"></div>
+            </div>
+        `;
+        root.appendChild(card);
+    });
+
+    function moveToSlot(word, cardIdx, btn) {
+        for (let s = 0; s < 3; s++) {
+            const slot = document.getElementById(`slot-${cardIdx}-${s}`);
+            if (slot.innerText === "") {
+                slot.innerText = word;
+                slot.classList.add('filled');
+                btn.style.display = "none";
+                break;
+            }
+        }
+        checkCard(cardIdx);
+    }
+
+    function returnToPool(cardIdx, slotIdx) {
+        const slot = document.getElementById(`slot-${cardIdx}-${slotIdx}`);
+        const word = slot.innerText;
+        if (word === "") return;
+
+        const pool = document.getElementById('pool-' + cardIdx);
+        const buttons = pool.getElementsByClassName('word-btn');
+        
+        for (let btn of buttons) {
+            if (btn.innerText === word && btn.style.display === "none") {
+                btn.style.display = "inline-block";
+                break;
+            }
+        }
+        
+        // Reset slot and neighbors
+        slot.innerText = "";
+        slot.classList.remove('filled', 'correct-pos', 'wrong-pos');
+        
+        // When one is removed, re-evaluate others
+        checkCard(cardIdx);
+    }
+
+    function checkCard(i) {
+        const slots = [
+            document.getElementById(`slot-${i}-0`),
+            document.getElementById(`slot-${i}-1`),
+            document.getElementById(`slot-${i}-2`)
+        ];
+        
+        const card = document.getElementById(`card-${i}`);
+        const allFilled = slots.every(s => s.innerText !== "");
+
+        if (allFilled) {
+            let correctCount = 0;
+            slots.forEach(slot => {
+                const userVal = slot.innerText;
+                const correctVal = slot.getAttribute('data-ans');
+                
+                if (userVal === correctVal) {
+                    slot.classList.add('correct-pos');
+                    slot.classList.remove('wrong-pos');
+                    correctCount++;
+                } else {
+                    slot.classList.add('wrong-pos');
+                    slot.classList.remove('correct-pos');
+                }
+            });
+
+            if(correctCount === 3) card.classList.add('card-completed');
+        } else {
+            // Clear colors if not all filled
+            slots.forEach(s => s.classList.remove('correct-pos', 'wrong-pos'));
+            card.classList.remove('card-completed');
+        }
+    }
+</script>
+
+</body>
+</html>
