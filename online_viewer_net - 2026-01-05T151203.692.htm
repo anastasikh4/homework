@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Case: The Sarah Mystery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #e5e5e1;
+            --ink: #1a1a1a;
+            --accent: #9b2226;
+            --folder: #d4a373;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #121212;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .case-file {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--paper);
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 10px 10px 0px var(--folder);
+            min-height: 95vh;
+            background-image: radial-gradient(#d1d1cf 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        h1 {
+            font-family: 'Special Elite', cursive;
+            text-align: center;
+            text-decoration: underline;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .stamp {
+            color: var(--accent);
+            border: 3px solid var(--accent);
+            display: inline-block;
+            padding: 5px;
+            font-family: 'Special Elite', cursive;
+            transform: rotate(-10deg);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        h2 { font-size: 16px; background: #333; color: white; padding: 5px; text-transform: uppercase; }
+
+        /* Drag Bank */
+        .clue-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border: 2px solid #333;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .clue {
+            background: white;
+            padding: 8px 12px;
+            border: 1px solid #333;
+            font-family: 'Special Elite', cursive;
+            cursor: grab;
+            font-size: 14px;
+        }
+
+        .sentence { margin-bottom: 15px; font-size: 15px; line-height: 1.8; border-bottom: 1px dashed #999; padding-bottom: 10px; }
+
+        .drop-box {
+            display: inline-block;
+            min-width: 80px;
+            height: 25px;
+            background: #d1d1cf;
+            vertical-align: middle;
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* Logic Match */
+        .match-row { margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 4px; border-left: 5px solid var(--folder); }
+        select { width: 100%; padding: 8px; margin-top: 5px; font-family: inherit; }
+
+        .btn-check {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-family: 'Special Elite', cursive;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .solved { background-color: #dcfce7 !important; color: #16a34a !important; }
+        .failed { background-color: #fee2e2 !important; color: #dc2626 !important; }
+    </style>
+</head>
+<body>
+
+<div class="case-file">
+    <h1>CASE FILE #0402</h1>
+    <div class="stamp">TOP SECRET</div>
+
+    <div class="section">
+        <h2>Phase 1: Complete the Interrogation</h2>
+        <p style="font-size: 12px; margin: 10px 0;">Drag the correct grammar clues to the interrogation transcript.</p>
+        
+        <div class="clue-bank">
+            <div class="clue" draggable="true">do you</div>
+            <div class="clue" draggable="true">does she</div>
+            <div class="clue" draggable="true">do they</div>
+            <div class="clue" draggable="true">do you</div>
+        </div>
+
+        <div class="sentence">
+            1. Detective: Where <div class="drop-box" data-ans="do you"></div> go after work?
+        </div>
+        <div class="sentence">
+            2. Detective: What time <div class="drop-box" data-ans="does she"></div> leave the office?
+        </div>
+        <div class="sentence">
+            3. Detective: How often <div class="drop-box" data-ans="do they"></div> meet Sarah?
+        </div>
+        <div class="sentence">
+            4. Detective: <div class="drop-box" data-ans="do you"></div> have the key?
+        </div>
+    </div>
+
+    <div class="section" style="margin-top: 30px;">
+        <h2>Phase 2: Logical Evidence</h2>
+        <p style="font-size: 12px; margin: 10px 0;">Match the suspect's answer to the detective's question.</p>
+        
+        <div class="match-row">
+            <span>"What do you do at 9:00 PM?"</span>
+            <select class="logic-match" data-ans="L1">
+                <option value="">Choose Answer...</option>
+                <option value="L1">I usually read a book at home.</option>
+                <option value="L2">Yes, I speak French and Italian.</option>
+                <option value="L3">She has a salad or a sandwich.</option>
+            </select>
+        </div>
+
+        <div class="match-row">
+            <span>"What does Sandra have for dinner?"</span>
+            <select class="logic-match" data-ans="L3">
+                <option value="">Choose Answer...</option>
+                <option value="L1">I usually read a book at home.</option>
+                <option value="L2">Yes, I speak French and Italian.</option>
+                <option value="L3">She has a salad or a sandwich.</option>
+            </select>
+        </div>
+
+        <div class="match-row">
+            <span>"Do you speak foreign languages?"</span>
+            <select class="logic-match" data-ans="L2">
+                <option value="">Choose Answer...</option>
+                <option value="L1">I usually read a book at home.</option>
+                <option value="L2">Yes, I speak French and Italian.</option>
+                <option value="L3">She has a salad or a sandwich.</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-check" onclick="solveCase()">SOLVE CASE</button>
+</div>
+
+<script>
+    const clues = document.querySelectorAll('.clue');
+    const boxes = document.querySelectorAll('.drop-box');
+
+    clues.forEach(clue => {
+        clue.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.innerText));
+    });
+
+    boxes.forEach(box => {
+        box.addEventListener('dragover', e => e.preventDefault());
+        box.addEventListener('drop', e => {
+            e.preventDefault();
+            box.innerText = e.dataTransfer.getData('text');
+        });
+    });
+
+    function solveCase() {
+        // Check Grammar
+        boxes.forEach(box => {
+            if(box.innerText.trim().toLowerCase() === box.dataset.ans) {
+                box.classList.add('solved');
+            } else {
+                box.classList.add('failed');
+            }
+        });
+
+        // Check Logic
+        document.querySelectorAll('.logic-match').forEach(select => {
+            if(select.value === select.dataset.ans) {
+                select.parentElement.style.borderColor = "#16a34a";
+            } else {
+                select.parentElement.style.borderColor = "#dc2626";
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
