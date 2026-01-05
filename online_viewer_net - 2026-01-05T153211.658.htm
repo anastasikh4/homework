@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Quest: A1 English</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mc-bamboo: #2ecc71;
+            --mc-dark: #2c3e50;
+            --mc-white: #ffffff;
+            --mc-heart: #ff7675;
+            --mc-exp: #55ff55;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 420px;
+            height: 92vh;
+            background: #2d3436;
+            border: 4px solid #000;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(46, 204, 113, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--mc-bamboo);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 4px solid #000;
+        }
+
+        h1 { margin: 0; font-size: 1.2rem; text-shadow: 2px 2px #000; color: white; }
+
+        .story-scroll {
+            background: #fdfdfd;
+            color: #2d3436;
+            margin: 15px;
+            padding: 20px;
+            border-radius: 15px;
+            height: 220px;
+            overflow-y: auto;
+            border: 3px solid #000;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .story-scroll h3 { margin-top: 0; color: var(--mc-bamboo); text-transform: uppercase; }
+
+        .quiz-body { flex-grow: 1; padding: 10px 25px; display: flex; flex-direction: column; }
+
+        .stats { display: flex; justify-content: space-between; padding: 5px 20px; font-weight: 800; font-size: 0.8rem; }
+
+        .question-box { font-size: 1.1rem; font-weight: 700; margin: 15px 0; color: #fab1a0; text-align: center; min-height: 50px; }
+
+        .options-grid { display: flex; flex-direction: column; gap: 10px; }
+
+        .option-btn {
+            background: #4a4a4a;
+            border: 3px solid #636e72;
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .correct { background: #2ecc71 !important; border-color: #27ae60 !important; }
+        .wrong { background: #ff7675 !important; border-color: #d63031 !important; }
+
+        .progress-bar { height: 8px; background: #111; width: 100%; }
+        .progress-fill { height: 100%; background: var(--mc-exp); width: 0%; transition: width 0.4s; }
+
+        #result-ui { display: none; text-align: center; padding: 40px 20px; }
+        .btn-restart { background: var(--mc-bamboo); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <header><h1>BAMBOO FOREST QUEST</h1></header>
+    
+    <div class="story-scroll">
+        <h3>🐼 Panda Research</h3>
+        Are pandas dangerous to people? No, they aren't. Most pandas are peaceful, but they are very strong. We must be careful!<br><br>
+        Why? Pandas don't often live near people, but they live in the mountains of China. <br><br>
+        So, what do pandas usually eat? They eat bamboo! They eat it all day long. They sometimes eat small animals or birds too. <br><br>
+        Pandas are good at climbing trees. They can see well and they have a very good sense of smell to find the best bamboo. <br><br>
+        Do they sleep in winter? No, they don't! They don't sleep all winter like bears. They stay awake and look for food in the snow.
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+    
+    <div class="stats">
+        <span>QUEST <span id="lvl">1</span>/5</span>
+        <span style="color:var(--mc-heart)" id="health">❤️❤️❤️</span>
+    </div>
+
+    <div id="quiz-ui" class="quiz-body">
+        <div class="question-box" id="questionText">Loading...</div>
+        <div class="options-grid" id="optionsBox"></div>
+    </div>
+
+    <div id="result-ui" class="quiz-body">
+        <h2 id="finalMsg">FOREST SAVED!</h2>
+        <p id="scoreMsg"></p>
+        <button class="btn-restart" onclick="location.reload()">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "1. Are pandas dangerous?", a: "No, they aren't.", alt: ["Yes, they are.", "Only on Fridays."] },
+        { q: "2. What do they usually eat?", a: "Bamboo", alt: ["Fish", "Pizza"] },
+        { q: "3. Pandas are good at ______.", a: "climbing trees", alt: ["singing songs", "flying"] },
+        { q: "4. Do they sleep all winter?", a: "No, they don't.", alt: ["Yes, they do.", "They only sleep at night."] },
+        { q: "5. They have a good sense of ______.", a: "smell", alt: ["humor", "time"] }
+    ];
+
+    let currentIdx = 0;
+    let health = 3;
+
+    function loadQuestion() {
+        if (currentIdx >= quizData.length) { showResults(); return; }
+        const data = quizData[currentIdx];
+        document.getElementById('questionText').innerText = data.q;
+        document.getElementById('lvl').innerText = (currentIdx + 1);
+        const options = [...data.alt, data.a].sort(() => Math.random() - 0.5);
+        const optionsBox = document.getElementById('optionsBox');
+        optionsBox.innerHTML = '';
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt === data.a);
+            optionsBox.appendChild(btn);
+        });
+        updateProgress();
+    }
+
+    function checkAnswer(btn, isCorrect) {
+        document.querySelectorAll('.option-btn').forEach(b => b.style.pointerEvents = 'none');
+        if (isCorrect) {
+            btn.classList.add('correct');
+            setTimeout(() => { currentIdx++; loadQuestion(); }, 1000);
+        } else {
+            btn.classList.add('wrong');
+            health--;
+            document.getElementById('health').innerText = '❤️'.repeat(health);
+            document.querySelectorAll('.option-btn').forEach(b => { if(b.innerText === quizData[currentIdx].a) b.classList.add('correct'); });
+            setTimeout(() => { if (health <= 0) gameOver(); else { currentIdx++; loadQuestion(); } }, 1500);
+        }
+    }
+
+    function updateProgress() { document.getElementById('progressBar').style.width = (currentIdx / quizData.length) * 100 + '%'; }
+    function showResults() { document.getElementById('quiz-ui').style.display = 'none'; document.getElementById('result-ui').style.display = 'block'; }
+    function gameOver() { document.getElementById('quiz-ui').style.display = 'none'; document.getElementById('result-ui').style.display = 'block'; document.getElementById('finalMsg').innerText = "❌ QUEST FAILED"; }
+    loadQuestion();
+</script>
+</body>
+</html>
