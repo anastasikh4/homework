@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 Practice: Prepositions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --error: #dc2626;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .audio-section {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        audio { width: 100%; }
+
+        h2 { font-size: 1.2rem; color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+
+        .sentence { margin-bottom: 15px; font-size: 1.1rem; line-height: 1.8; }
+
+        select {
+            padding: 5px;
+            font-size: 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            color: var(--primary);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .tf-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+
+        .choice-btn {
+            padding: 8px 15px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .correct-choice { background-color: var(--success) !important; color: white; border-color: var(--success); }
+        .wrong-choice { background-color: var(--error) !important; color: white; border-color: var(--error); }
+
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            cursor: pointer;
+        }
+
+        .correct-select { border-color: var(--success); background-color: #f0fdf4; }
+        .wrong-select { border-color: var(--error); background-color: #fef2f2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>A1 Listening Exercise</h1>
+
+    <div class="audio-section">
+        <p><strong>1. Listen to Paul</strong></p>
+        <audio controls>
+            <source src="audio3.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="exercise">
+        <h2>2. Choose the correct word</h2>
+        
+        <div class="sentence">
+            1. <select class="q-select" data-ans="in">
+                <option value="">---</option>
+                <option value="in">In</option>
+                <option value="at">At</option>
+            </select> the morning, I drink coffee.
+        </div>
+
+        <div class="sentence">
+            2. I go <select class="q-select" data-ans="to">
+                <option value="">---</option>
+                <option value="to">to</option>
+                <option value="at">at</option>
+            </select> work by bus.
+        </div>
+
+        <div class="sentence">
+            3. I arrive <select class="q-select" data-ans="at">
+                <option value="">---</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> the office at 9:00 AM.
+        </div>
+
+        <div class="sentence">
+            4. <select class="q-select" data-ans="on">
+                <option value="">---</option>
+                <option value="on">On</option>
+                <option value="in">In</option>
+            </select> Saturdays, I go to the park.
+        </div>
+    </div>
+
+    <div class="exercise" style="margin-top: 30px;">
+        <h2>3. True or False?</h2>
+        
+        <div class="tf-row">
+            <span>1. Paul goes to work by bus.</span>
+            <div class="btn-group">
+                <button class="choice-btn" onclick="checkTF(this, true)">True</button>
+                <button class="choice-btn" onclick="checkTF(this, false)">False</button>
+            </div>
+        </div>
+
+        <div class="tf-row">
+            <span>2. He works on Saturdays.</span>
+            <div class="btn-group">
+                <button class="choice-btn" onclick="checkTF(this, false)">True</button>
+                <button class="choice-btn" onclick="checkTF(this, true)">False</button>
+            </div>
+        </div>
+
+        <div class="tf-row">
+            <span>3. He likes the beach in the summer.</span>
+            <div class="btn-group">
+                <button class="choice-btn" onclick="checkTF(this, true)">True</button>
+                <button class="choice-btn" onclick="checkTF(this, false)">False</button>
+            </div>
+        </div>
+
+        <div class="tf-row">
+            <span>4. He is sad at the weekend.</span>
+            <div class="btn-group">
+                <button class="choice-btn" onclick="checkTF(this, false)">True</button>
+                <button class="choice-btn" onclick="checkTF(this, true)">False</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="checkAll()">Check My Answers</button>
+</div>
+
+<script>
+    function checkAll() {
+        // Check Selects
+        document.querySelectorAll('.q-select').forEach(select => {
+            if (select.value === select.dataset.ans) {
+                select.className = 'q-select correct-select';
+            } else {
+                select.className = 'q-select wrong-select';
+            }
+        });
+    }
+
+    function checkTF(btn, isCorrect) {
+        // Reset colors in the same group
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.choice-btn').forEach(b => b.className = 'choice-btn');
+        
+        // Apply result color
+        if (isCorrect) {
+            btn.classList.add('correct-choice');
+        } else {
+            btn.classList.add('wrong-choice');
+        }
+    }
+</script>
+
+</body>
+</html>
