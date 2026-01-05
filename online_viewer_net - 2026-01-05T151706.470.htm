@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Translation Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mc-green: #5da93c;
+            --mc-dirt: #795548;
+            --mc-blue: #3f76e4;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 400px;
+            height: 90vh;
+            background: var(--card-bg);
+            border: 4px solid #3d3d3d;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        header {
+            background: var(--mc-green);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #3d3d3d;
+            border-radius: 25px 25px 0 0;
+        }
+
+        h1 { color: white; margin: 0; font-size: 1.2rem; text-shadow: 2px 2px #38761d; letter-spacing: 1px; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: #eee;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .hearts { color: #ff5555; }
+
+        .progress-container {
+            height: 8px;
+            background: #ddd;
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--mc-blue);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-body {
+            flex-grow: 1;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .phrase-box {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #3d3d3d;
+        }
+
+        .options-grid {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover { border-color: var(--mc-blue); background: #f8faff; }
+
+        /* Feedback States */
+        .correct-anim { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; }
+        .wrong-anim { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
+
+        .result-screen {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .btn-restart {
+            background: var(--mc-green);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 800;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <header><h1>QUEST: TRANSLATION</h1></header>
+    
+    <div class="progress-container"><div class="progress-fill" id="progressBar"></div></div>
+    
+    <div class="stats">
+        <span>LVL: <span id="lvl">1</span></span>
+        <span class="hearts" id="health">❤️❤️❤️</span>
+    </div>
+
+    <div id="quiz-ui" class="quiz-body">
+        <div class="phrase-box" id="questionText">Loading quest...</div>
+        <div class="options-grid" id="optionsBox"></div>
+    </div>
+
+    <div id="result-ui" class="result-screen">
+        <h2 id="finalMsg">LEVEL COMPLETE!</h2>
+        <p>You earned 500 XP</p>
+        <button class="btn-restart" onclick="location.reload()">REPLAY QUEST</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "I don't want", a: "Я не хочу", alt: ["Я не знаю", "Я хочу"] },
+        { q: "On Friday", a: "В пятницу", alt: ["В субботу", "В воскресенье"] },
+        { q: "Maths", a: "Математика", alt: ["Музыка", "Медицина"] },
+        { q: "I bought a new lip oil", a: "Я купила новое масло для губ", alt: ["Я купила новую помаду", "Мне подарили масло"] },
+        { q: "She gave me a present", a: "Она подарила мне подарок", alt: ["Я дала ей подарок", "Она пришла ко мне"] },
+        { q: "A lot of", a: "Много", alt: ["Мало", "Несколько"] },
+        { q: "Rarely", a: "Редко", alt: ["Часто", "Иногда"] },
+        { q: "Long and short", a: "Длинный и короткий", alt: ["Большой и маленький", "Высокий и низкий"] },
+        { q: "I don't really like", a: "Мне не очень нравится", alt: ["Мне очень нравится", "Я ненавижу"] },
+        { q: "Clouds", a: "Облака", alt: ["Небо", "Дождь"] },
+        { q: "Nail", a: "Ноготь", alt: ["Палец", "Рука"] }
+    ];
+
+    let currentIdx = 0;
+    let health = 3;
+
+    function loadQuestion() {
+        if (currentIdx >= quizData.length) {
+            showResults();
+            return;
+        }
+
+        const data = quizData[currentIdx];
+        document.getElementById('questionText').innerText = data.q;
+        document.getElementById('lvl').innerText = (currentIdx + 1);
+        
+        const options = [...data.alt, data.a].sort(() => Math.random() - 0.5);
+        const optionsBox = document.getElementById('optionsBox');
+        optionsBox.innerHTML = '';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt === data.a);
+            optionsBox.appendChild(btn);
+        });
+
+        updateProgress();
+    }
+
+    function checkAnswer(btn, isCorrect) {
+        // Disable all buttons to prevent double clicking
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        if (isCorrect) {
+            btn.classList.add('correct-anim');
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 800);
+        } else {
+            btn.classList.add('wrong-anim');
+            health--;
+            updateHealth();
+            
+            // Show the correct answer
+            allBtns.forEach(b => {
+                if(b.innerText === quizData[currentIdx].a) b.classList.add('correct-anim');
+            });
+
+            setTimeout(() => {
+                if (health <= 0) {
+                    gameOver();
+                } else {
+                    currentIdx++;
+                    loadQuestion();
+                }
+            }, 1200);
+        }
+    }
+
+    function updateHealth() {
+        document.getElementById('health').innerText = '❤️'.repeat(health);
+    }
+
+    function updateProgress() {
+        const perc = (currentIdx / quizData.length) * 100;
+        document.getElementById('progressBar').style.width = perc + '%';
+    }
+
+    function showResults() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('result-ui').style.display = 'block';
+        document.getElementById('finalMsg').innerText = "🏆 QUEST CLEAR!";
+    }
+
+    function gameOver() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('result-ui').style.display = 'block';
+        document.getElementById('finalMsg').innerText = "❌ GAME OVER";
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
