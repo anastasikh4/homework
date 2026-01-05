@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional English: Prepositions Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --error: #dc2626;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1 { font-size: 24px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+
+        .rule-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .exercise-list { list-style: none; padding: 0; }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .question-num {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #64748b;
+        }
+
+        select {
+            appearance: none;
+            background-color: #fff;
+            border: 1px solid #cbd5e1;
+            padding: 4px 24px 4px 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .correct { background-color: #f0fdf4; border: 1px solid var(--success); }
+        .incorrect { background-color: #fef2f2; border: 1px solid var(--error); }
+
+        .btn-check {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+
+        .btn-check:hover { background-color: #1d4ed8; }
+
+        #score-display {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Prepositions: In, On, At, To</h1>
+    
+    <div class="rule-box">
+        <strong>Quick Rule:</strong> Use <em>In</em> for months/seasons/parts of day; <em>On</em> for days/dates; <em>At</em> for times/specific places; <em>To</em> for movement.
+    </div>
+
+    <div class="exercise-list" id="quiz">
+        <div class="question" data-answer="in">
+            <span class="question-num">1</span> I take a shower 
+            <select>
+                <option value="">---</option>
+                <option value="in">in</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> the morning.
+        </div>
+
+        <div class="question" data-answer="in">
+            <span class="question-num">2</span> We usually go on vacation 
+            <select>
+                <option value="">---</option>
+                <option value="in">in</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> July.
+        </div>
+
+        <div class="question" data-answer="at">
+            <span class="question-num">3</span> My cousin studies engineering 
+            <select>
+                <option value="">---</option>
+                <option value="at">at</option>
+                <option value="in">in</option>
+                <option value="to">to</option>
+            </select> university.
+        </div>
+
+        <div class="question" data-answer="at">
+            <span class="question-num">4</span> The flight arrives 
+            <select>
+                <option value="">---</option>
+                <option value="in">in</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> midnight.
+        </div>
+
+        <div class="question" data-answer="in">
+            <span class="question-num">5</span> Do they stay 
+            <select>
+                <option value="">---</option>
+                <option value="at">at</option>
+                <option value="in">in</option>
+                <option value="to">to</option>
+            </select> a hotel or an apartment?
+        </div>
+
+        <div class="question" data-answer="on">
+            <span class="question-num">6</span> She has meetings 
+            <select>
+                <option value="">---</option>
+                <option value="in">in</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> Mondays and Wednesdays.
+        </div>
+
+        <div class="question" data-answer="at">
+            <span class="question-num">7</span> My colleagues have coffee 
+            <select>
+                <option value="">---</option>
+                <option value="at">at</option>
+                <option value="in">in</option>
+                <option value="to">to</option>
+            </select> work.
+        </div>
+
+        <div class="question" data-answer="at">
+            <span class="question-num">8</span> I don't like working 
+            <select>
+                <option value="">---</option>
+                <option value="in">in</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> the weekend.
+        </div>
+
+        <div class="question" data-answer="to">
+            <span class="question-num">9</span> Mark goes 
+            <select>
+                <option value="">---</option>
+                <option value="at">at</option>
+                <option value="in">in</option>
+                <option value="to">to</option>
+            </select> the office by train.
+        </div>
+
+        <div class="question" data-answer="in">
+            <span class="question-num">10</span> The park is beautiful 
+            <select>
+                <option value="">---</option>
+                <option value="in">in</option>
+                <option value="on">on</option>
+                <option value="at">at</option>
+            </select> the winter.
+        </div>
+    </div>
+
+    <button class="btn-check" onclick="checkAnswers()">Check My Answers</button>
+    <div id="score-display"></div>
+</div>
+
+<script>
+    function checkAnswers() {
+        const questions = document.querySelectorAll('.question');
+        let score = 0;
+
+        questions.forEach(q => {
+            const select = q.querySelector('select');
+            const correctAnswer = q.getAttribute('data-answer');
+            
+            if (select.value === correctAnswer) {
+                q.className = 'question correct';
+                score++;
+            } else {
+                q.className = 'question incorrect';
+            }
+        });
+
+        const scoreDisplay = document.getElementById('score-display');
+        scoreDisplay.style.display = 'block';
+        scoreDisplay.innerHTML = `You scored ${score} out of ${questions.length}`;
+        scoreDisplay.style.color = score === 10 ? '#16a34a' : '#1e293b';
+    }
+</script>
+
+</body>
+</html>
