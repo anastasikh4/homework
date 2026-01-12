@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grinchy Sound Teams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Boogaloo&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grinch-green: #7cfc00;
+            --grinch-dark: #2d5a27;
+            --heart-red: #d62828;
+            --whoville-yellow: #fdf0d5;
+        }
+
+        body { 
+            background-color: var(--grinch-dark); 
+            font-family: 'Boogaloo', cursive; 
+            display: flex; flex-direction: column; align-items: center; padding: 20px; color: white;
+            min-height: 100vh; margin: 0;
+        }
+
+        .game-box { 
+            background: var(--whoville-yellow); 
+            width: 100%; max-width: 480px; padding: 25px; 
+            border-radius: 40px; box-shadow: 12px 12px 0px var(--grinch-green); 
+            text-align: center; border: 6px solid #000; color: #000;
+            position: relative; min-height: 550px; margin-top: 20px;
+        }
+
+        .step-header { color: var(--grinch-dark); font-size: 24px; margin-bottom: 10px; border-bottom: 2px dashed #000; }
+
+        .card-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .grinch-card { height: 110px; perspective: 1000px; cursor: pointer; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s; transform-style: preserve-3d;
+            border: 3px solid #000; border-radius: 12px;
+        }
+        .card-flipped { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            display: flex; align-items: center; justify-content: center; border-radius: 9px;
+        }
+        .card-front { background: var(--grinch-green); font-size: 40px; }
+        .card-back { background: white; transform: rotateY(180deg); font-size: 20px; flex-direction: column; padding: 5px; }
+
+        .btn-choice {
+            background: white; border: 4px solid #000; padding: 12px; width: 100%;
+            border-radius: 15px; margin-bottom: 10px; font-size: 30px; cursor: pointer;
+            font-family: 'Boogaloo'; transition: 0.2s;
+        }
+        .btn-choice:hover { background: var(--grinch-green); }
+        .wrong { opacity: 0.3; pointer-events: none; }
+
+        /* Glowing Speaker Button */
+        .speaker-btn { 
+            font-size: 80px; background: none; border: none; cursor: pointer; margin: 5px; 
+            filter: drop-shadow(2px 2px 0px white);
+            animation: glow 1.5s infinite alternate;
+        }
+        @keyframes glow {
+            from { transform: scale(1); filter: drop-shadow(0 0 5px #fff); }
+            to { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--heart-red)); }
+        }
+
+        #success-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(124, 252, 0, 0.95); border-radius: inherit;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-box" id="game-box">
+    <div id="success-overlay">
+        <h2 style="font-size: 50px; color: var(--heart-red);">❤️ YES!</h2>
+    </div>
+    <div id="content">
+        <h1 style="color:var(--heart-red); font-size: 40px;">Grinch Phonics</h1>
+        <p style="font-size: 24px;">Listen to the Girl Voice!</p>
+        <button class="btn-choice" style="background:var(--heart-red); color:white;" onclick="loadStep(1)">START! 🚀</button>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    let qIdx = 0;
+    let persistentChoices = []; 
+    let isPeeking = false;
+    const content = document.getElementById('content');
+    const overlay = document.getElementById('success-overlay');
+
+    const words = [
+        { word: "CHIPS", team: "CH", emoji: "🍟" },
+        { word: "SHIP", team: "SH", emoji: "🚢" },
+        { word: "PHONE", team: "PH", emoji: "📞" },
+        { word: "CHEESE", team: "CH", emoji: "🧀" },
+        { word: "FISH", team: "SH", emoji: "🐟" },
+        { word: "PHOTO", team: "PH", emoji: "🖼️" },
+        { word: "CHAIR", team: "CH", emoji: "🪑" },
+        { word: "SHELL", team: "SH", emoji: "🐚" },
+        { word: "ELEPHANT", team: "PH", emoji: "🐘" }
+    ];
+
+    function speak(t, isSlow = false) {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(t);
+        const voices = window.speechSynthesis.getVoices();
+        
+        // Specifically looking for Microsoft Zira (the girl) or Aria
+        const girlVoice = voices.find(v => v.name.includes('Zira') || v.name.includes('Aria') || v.name.includes('Female') || v.name.includes('Google US English'));
+        
+        if (girlVoice) ut.voice = girlVoice;
+        ut.rate = isSlow ? 0.6 : 0.8; 
+        ut.pitch = 1.2; // Slightly higher pitch for a "girl" tone
+        window.speechSynthesis.speak(ut);
+    }
+
+    function loadStep(step) {
+        currentStep = step;
+        qIdx = 0;
+        if (step === 2) {
+            persistentChoices = [...words].sort(() => 0.5 - Math.random()).slice(0, 6);
+            isPeeking = true;
+        }
+        renderQuestion();
+        
+        if (step === 2) {
+            setTimeout(() => {
+                isPeeking = false;
+                const inners = document.querySelectorAll('.card-inner');
+                inners.forEach(el => el.classList.remove('card-flipped'));
+            }, 3000);
+        }
+    }
+
+    function renderQuestion() {
+        overlay.style.display = "none";
+        content.innerHTML = "";
+
+        if (currentStep === 1) {
+            const q = words[qIdx % words.length];
+            content.innerHTML = `<div class="step-header">Mission 1: Find the Team</div>
+                <div style="font-size:70px; margin-top:5px;">${q.emoji}</div>
+                <button class="speaker-btn" onclick="speak('${q.word}', true)">🔊</button>
+                <div id="options"></div>`;
+            ["CH", "SH", "PH"].forEach(opt => {
+                const b = document.createElement('button');
+                b.className = "btn-choice";
+                b.innerText = opt;
+                b.onclick = () => { if(opt === q.team) showSuccess(); else b.classList.add('wrong'); };
+                document.getElementById('options').appendChild(b);
+            });
+        } 
+        else if (currentStep === 2) {
+            const correctWord = persistentChoices[qIdx];
+            content.innerHTML = `<div class="step-header">Mission 2: Memory Test</div>
+                <p style="margin:2px">${isPeeking ? 'MEMORIZE!' : 'WHERE WAS IT?'}</p>
+                <button class="speaker-btn" onclick="speak('${correctWord.word}')">🔊</button>
+                <div class="card-container" id="card-grid"></div>`;
+            
+            persistentChoices.forEach(choice => {
+                const card = document.createElement('div');
+                card.className = "grinch-card";
+                card.innerHTML = `
+                    <div class="card-inner ${isPeeking ? 'card-flipped' : ''}">
+                        <div class="card-front">🤢</div>
+                        <div class="card-back">
+                            <span style="font-size:35px">${choice.emoji}</span>
+                            <small style="font-size:14px; font-weight:bold">${choice.word}</small>
+                        </div>
+                    </div>`;
+                card.onclick = () => {
+                    if(isPeeking) return;
+                    const inner = card.querySelector('.card-inner');
+                    if(inner.classList.contains('card-flipped')) return;
+
+                    inner.classList.add('card-flipped');
+                    if(choice.word === correctWord.word) {
+                        speak(choice.word);
+                        setTimeout(showSuccess, 1000);
+                    } else {
+                        setTimeout(() => inner.classList.remove('card-flipped'), 1000);
+                    }
+                };
+                document.getElementById('card-grid').appendChild(card);
+            });
+        }
+        else if (currentStep === 3) {
+            const q = words[qIdx % words.length];
+            content.innerHTML = `<div class="step-header">Mission 3: Reading Time</div>
+                <div style="font-size:80px">${q.emoji}</div>
+                <button class="speaker-btn" onclick="speak('${q.word}')">🔊</button>
+                <div id="options"></div>`;
+            
+            let choices = [q.word, ...words.filter(w => w.word !== q.word).map(w => w.word)].sort(() => 0.5 - Math.random()).slice(0,3);
+            if (!choices.includes(q.word)) choices[0] = q.word;
+
+            choices.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = "btn-choice";
+                b.innerText = opt;
+                b.onclick = () => { if(opt === q.word) showSuccess(); else b.classList.add('wrong'); };
+                document.getElementById('options').appendChild(b);
+            });
+        }
+    }
+
+    function showSuccess() {
+        overlay.style.display = "flex";
+        setTimeout(() => {
+            qIdx++;
+            let max = (currentStep === 2) ? persistentChoices.length : words.length;
+            if (qIdx >= max) {
+                if (currentStep < 3) loadStep(currentStep + 1);
+                else finishGame();
+            } else {
+                renderQuestion();
+            }
+        }, 1200);
+    }
+
+    function finishGame() {
+        overlay.style.display = "none";
+        content.innerHTML = `<h1 style="color:var(--grinch-green)">GREAT JOB!</h1>
+            <div style="font-size:100px">🏆 🎄 🎅</div>
+            <p>You found all the sounds!</p>
+            <button class="btn-choice" onclick="location.reload()">PLAY AGAIN</button>`;
+    }
+
+    window.speechSynthesis.onvoiceschanged = () => {};
+</script>
+</body>
+</html>
