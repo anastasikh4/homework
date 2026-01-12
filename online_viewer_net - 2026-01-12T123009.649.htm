@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Phrase Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-bg: #0f172a;
+            --neon-blue: #38bdf8;
+            --neon-purple: #a855f7;
+            --neon-gold: #fbbf24;
+            --laser-red: #f43f5e;
+        }
+
+        body { 
+            background-color: var(--space-bg); 
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            font-family: 'Fredoka One', cursive; 
+            display: flex; flex-direction: column; align-items: center; padding: 15px; color: white;
+            min-height: 100vh; margin: 0;
+        }
+
+        .game-box { 
+            background: #1e293b; 
+            width: 100%; max-width: 420px; padding: 20px; 
+            border-radius: 20px; border: 4px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            text-align: center; position: relative; min-height: 600px; margin-top: 10px;
+        }
+
+        .step-header { 
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue); font-size: 16px; margin-bottom: 10px; text-transform: uppercase;
+        }
+
+        .emoji-pair { 
+            display: flex; justify-content: center; align-items: center; gap: 15px; 
+            font-size: 70px; margin-bottom: 10px; filter: drop-shadow(0 0 10px white);
+        }
+
+        .card-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .space-card { height: 100px; cursor: pointer; perspective: 1000px; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; transition: transform 0.5s;
+            transform-style: preserve-3d; border: 2px solid var(--neon-purple); border-radius: 12px;
+        }
+        .card-flipped { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            display: flex; align-items: center; justify-content: center; border-radius: 10px;
+        }
+        .card-front { background: #334155; font-size: 35px; color: var(--neon-blue); }
+        .card-back { background: white; transform: rotateY(180deg); flex-direction: column; color: #1e293b; border: 2px solid white; padding: 2px; }
+        .card-back span { font-size: 13px; font-weight: bold; text-align: center; line-height: 1.1; }
+
+        .scramble-slots { display: flex; justify-content: center; gap: 10px; margin: 20px 0; min-height: 60px; }
+        .slot { border-bottom: 4px solid var(--neon-purple); width: 110px; height: 50px; font-size: 26px; color: var(--neon-gold); display: flex; align-items: center; justify-content: center; }
+        .word-bank { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+        .btn-choice {
+            background: #334155; border: 3px solid var(--neon-blue); padding: 15px 20px;
+            border-radius: 50px; font-size: 24px; cursor: pointer; color: white; font-family: 'Fredoka One';
+        }
+        .btn-full { width: 100%; margin-bottom: 12px; }
+
+        #success-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95); border-radius: inherit;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 10;
+        }
+
+        .stars-container { margin-top: 20px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+
+<div class="game-box" id="game-box">
+    <div id="success-overlay"><h2 style="font-size: 50px; color: var(--neon-gold);">SUPER! 🚀</h2></div>
+    <div id="content">
+        <h1 style="font-family: 'Orbitron'; color: var(--neon-gold); font-size: 32px;">SPACE PHRASE</h1>
+        <div style="font-size: 100px; margin: 20px;">🛸</div>
+        <button class="btn-choice btn-full" onclick="loadStep(1)">START MISSION ▶️</button>
+    </div>
+</div>
+<div class="stars-container" id="stars"></div>
+
+<script>
+    let currentStep = 1;
+    let qIdx = 0;
+    let memoryCards = [];
+    let flippedCards = [];
+    let matchedCount = 0;
+    let currentScrambleInput = [];
+
+    const phraseData = [
+        { id: 1, phrase: "My ball", person: "👦", toy: "⚽", words: ["My", "ball"] },
+        { id: 2, phrase: "Your car", person: "🫵", toy: "🏎️", words: ["Your", "car"] },
+        { id: 3, phrase: "His robot", person: "👦", toy: "🤖", words: ["His", "robot"] },
+        { id: 4, phrase: "Her doll", person: "👧", toy: "🪆", words: ["Her", "doll"] },
+        { id: 5, phrase: "Our plane", person: "👨‍👩‍👦", toy: "✈️", words: ["Our", "plane"] },
+        { id: 6, phrase: "Their train", person: "👬", toy: "🚂", words: ["Their", "train"] }
+    ];
+
+    // UPDATED VOICE LOGIC
+    function speak(t) {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(t);
+        const voices = window.speechSynthesis.getVoices();
+        
+        // Specifically prioritize Microsoft voices
+        const targetVoice = voices.find(v => v.name.includes('Microsoft David')) || 
+                            voices.find(v => v.name.includes('Microsoft Zira')) ||
+                            voices.find(v => v.name.includes('Google UK English Male')) ||
+                            voices.find(v => v.lang.startsWith('en'));
+
+        if (targetVoice) ut.voice = targetVoice;
+        ut.rate = 0.8; 
+        window.speechSynthesis.speak(ut);
+    }
+
+    function loadStep(step) {
+        currentStep = step;
+        qIdx = 0;
+        if (step === 2) initMemoryGame();
+        else renderQuestion();
+    }
+
+    function initMemoryGame() {
+        matchedCount = 0;
+        flippedCards = [];
+        let cards = [];
+        phraseData.forEach(p => {
+            cards.push({ id: p.id, type: 'emoji', content: p.person + p.toy, phrase: p.phrase });
+            cards.push({ id: p.id, type: 'text', content: p.phrase, phrase: p.phrase });
+        });
+        memoryCards = cards.sort(() => 0.5 - Math.random());
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const content = document.getElementById('content');
+        document.getElementById('success-overlay').style.display = "none";
+        
+        if (currentStep === 1) {
+            const q = phraseData[qIdx];
+            content.innerHTML = `<div class="step-header">Level 1: Listen & Read</div>
+                <div class="emoji-pair">${q.person} + ${q.toy}</div>
+                <button onclick="speak('${q.phrase}')" style="background:none; border:none; font-size:80px; cursor:pointer;">🔊</button>
+                <div id="options"></div>`;
+            let choices = [q.phrase, phraseData[(qIdx+1)%6].phrase, phraseData[(qIdx+2)%6].phrase].sort(() => 0.5 - Math.random());
+            choices.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = "btn-choice btn-full";
+                b.innerText = opt;
+                b.onclick = () => { if(opt === q.phrase) showSuccess(); else b.style.borderColor = "var(--laser-red)"; };
+                document.getElementById('options').appendChild(b);
+            });
+        } 
+        else if (currentStep === 2) {
+            content.innerHTML = `<div class="step-header">Level 2: Match the Pairs</div>
+                <div class="card-container" id="card-grid"></div>`;
+            memoryCards.forEach((cardData, index) => {
+                const card = document.createElement('div');
+                card.className = "space-card";
+                card.innerHTML = `<div class="card-inner" id="card-${index}">
+                    <div class="card-front">🛰️</div>
+                    <div class="card-back">${cardData.type === 'emoji' ? '<div style="font-size:24px">'+cardData.content+'</div>' : '<span>'+cardData.content+'</span>'}</div>
+                </div>`;
+                card.onclick = () => handleFlip(index);
+                document.getElementById('card-grid').appendChild(card);
+            });
+        }
+        else if (currentStep === 3) {
+            const q = phraseData[qIdx];
+            currentScrambleInput = [];
+            content.innerHTML = `<div class="step-header">Level 3: Fix the Phrase</div>
+                <div class="emoji-pair">${q.person} + ${q.toy}</div>
+                <button onclick="speak('${q.phrase}')" style="background:none; border:none; font-size:50px; cursor:pointer;">🔊</button>
+                <div class="scramble-slots"><div class="slot" id="slot-0"></div><div class="slot" id="slot-1"></div></div>
+                <div class="word-bank" id="word-bank"></div>`;
+            [...q.words].sort(() => 0.5 - Math.random()).forEach(word => {
+                const b = document.createElement('button');
+                b.className = "btn-choice";
+                b.innerText = word;
+                b.onclick = () => {
+                    if(currentScrambleInput.length < 2) {
+                        document.getElementById(`slot-${currentScrambleInput.length}`).innerText = word;
+                        currentScrambleInput.push(word);
+                        b.style.opacity = "0.3";
+                        if(currentScrambleInput.length === 2) {
+                            if(currentScrambleInput.join(' ') === q.phrase) showSuccess();
+                            else { speak("Try again!"); setTimeout(renderQuestion, 800); }
+                        }
+                    }
+                };
+                document.getElementById('word-bank').appendChild(b);
+            });
+        }
+    }
+
+    function handleFlip(index) {
+        if (flippedCards.length === 2 || flippedCards.includes(index)) return;
+        const cardEl = document.getElementById(`card-${index}`);
+        if(cardEl.classList.contains('card-flipped')) return;
+        
+        cardEl.classList.add('card-flipped');
+        flippedCards.push(index);
+        speak(memoryCards[index].phrase);
+
+        if (flippedCards.length === 2) {
+            const [first, second] = flippedCards;
+            if (memoryCards[first].id === memoryCards[second].id && memoryCards[first].type !== memoryCards[second].type) {
+                matchedCount++;
+                flippedCards = [];
+                if (matchedCount === 6) setTimeout(showSuccess, 1000);
+            } else {
+                setTimeout(() => {
+                    document.getElementById(`card-${first}`).classList.remove('card-flipped');
+                    document.getElementById(`card-${second}`).classList.remove('card-flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+    }
+
+    function showSuccess() {
+        document.getElementById('stars').innerHTML += '⭐';
+        document.getElementById('success-overlay').style.display = "flex";
+        setTimeout(() => {
+            if (currentStep === 2) { loadStep(3); } 
+            else {
+                qIdx++;
+                if (qIdx >= phraseData.length) {
+                    if (currentStep === 1) loadStep(2);
+                    else finishGame();
+                } else { renderQuestion(); }
+            }
+        }, 1000);
+    }
+
+    function finishGame() {
+        document.getElementById('success-overlay').style.display = "none";
+        document.getElementById('content').innerHTML = `<h1 style="color:var(--neon-gold); font-family:'Orbitron'">MISSION COMPLETE!</h1><div style="font-size:80px;">🏆</div><p>Phrase Master!</p><button class="btn-choice btn-full" onclick="location.reload()">PLAY AGAIN</button>`;
+    }
+
+    // Pre-load voices
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+</script>
+</body>
+</html>
