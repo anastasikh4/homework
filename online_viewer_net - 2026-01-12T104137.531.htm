@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grinchy Possessive Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Raleway:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grinch-green: #7cfc00;
+            --grinch-dark: #2d5a27;
+            --heart-red: #d62828;
+            --whoville-yellow: #fdf0d5;
+        }
+
+        body { 
+            background-color: var(--grinch-dark); 
+            background-image: repeating-linear-gradient(45deg, #1a3a17 0, #1a3a17 2px, transparent 0, transparent 50%);
+            background-size: 30px 30px;
+            font-family: 'Boogaloo', cursive; 
+            display: flex; flex-direction: column; align-items: center; padding: 20px; color: white; 
+            overflow-x: hidden;
+        }
+
+        .track { width: 100%; max-width: 500px; height: 15px; background: #000; border-radius: 10px; position: relative; margin-bottom: 30px; border: 3px solid var(--grinch-green); }
+        #grinch-icon { position: absolute; left: 0%; font-size: 40px; transition: 0.8s ease-in-out; top: -20px; filter: drop-shadow(0 0 5px var(--grinch-green)); }
+
+        .game-box { 
+            background: var(--whoville-yellow); 
+            width: 100%; max-width: 450px; padding: 25px; 
+            border-radius: 60px 15px 60px 15px; 
+            box-shadow: 15px 15px 0px var(--grinch-green); 
+            text-align: center; border: 8px solid #000; color: #000;
+            position: relative; min-height: 420px;
+        }
+
+        .step-indicator { font-family: 'Raleway', sans-serif; font-weight: 900; color: var(--grinch-dark); letter-spacing: 1px; margin-bottom: 5px; }
+
+        .scramble-pool { display: flex; gap: 12px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .word-pill { 
+            background: var(--grinch-green); color: #000; padding: 12px 20px; 
+            border-radius: 10px; cursor: pointer; font-size: 26px; font-weight: bold; 
+            border: 3px solid #000; box-shadow: 0 4px 0 #000;
+        }
+
+        .answer-zone { 
+            display: flex; gap: 10px; justify-content: center; margin: 20px 0; 
+            border-bottom: 5px dashed var(--heart-red); min-height: 75px; align-items: center;
+        }
+        .answer-word { 
+            background: white; padding: 10px 15px; border-radius: 5px; 
+            font-size: 26px; border: 3px solid #000; animation: wobble 0.3s;
+        }
+
+        @keyframes wobble {
+            0% { transform: scale(0.5) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .visual-cue { font-size: 80px; margin: 10px 0; display: flex; justify-content: center; gap: 15px; }
+        
+        #success-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(124, 252, 0, 0.95); border-radius: inherit;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 10;
+        }
+        .heart { font-size: 100px; color: var(--heart-red); animation: beat 0.6s infinite alternate; }
+        @keyframes beat { from { transform: scale(1); } to { transform: scale(1.3); } }
+
+        .mc-option { 
+            background: white; border: 4px solid #000; padding: 12px; 
+            border-radius: 10px; margin-bottom: 8px; cursor: pointer; 
+            font-size: 22px; font-family: 'Boogaloo'; width: 100%; 
+        }
+
+        .start-btn { 
+            background: var(--heart-red); color: white; border: 4px solid #000; 
+            padding: 20px 50px; border-radius: 50px; font-size: 30px; cursor: pointer; 
+            font-family: 'Boogaloo';
+        }
+    </style>
+</head>
+<body>
+
+<div class="track"><div id="grinch-icon">🤢</div></div>
+
+<div class="game-box" id="game-box">
+    <div id="success-overlay">
+        <div class="heart">❤️</div>
+        <h2 style="font-size: 40px;">GREAT JOB!</h2>
+    </div>
+
+    <div id="content">
+        <h1 style="color:var(--heart-red); font-size: 45px; margin-bottom: 0;">Grinchy Words</h1>
+        <p style="font-size: 22px;">Who owns it? Click the 🔊!</p>
+        <div class="visual-cue">👦 ⚽</div>
+        <button class="start-btn" onclick="startGame()">START! 🚀</button>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    let qIdx = 0;
+    const content = document.getElementById('content');
+    const overlay = document.getElementById('success-overlay');
+    const grinch = document.getElementById('grinch-icon');
+
+    // Mission 1: Listen & Build (8 items)
+    const ex1Data = [
+        { eng: ["My", "dog"], emojis: ["🙋‍♂️", "🐶"] },
+        { eng: ["Your", "cat"], emojis: ["🧒", "🐱"] },
+        { eng: ["His", "ball"], emojis: ["👦", "⚽"] },
+        { eng: ["Her", "doll"], emojis: ["👧", "🪆"] },
+        { eng: ["Our", "tree"], emojis: ["👨‍👩‍👧", "🎄"] },
+        { eng: ["My", "apple"], emojis: ["🙋‍♀️", "🍎"] },
+        { eng: ["His", "hat"], emojis: ["👦", "🎩"] },
+        { eng: ["Her", "gift"], emojis: ["👧", "🎁"] }
+    ];
+
+    // Mission 2: Scramble (6 items)
+    const ex2Data = [
+        { eng: ["My", "toy"], cue: "🙋‍♂️ 🧸" },
+        { eng: ["His", "car"], cue: "👦 🚗" },
+        { eng: ["Her", "cake"], cue: "👧 🍰" },
+        { eng: ["Our", "pizza"], cue: "👨‍👩‍👦 🍕" },
+        { eng: ["His", "bike"], cue: "👦 🚲" },
+        { eng: ["Her", "book"], cue: "👧 📖" }
+    ];
+
+    // Mission 3: Choose (10 items)
+    const ex3Data = [
+        { cue: "🙋‍♀️ ⚽", text: "Look!", ans: "My ball", options: ["My ball", "His ball", "Our ball"] },
+        { cue: "👦 ⚽", text: "Look!", ans: "His ball", options: ["Her ball", "His ball", "Your ball"] },
+        { cue: "👧 🚲", text: "Look!", ans: "Her bike", options: ["Her bike", "Our bike", "My bike"] },
+        { cue: "👨‍👩‍👧 🏠", text: "Look!", ans: "Our house", options: ["His house", "My house", "Our house"] },
+        { cue: "👦 👟", text: "Look!", ans: "His shoes", options: ["His shoes", "Her shoes", "My shoes"] },
+        { cue: "🙋‍♂️ 🍎", text: "Look!", ans: "My apple", options: ["Our apple", "My apple", "His apple"] },
+        { cue: "👧 🧣", text: "Look!", ans: "Her scarf", options: ["Her scarf", "His scarf", "Your scarf"] },
+        { cue: "🧒 🍦", text: "Look!", ans: "Your ice cream", options: ["My ice cream", "Your ice cream", "His ice cream"] },
+        { cue: "👩‍👦 🎁", text: "Look!", ans: "Our gift", options: ["Our gift", "His gift", "Her gift"] },
+        { cue: "👦 🐶", text: "Look!", ans: "His dog", options: ["His dog", "My dog", "Her dog"] }
+    ];
+
+    function startGame() { loadQuestion(); }
+
+    function speak(t) {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(t);
+        const voices = window.speechSynthesis.getVoices();
+        const maleVoice = voices.find(v => v.name.includes('David') || v.name.includes('Microsoft David') || v.name.includes('Male'));
+        if (maleVoice) ut.voice = maleVoice;
+        ut.rate = 0.75; 
+        ut.pitch = 0.9;
+        window.speechSynthesis.speak(ut);
+    }
+
+    function updateTrack() {
+        let total = ex1Data.length + ex2Data.length + ex3Data.length;
+        let current = (currentStep === 1 ? qIdx : currentStep === 2 ? ex1Data.length + qIdx : ex1Data.length + ex2Data.length + qIdx);
+        grinch.style.left = (current / total * 90) + "%";
+    }
+
+    function loadQuestion() {
+        content.innerHTML = "";
+        overlay.style.display = "none";
+        updateTrack();
+
+        if (currentStep === 1) {
+            let s = ex1Data[qIdx].eng.join(' ');
+            content.innerHTML = `
+                <div class="step-indicator">Mission 1: Listen! (${qIdx+1}/${ex1Data.length})</div>
+                <div class="visual-cue">
+                    <span>${ex1Data[qIdx].emojis[0]}</span>
+                    <span>${ex1Data[qIdx].emojis[1]}</span>
+                </div>
+                <button onclick="speak('${s}')" style="font-size:70px; border:none; background:none; cursor:pointer;">🔊</button>
+                <div class="answer-zone" id="answer-zone"></div>
+                <div class="scramble-pool" id="pool"></div>
+            `;
+            renderWords(ex1Data[qIdx].eng);
+            setTimeout(() => speak(s), 500);
+        } else if (currentStep === 2) {
+            const q = ex2Data[qIdx];
+            content.innerHTML = `
+                <div class="step-indicator">Mission 2: Build! (${qIdx+1}/${ex2Data.length})</div>
+                <div class="visual-cue">${q.cue}</div>
+                <div class="answer-zone" id="answer-zone"></div>
+                <div class="scramble-pool" id="pool"></div>
+            `;
+            renderWords(q.eng);
+        } else if (currentStep === 3) {
+            const q = ex3Data[qIdx];
+            content.innerHTML = `
+                <div class="step-indicator">Mission 3: Pick! (${qIdx+1}/${ex3Data.length})</div>
+                <div class="visual-cue">${q.cue}</div>
+                <div id="options-box"></div>
+            `;
+            q.options.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'mc-option';
+                b.innerText = opt;
+                b.onclick = () => { if(opt === q.ans) { speak(opt); showSuccess(); } else { b.style.opacity = "0.3"; b.style.pointerEvents = "none"; } };
+                document.getElementById('options-box').appendChild(b);
+            });
+        }
+    }
+
+    function renderWords(words) {
+        const pool = document.getElementById('pool');
+        const scrambled = [...words].sort(() => Math.random() - 0.5);
+        scrambled.forEach(w => {
+            const b = document.createElement('div');
+            b.className = 'word-pill';
+            b.innerText = w;
+            b.onclick = () => {
+                const zone = document.getElementById('answer-zone');
+                const az = document.createElement('div');
+                az.className = 'answer-word';
+                az.innerText = w;
+                az.onclick = () => { az.remove(); b.style.display = "block"; };
+                zone.appendChild(az);
+                b.style.display = "none";
+                
+                if(zone.children.length === words.length) {
+                    const user = Array.from(zone.children).map(c => c.innerText).join(' ');
+                    if(user === words.join(' ')) {
+                        speak(user);
+                        showSuccess();
+                    } else {
+                        setTimeout(() => {
+                            zone.innerHTML = "";
+                            pool.querySelectorAll('.word-pill').forEach(p => p.style.display = "block");
+                        }, 500);
+                    }
+                }
+            };
+            pool.appendChild(b);
+        });
+    }
+
+    function showSuccess() {
+        overlay.style.display = "flex";
+        setTimeout(nextQuest, 1500);
+    }
+
+    function nextQuest() {
+        qIdx++;
+        let max = (currentStep === 1) ? ex1Data.length : (currentStep === 2) ? ex2Data.length : ex3Data.length;
+        if (qIdx >= max) { currentStep++; qIdx = 0; }
+
+        if (currentStep > 3) {
+            grinch.innerText = "🎅";
+            grinch.style.left = "90%";
+            content.innerHTML = `
+                <h1 style="color:var(--grinch-green)">MAX IS HAPPY!</h1>
+                <div class="visual-cue">🐶 ⚽ 🏠 🎄</div>
+                <p style="font-size:24px">You are a Word Master!</p>
+                <button class="start-btn" onclick="location.reload()">PLAY AGAIN</button>
+            `;
+            overlay.style.display = "none";
+        } else {
+            loadQuestion();
+        }
+    }
+    window.speechSynthesis.onvoiceschanged = () => {};
+</script>
+</body>
+</html>
