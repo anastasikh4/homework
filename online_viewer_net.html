@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana's Week & Quiz (A1 Level)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+        }
+        .quiz-section h3 {
+            color: #333;
+            margin-top: 25px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .feedback {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .correct {
+            color: #28a745; /* Green for correct */
+        }
+        .incorrect {
+            color: #dc3545; /* Red for incorrect */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        audio {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Ana's Week (Listen and Learn)</h1>
+
+        <!-- Audio Player -->
+        <audio controls>
+            <source src="a3.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+
+        <!-- The monologue text is intentionally omitted here as requested. -->
+        <p><i>Listen to the audio and complete the exercises below.</i></p>
+
+        <hr>
+
+        <div class="quiz-section">
+            <h2>Exercise 1: Multiple Choice (Listening Comprehension)</h2>
+            <form id="quizForm1">
+                <h3>1. What does Ana always do in the morning?</h3>
+                <ul>
+                    <li><input type="radio" name="q1" value="a"> (a) Drink coffee</li>
+                    <li><input type="radio" name="q1" value="b"> (b) Drink a glass of water</li>
+                    <li><input type="radio" name="q1" value="c"> (c) Drink tea</li>
+                </ul>
+                <span id="f1" class="feedback"></span>
+
+                <h3>2. How often does Ana drink coffee?</h3>
+                <ul>
+                    <li><input type="radio" name="q2" value="a"> (a) Once a day</li>
+                    <li><input type="radio" name="q2" value="b"> (b) Sometimes</li>
+                    <li><input type="radio" name="q2" value="c"> (c) Never</li>
+                </ul>
+                <span id="f2" class="feedback"></span>
+
+                <h3>3. How often does Ana eat fruit?</h3>
+                <ul>
+                    <li><input type="radio" name="q3" value="a"> (a) Once a day</li>
+                    <li><input type="radio" name="q3" value="b"> (b) Twice a week</li>
+                    <li><input type="radio" name="q3" value="c"> (c) Every day</li>
+                </ul>
+                <span id="f3" class="feedback"></span>
+
+                <h3>4. What days does Ana exercise?</h3>
+                <ul>
+                    <li><input type="radio" name="q4" value="a"> (a) Mondays and Thursdays</li>
+                    <li><input type="radio" name="q4" value="b"> (b) Mondays and Tuesdays</li>
+                    <li><input type="radio" name="q4" value="c"> (c) Every day</li>
+                </ul>
+                <span id="f4" class="feedback"></span>
+
+                <h3>5. Does Ana watch a lot of TV in the evening?</h3>
+                <ul>
+                    <li><input type="radio" name="q5" value="a"> (a) Yes, always</li>
+                    <li><input type="radio" name="q5" value="b"> (b) No, hardly ever</li>
+                    <li><input type="radio" name="q5" value="c"> (c) Yes, sometimes</li>
+                </ul>
+                <span id="f5" class="feedback"></span>
+
+                <button type="button" onclick="checkAnswers1()">Check Answers for Exercise 1</button>
+            </form>
+        </div>
+
+        <hr>
+
+        <div class="quiz-section">
+            <h2>Exercise 2: Translate Adverbs (Multiple Choice)</h2>
+            <form id="quizForm2">
+                <h3>1. Translate "всегда"</h3>
+                <ul>
+                    <li><input type="radio" name="t1" value="a"> (a) never</li>
+                    <li><input type="radio" name="t1" value="b"> (b) sometimes</li>
+                    <li><input type="radio" name="t1" value="c"> (c) always</li>
+                </ul>
+                <span id="tf1" class="feedback"></span>
+                
+                <h3>2. Translate "никогда"</h3>
+                <ul>
+                    <li><input type="radio" name="t2" value="a"> (a) always</li>
+                    <li><input type="radio" name="t2" value="b"> (b) never</li>
+                    <li><input type="radio" name="t2" value="c"> (c) once a day</li>
+                </ul>
+                <span id="tf2" class="feedback"></span>
+
+                <h3>3. Translate "иногда"</h3>
+                <ul>
+                    <li><input type="radio" name="t3" value="a"> (a) hardly ever</li>
+                    <li><input type="radio" name="t3" value="b"> (b) sometimes</li>
+                    <li><input type="radio" name="t3" value="c"> (c) always</li>
+                </ul>
+                <span id="tf3" class="feedback"></span>
+
+                <h3>4. Translate "почти никогда"</h3>
+                <ul>
+                    <li><input type="radio" name="t4" value="a"> (a) twice a week</li>
+                    <li><input type="radio" name="t4" value="b"> (b) never</li>
+                    <li><input type="radio" name="t4" value="c"> (c) hardly ever</li>
+                </ul>
+                <span id="tf4" class="feedback"></span>
+                
+                <h3>5. Translate "раз в день"</h3>
+                <ul>
+                    <li><input type="radio" name="t5" value="a"> (a) once a day</li>
+                    <li><input type="radio" name="t5" value="b"> (b) once a week</li>
+                    <li><input type="radio" name="t5" value="c"> (c) always</li>
+                </ul>
+                <span id="tf5" class="feedback"></span>
+
+                <h3>6. Translate "дважды в неделю"</h3>
+                <ul>
+                    <li><input type="radio" name="t6" value="a"> (a) once a day</li>
+                    <li><input type="radio" name="t6" value="b"> (b) twice a week</li>
+                    <li><input type="radio" name="t6" value="c"> (c) sometimes</li>
+                </ul>
+                <span id="tf6" class="feedback"></span>
+                
+                <button type="button" onclick="checkAnswers2()">Check Answers for Exercise 2</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function checkAnswers1() {
+            const correctAnswers = {
+                q1: 'b', q2: 'c', q3: 'a', q4: 'a', q5: 'b'
+            };
+            const form = document.getElementById('quizForm1');
+            Object.keys(correctAnswers).forEach((q, index) => {
+                const selectedOption = form.elements[q].value;
+                const feedbackElement = document.getElementById(`f${index + 1}`); 
+                feedbackElement.textContent = '';
+                if (selectedOption === correctAnswers[q]) {
+                    feedbackElement.textContent = 'Correct!';
+                    feedbackElement.className = 'feedback correct';
+                } else {
+                    feedbackElement.textContent = 'Incorrect.';
+                    feedbackElement.className = 'feedback incorrect';
+                }
+            });
+        }
+
+        function checkAnswers2() {
+            // Correct answers for the new multiple choice format for Exercise 2
+            const correctAnswers = {
+                t1: 'c', // всегда: always
+                t2: 'b', // никогда: never
+                t3: 'b', // иногда: sometimes
+                t4: 'c', // почти никогда: hardly ever
+                t5: 'a', // раз в день: once a day
+                t6: 'b'  // дважды в неделю: twice a week
+            };
+            const form = document.getElementById('quizForm2');
+            Object.keys(correctAnswers).forEach((t, index) => {
+                const selectedOption = form.elements[t].value;
+                const feedbackElement = document.getElementById(`tf${index + 1}`);
+                feedbackElement.textContent = '';
+
+                if (selectedOption === correctAnswers[t]) {
+                    feedbackElement.textContent = 'Correct!';
+                    feedbackElement.className = 'feedback correct';
+                } else {
+                    feedbackElement.textContent = 'Incorrect.';
+                    feedbackElement.className = 'feedback incorrect';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
