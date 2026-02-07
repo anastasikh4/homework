@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-A2 Monologue Exercises (Auto-Check)</title>
+    <style>
+        /* General Body and Container Styling */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 700px; 
+            margin: 20px auto; 
+            line-height: 1.6; 
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container { 
+            padding: 30px; 
+            background-color: #ffffff;
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+
+        /* Typography */
+        h1 { color: #0056b3; }
+        h2, h3 { color: #007bff; border-bottom: 2px solid #e9ecef; padding-bottom: 5px; }
+
+        /* Audio Widget Styling */
+        .audio-player-controls { 
+            margin-bottom: 25px; 
+            background-color: #eef7ff;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .audio-btn { 
+            padding: 10px 15px; 
+            margin-right: 10px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 20px;
+            transition: background-color 0.3s;
+            line-height: 1;
+        }
+        .audio-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Exercise Styling and Feedback */
+        .exercise { margin-bottom: 30px; }
+        .question { margin-bottom: 15px; }
+        .answer-box { 
+            border: 2px solid #ccc; 
+            padding: 8px; 
+            border-radius: 4px; 
+            width: 150px;
+        }
+        .feedback {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .correct { color: #28a745; } /* Green */
+        .incorrect { color: #dc3545; } /* Red */
+
+        /* Check Answers Button */
+        #checkAnswersBtn {
+            padding: 12px 25px;
+            background-color: #28a745; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        #checkAnswersBtn:hover {
+            background-color: #218838;
+        }
+
+        hr { border-top: 1px solid #007bff; margin: 30px 0; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pre-A2 English Practice</h1>
+        
+        <h2>Tom's Monologue: The Moving Problem</h2>
+
+        <!-- Audio Player Widget -->
+        <div class="audio-player-controls">
+            <audio id="monologueAudio" src="audio12.mp3" preload="auto"></audio>
+            <button class="audio-btn" onclick="playAudio()" title="Play">▶️</button>
+            <button class="audio-btn" onclick="pauseAudio()" title="Pause">⏸️</button>
+            <button class="audio-btn" onclick="restartAudio()" title="Start Again">🔄</button>
+        </div>
+
+        <!-- JavaScript for Audio Controls -->
+        <script>
+            const audio = document.getElementById('monologueAudio');
+
+            function playAudio() {
+                audio.play();
+            }
+
+            function pauseAudio() {
+                audio.pause();
+            }
+
+            function restartAudio() {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        </script>
+        
+        <hr>
+
+        <!-- Exercise 1: Completion -->
+        <div class="exercise">
+            <h3>Exercise 1: Complete the sentences</h3>
+            <p>Listen to the monologue and fill in the blanks with **can** or **can't**.</p>
+            <form id="exercise1Form">
+                <div class="question">
+                    1. Tom ____ help in the morning. <input type="text" id="e1q1" class="answer-box"> <span id="e1q1-feedback" class="feedback"></span>
+                </div>
+                <div class="question">
+                    2. Tom ____ help in the afternoon. <input type="text" id="e1q2" class="answer-box"> <span id="e1q2-feedback" class="feedback"></span>
+                </div>
+                <div class="question">
+                    3. Mike ____ help this weekend. <input type="text" id="e1q3" class="answer-box"> <span id="e1q3-feedback" class="feedback"></span>
+                </div>
+                <div class="question">
+                    4. Sarah ____ lift heavy boxes. <input type="text" id="e1q4" class="answer-box"> <span id="e1q4-feedback" class="feedback"></span>
+                </div>
+            </form>
+        </div>
+
+        <hr>
+
+        <!-- Exercise 2: True or False -->
+        <div class="exercise">
+            <h3>Exercise 2: True or False</h3>
+            <p>Listen to the monologue. Are these statements true (T) or false (F)?</p>
+            <form id="exercise2Form">
+                <div class="question">
+                    1. Tom is moving house this weekend. 
+                    <input type="radio" name="q1" value="T"> T
+                    <input type="radio" name="q1" value="F"> F
+                    <span id="e2q1-feedback" class="feedback"></span>
+                </div>
+                <div class="question">
+                    2. Tom has a doctor appointment in the afternoon. 
+                    <input type="radio" name="q2" value="T"> T
+                    <input type="radio" name="q2" value="F"> F
+                    <span id="e2q2-feedback" class="feedback"></span>
+                </div>
+                <div class="question">
+                    3. Mike is away for the weekend.
+                    <input type="radio" name="q3" value="T"> T
+                    <input type="radio" name="q3" value="F"> F
+                    <span id="e2q3-feedback" class="feedback"></span>
+                </div>
+                <div class="question">
+                    4. Sarah will come at 3 PM.
+                    <input type="radio" name="q4" value="T"> T
+                    <input type="radio" name="q4" value="F"> F
+                    <span id="e2q4-feedback" class="feedback"></span>
+                </div>
+            </form>
+        </div>
+
+        <!-- Check Answers Button -->
+        <button id="checkAnswersBtn" onclick="checkAnswers()">Check Answers</button>
+
+
+        <!-- JavaScript for Answer Checking -->
+        <script>
+            function checkAnswers() {
+                // Exercise 1: Fill in the blanks (Answers: can, can't, can't, can)
+                const ans1_1 = document.getElementById('e1q1').value.toLowerCase().trim();
+                const ans1_2 = document.getElementById('e1q2').value.toLowerCase().trim();
+                const ans1_3 = document.getElementById('e1q3').value.toLowerCase().trim();
+                const ans1_4 = document.getElementById('e1q4').value.toLowerCase().trim();
+
+                evaluateTextAnswer(ans1_1, 'can', 'e1q1-feedback');
+                evaluateTextAnswer(ans1_2, "can't", 'e1q2-feedback');
+                evaluateTextAnswer(ans1_3, "can't", 'e1q3-feedback');
+                evaluateTextAnswer(ans1_4, 'can', 'e1q4-feedback');
+
+                // Exercise 2: True or False (Answers: F, F, T, F)
+                const ans2_1 = document.querySelector('input[name="q1"]:checked')?.value;
+                const ans2_2 = document.querySelector('input[name="q2"]:checked')?.value;
+                const ans2_3 = document.querySelector('input[name="q3"]:checked')?.value;
+                const ans2_4 = document.querySelector('input[name="q4"]:checked')?.value;
+
+                evaluateRadioAnswer(ans2_1, 'F', 'e2q1-feedback');
+                evaluateRadioAnswer(ans2_2, 'F', 'e2q2-feedback');
+                evaluateRadioAnswer(ans2_3, 'T', 'e2q3-feedback');
+                evaluateRadioAnswer(ans2_4, 'F', 'e2q4-feedback');
+            }
+
+            function evaluateTextAnswer(userInput, correctAnswer, feedbackElementId) {
+                const feedbackEl = document.getElementById(feedbackElementId);
+                if (userInput === correctAnswer) {
+                    feedbackEl.textContent = '✅ Correct!';
+                    feedbackEl.className = 'feedback correct';
+                } else {
+                    feedbackEl.textContent = `❌ Wrong. Answer: ${correctAnswer}`;
+                    feedbackEl.className = 'feedback incorrect';
+                }
+            }
+
+            function evaluateRadioAnswer(userInput, correctAnswer, feedbackElementId) {
+                const feedbackEl = document.getElementById(feedbackElementId);
+                if (userInput === correctAnswer) {
+                    feedbackEl.textContent = '✅ Correct!';
+                    feedbackEl.className = 'feedback correct';
+                } else {
+                    feedbackEl.textContent = `❌ Wrong. Answer: ${correctAnswer}`;
+                    feedbackEl.className = 'feedback incorrect';
+                }
+            }
+        </script>
+
+    </div>
+</body>
+</html>
