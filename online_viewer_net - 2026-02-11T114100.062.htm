@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hobbies Listening Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .quiz-card {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-width: 600px; width: 100%;
+        }
+        h1 { color: #ff6b6b; text-align: center; margin-bottom: 30px; }
+        .audio-section { background: #f0f7ff; padding: 15px; border-radius: 15px; margin-bottom: 25px; text-align: center; }
+        audio { width: 100%; margin-top: 10px; }
+        .question-box { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .question-box p { font-weight: bold; color: #444; margin-bottom: 10px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .options label {
+            background: #fff; border: 2px solid #e0e0e0; padding: 10px;
+            border-radius: 10px; cursor: pointer; transition: 0.3s; font-size: 14px;
+        }
+        .options input { margin-right: 10px; }
+        .options label:hover { border-color: #4ecdc4; background: #f7fffe; }
+        button {
+            width: 100%; padding: 15px; border: none; border-radius: 12px;
+            background: #ff6b6b; color: white; font-size: 18px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; margin-top: 20px;
+        }
+        button:hover { background: #ee5253; transform: translateY(-2px); }
+        #result { margin-top: 20px; text-align: center; font-size: 20px; font-weight: bold; color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <h1>🎧 Hobbies Quiz</h1>
+    
+    <div class="audio-section">
+        <strong>Listen carefully to the audio:</strong>
+        <audio controls>
+            <!-- Replace YOUR_USERNAME and YOUR_REPO_NAME with your actual GitHub info -->
+            <source src="https://raw.githubusercontent.com" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <form id="quizForm">
+        <!-- Ann -->
+        <div class="question-box">
+            <p>1. What is Ann's hobby?</p>
+            <div class="options">
+                <label><input type="radio" name="q1" value="painting"> Painting</label>
+                <label><input type="radio" name="q1" value="singing"> Singing</label>
+            </div>
+        </div>
+
+        <!-- Tony -->
+        <div class="question-box">
+            <p>2. What is Tony's hobby?</p>
+            <div class="options">
+                <label><input type="radio" name="q2" value="football"> Football</label>
+                <label><input type="radio" name="q2" value="cooking"> Cooking</label>
+            </div>
+        </div>
+
+        <!-- Pat -->
+        <div class="question-box">
+            <p>3. What is Pat's hobby?</p>
+            <div class="options">
+                <label><input type="radio" name="q3" value="games"> Computer Games</label>
+                <label><input type="radio" name="q3" value="dancing"> Dancing</label>
+            </div>
+        </div>
+
+        <!-- Bill -->
+        <div class="question-box">
+            <p>4. What is Bill's hobby?</p>
+            <div class="options">
+                <label><input type="radio" name="q4" value="guitar"> Playing the guitar</label>
+                <label><input type="radio" name="q4" value="cooking"> Cooking</label>
+            </div>
+        </div>
+
+        <!-- Laura -->
+        <div class="question-box">
+            <p>5. What is Laura's hobby?</p>
+            <div class="options">
+                <label><input type="radio" name="q5" value="guitar"> Playing the guitar</label>
+                <label><input type="radio" name="q5" value="painting"> Painting</label>
+            </div>
+        </div>
+
+        <button type="button" onclick="checkScore()">Check My Score!</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    function checkScore() {
+        const answers = {
+            q1: "painting",
+            q2: "football",
+            q3: "games",
+            q4: "cooking",
+            q5: "guitar"
+        };
+        
+        let score = 0;
+        const form = document.getElementById('quizForm');
+        const formData = new FormData(form);
+        
+        for (let [key, value] of Object.entries(answers)) {
+            if (formData.get(key) === value) {
+                score++;
+            }
+        }
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `You got ${score} out of 5 correct! 🎉`;
+    }
+</script>
+
+</body>
+</html>
