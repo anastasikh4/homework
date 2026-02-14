@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Au12: Audio Practice & Quiz</title>
+    <style>
+        :root { --primary: #4a90e2; --success: #27ae60; --error: #e74c3c; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; display: flex; justify-content: center; }
+        .quiz-card { background: white; max-width: 650px; width: 100%; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+        
+        /* Audio Player Styling */
+        .audio-section {
+            background: #eef2f7;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px dashed var(--primary);
+        }
+        audio { width: 100%; margin-top: 10px; }
+        .audio-section p { margin: 0; font-weight: bold; color: var(--primary); }
+
+        .section-header { background: var(--primary); color: white; padding: 10px 15px; border-radius: 8px; margin: 25px 0 15px 0; font-size: 1rem; }
+        .q-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .q-text { font-weight: 600; display: block; margin-bottom: 12px; color: #34495e; }
+        .options { display: grid; gap: 10px; }
+        button { padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; background: white; cursor: pointer; text-align: left; transition: 0.2s; font-size: 0.95rem; }
+        button:hover { background: #f1f7ff; border-color: var(--primary); }
+        button.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        button.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+        #score-panel { position: sticky; top: 0; background: #2c3e50; color: white; text-align: center; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; z-index: 100; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div id="score-panel">Score: 0 / 10</div>
+    <h1>English Practice (Au12)</h1>
+
+    <!-- AUDIO PLAYER SECTION -->
+    <div class="audio-section">
+        <p>🎧 Step 1: Listen to the audio</p>
+        <audio controls>
+            <source src="au12.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <small style="display:block; margin-top:5px; color:#7f8c8d;">Listen carefully to answer the questions below.</small>
+    </div>
+
+    <!-- SECTION 1: COMPREHENSION -->
+    <div class="section-header">Part 1: Understanding the Dialogue (True/False)</div>
+    <div id="comprehension-quiz"></div>
+
+    <!-- SECTION 2: GRAMMAR -->
+    <div class="section-header">Part 2: Grammar - Present Continuous (A, B, C, D)</div>
+    <div id="grammar-quiz"></div>
+</div>
+
+<script>
+// Data remains the same
+const compQuestions = [
+    { q: "1. The speaker is looking for her glasses.", options: ["True", "False"], correct: 1 },
+    { q: "2. The brother-in-law is buying a new house today.", options: ["True", "False"], correct: 0 },
+    { q: "3. They are dancing right now because they love the music.", options: ["True", "False"], correct: 1 },
+    { q: "4. The speaker is currently on holiday and not working.", options: ["True", "False"], correct: 0 },
+    { q: "5. The niece and nephew are swimming in the sea.", options: ["True", "False"], correct: 0 }
+];
+
+const grammarQuestions = [
+    { q: "6. My brother-in-law _______ a new house.", options: ["A. buys", "B. is buying", "C. are buying", "D. buying"], correct: 1 },
+    { q: "7. We _______ because we don't like the music.", options: ["A. not dancing", "B. aren't dancing", "C. isn't dancing", "D. don't dancing"], correct: 1 },
+    { q: "8. ____ the waitress ____ with our dinner?", options: ["A. Is / coming", "B. Are / coming", "C. Is / comes", "D. Does / coming"], correct: 0 },
+    { q: "9. She can't read. She _______ her glasses.", options: ["A. not wearing", "B. isn't wearing", "C. doesn't wear", "D. aren't wearing"], correct: 1 },
+    { q: "10. My niece and nephew _______ in the sea.", options: ["A. swimming", "B. are swiming", "C. are swimming", "D. is swimming"], correct: 2 }
+];
+
+let score = 0;
+let totalAnswered = 0;
+
+function renderQuiz(data, containerId) {
+    const container = document.getElementById(containerId);
+    data.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'q-item';
+        div.innerHTML = `<span class="q-text">${item.q}</span><div class="options"></div>`;
+        const optContainer = div.querySelector('.options');
+
+        item.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if(div.dataset.done) return;
+                div.dataset.done = "true";
+                totalAnswered++;
+                if(idx === item.correct) {
+                    btn.classList.add('correct');
+                    score++;
+                } else {
+                    btn.classList.add('wrong');
+                    optContainer.children[item.correct].classList.add('correct');
+                }
+                document.getElementById('score-panel').innerText = `Score: ${score} / 10`;
+                if(totalAnswered === 10) {
+                    const finalMsg = score >= 8 ? "Excellent! 🎉" : "Good job! Try again to get 10/10!";
+                    alert(`Quiz Finished!\nScore: ${score} / 10\n${finalMsg}`);
+                }
+            };
+            optContainer.appendChild(btn);
+        });
+        container.appendChild(div);
+    });
+}
+
+renderQuiz(compQuestions, 'comprehension-quiz');
+renderQuiz(grammarQuestions, 'grammar-quiz');
+</script>
+
+</body>
+</html>
