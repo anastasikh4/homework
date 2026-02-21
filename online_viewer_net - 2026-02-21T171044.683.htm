@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2+ Mastery: The Presentation (Audit)</title>
+    <style>
+        :root { --duo-green: #58cc02; --duo-blue: #1cb0f6; --duo-dark: #3c3c3c; --bg: #f7f7f7; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; color: var(--duo-dark); }
+        .app-container { max-width: 700px; width: 100%; background: white; border: 2px solid #e5e5e5; border-radius: 20px; padding: 30px; box-shadow: 0 8px 0 #e5e5e5; }
+        
+        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 25px; }
+        .audio-player { background: #f1f8ff; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--duo-blue); text-align: center; }
+        
+        .question-card { margin-bottom: 25px; padding: 20px; border: 2px solid #f0f0f0; border-radius: 15px; transition: 0.2s; }
+        .question-text { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; display: block; color: #1a1a1a; }
+        
+        .options-grid { display: grid; gap: 10px; }
+        .opt-btn { padding: 12px; border: 2px solid #e5e5e5; border-bottom: 4px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; text-align: left; font-weight: 600; font-family: inherit; transition: 0.1s; }
+        .opt-btn:hover:not(:disabled) { background: #f7f7f7; border-color: #aaa; }
+        .opt-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; }
+        
+        .selected { border-color: var(--duo-blue) !important; background: #e8f4fd !important; }
+        .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #1e4601; }
+        .wrong { background: #ffdfe0 !important; border-color: #ee2a2a !important; color: #6a0000; }
+        
+        #submit-area { text-align: center; margin-top: 40px; border-top: 2px solid #eee; padding-top: 25px; }
+        .score-display { font-size: 1.8rem; font-weight: bold; color: var(--duo-blue); display: none; margin-bottom: 15px; }
+        .check-btn { background: var(--duo-green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; border-bottom: 4px solid #46a302; }
+        .check-btn:active { transform: translateY(4px); border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>📊 Listening Audit: song31</h1>
+        <p>Listen and answer all 9 questions below.</p>
+    </div>
+
+    <div class="audio-player">
+        <audio controls style="width: 100%;">
+            <source src="song31.mp3" type="audio/mpeg">
+            Your browser does not support audio.
+        </audio>
+    </div>
+
+    <div id="quiz-form"></div>
+
+    <div id="submit-area">
+        <div id="final-score" class="score-display"></div>
+        <button id="check-btn" class="check-btn" onclick="revealAnswers()">Check My Score</button>
+        <button id="retry-btn" class="check-btn" style="display:none; background: var(--duo-blue); border-color: #1899d6;" onclick="location.reload()">Try Again</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "1. Why was the speaker disappointed?", a: ["He lost his phone", "He had forgotten his laptop", "He was late for work"], c: 1 },
+        { q: "2. The speaker ____ the laptop BEFORE he arrived.", a: ["has forgotten", "had forgotten", "was forgetting"], c: 1 },
+        { q: "3. (True/False) Someone had stolen the computer.", a: ["True", "False (Only the mouse)"], c: 1 },
+        { q: "4. What spontaneous decision did he make?", a: ["I'll open the window", "I'll call Sarah", "I'll buy a coffee"], c: 0 },
+        { q: "5. How did he prepare the presentation today?", a: ["By himself", "On his own", "With a colleague"], c: 2 },
+        { q: "6. (True/False) They were able to fix the problems.", a: ["True", "False"], c: 0 },
+        { q: "7. Comparison: The new software is ____ the old one.", a: ["as easy than", "not as easy as", "the easiest as"], c: 1 },
+        { q: "8. Why is the speaker exhausted?", a: ["He's been working since 6:00", "He worked since 9:00", "He's lazy"], c: 0 },
+        { q: "9. What is his immediate plan now?", a: ["Go home", "Have a coffee", "Sleep"], c: 1 }
+    ];
+
+    const container = document.getElementById('quiz-form');
+    let userAnswers = new Array(questions.length).fill(null);
+
+    // Build the quiz
+    questions.forEach((data, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `<span class="question-text">${data.q}</span><div class="options-grid" id="q${qIdx}"></div>`;
+        container.appendChild(card);
+
+        const grid = document.getElementById(`q${qIdx}`);
+        data.a.forEach((opt, oIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                userAnswers[qIdx] = oIdx;
+            };
+            grid.appendChild(btn);
+        });
+    });
+
+    function revealAnswers() {
+        let score = 0;
+        questions.forEach((data, qIdx) => {
+            const grid = document.getElementById(`q${qIdx}`);
+            const btns = grid.querySelectorAll('.opt-btn');
+            
+            btns.forEach((btn, oIdx) => {
+                btn.disabled = true;
+                if (oIdx === data.c) btn.classList.add('correct');
+                if (userAnswers[qIdx] === oIdx && oIdx !== data.c) btn.classList.add('wrong');
+            });
+
+            if (userAnswers[qIdx] === data.c) score++;
+        });
+
+        const scoreEl = document.getElementById('final-score');
+        scoreEl.innerText = `Audit Score: ${score} / 9`;
+        scoreEl.style.display = 'block';
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('retry-btn').style.display = 'inline-block';
+    }
+</script>
+
+</body>
+</html>
