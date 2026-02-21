@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noisy House: All-in-One Quest</title>
+    <style>
+        :root { --duo-green: #58cc02; --duo-blue: #1cb0f6; --duo-dark: #3c3c3c; --bg: #f7f7f7; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; color: var(--duo-dark); }
+        .app-container { max-width: 700px; width: 100%; background: white; border: 2px solid #e5e5e5; border-radius: 20px; padding: 30px; box-shadow: 0 8px 0 #e5e5e5; }
+        
+        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 25px; }
+        .audio-player { background: #f1f8ff; padding: 15px; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--duo-blue); }
+        
+        .question-card { margin-bottom: 25px; padding: 20px; border: 2px solid #f0f0f0; border-radius: 15px; transition: 0.2s; }
+        .question-text { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; display: block; color: #1a1a1a; }
+        
+        .options-grid { display: grid; gap: 10px; }
+        .opt-btn { padding: 12px; border: 2px solid #e5e5e5; border-bottom: 4px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; text-align: left; font-weight: 600; font-family: inherit; transition: 0.1s; }
+        .opt-btn:hover:not(:disabled) { background: #f7f7f7; }
+        
+        .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #1e4601; }
+        .wrong { background: #ffdfe0 !important; border-color: #ee2a2a !important; color: #6a0000; }
+        
+        #submit-area { text-align: center; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .score-display { font-size: 1.5rem; font-weight: bold; color: var(--duo-blue); display: none; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>🏠 Noisy House Audit</h1>
+        <p>Listen and complete all 8 challenges on this page.</p>
+    </div>
+
+    <div class="audio-player">
+        <audio controls style="width: 100%;">
+            <source src="son21.mp3" type="audio/mpeg">
+            Your browser does not support audio.
+        </audio>
+    </div>
+
+    <div id="quiz-form"></div>
+
+    <div id="submit-area">
+        <div id="final-score" class="score-display"></div>
+        <button id="check-all-btn" class="opt-btn" style="width: 200px; text-align: center; border-color: var(--duo-green); color: var(--duo-green); border-bottom-color: #46a302;" onclick="revealAll()">Check My Answers</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "1. What are the neighbors upstairs doing?", a: ["They are jumping rope", "They are dancing", "They are arguing"], c: 0 },
+        { q: "2. The family next door ______ loudly.", a: ["is arguing", "are arguing", "arguing"], c: 1 },
+        { q: "3. Where is the speaker sitting?", a: ["In the kitchen", "In the bedroom", "At his desk"], c: 2 },
+        { q: "4. What is Sam doing right now?", a: ["He's sleeping", "He's watching football", "He's cleaning"], c: 1 },
+        { q: "5. Why is Sam shouting?", a: ["At the football players", "At the neighbors", "At the dog"], c: 0 },
+        { q: "6. (T/F) The speaker has a headache (головная боль).", a: ["True", "False"], c: 0 },
+        { q: "7. Why can't he use the bedroom?", a: ["His girlfriend is sleeping", "He is working there", "The dog is there"], c: 0 },
+        { q: "8. Is the dishwasher (посудомойка) running?", a: ["No, it isn't.", "Yes, it is.", "Yes, it's breaking."], c: 1 }
+    ];
+
+    const quizContainer = document.getElementById('quiz-form');
+    let userChoices = new Array(questions.length).fill(null);
+
+    questions.forEach((data, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `<span class="question-text">${data.q}</span><div class="options-grid" id="q${qIdx}"></div>`;
+        quizContainer.appendChild(card);
+
+        const optGrid = document.getElementById(`q${qIdx}`);
+        data.a.forEach((opt, oIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                const siblings = optGrid.querySelectorAll('.opt-btn');
+                siblings.forEach(s => s.style.background = "white");
+                btn.style.background = "#e8f4fd";
+                userChoices[qIdx] = oIdx;
+            };
+            optGrid.appendChild(btn);
+        });
+    });
+
+    function revealAll() {
+        let score = 0;
+        questions.forEach((data, qIdx) => {
+            const optGrid = document.getElementById(`q${qIdx}`);
+            const buttons = optGrid.querySelectorAll('.opt-btn');
+            
+            buttons.forEach((btn, oIdx) => {
+                btn.disabled = true;
+                if (oIdx === data.c) btn.classList.add('correct');
+                if (userChoices[qIdx] === oIdx && oIdx !== data.c) btn.classList.add('wrong');
+            });
+
+            if (userChoices[qIdx] === data.c) score++;
+        });
+
+        const scoreEl = document.getElementById('final-score');
+        scoreEl.innerText = `Final Score: ${score} / 8`;
+        scoreEl.style.display = 'block';
+        document.getElementById('check-all-btn').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
