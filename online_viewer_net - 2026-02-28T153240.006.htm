@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song 41: Listening Comprehension (10 Questions)</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; max-width: 750px; margin: 30px auto; padding: 20px; background-color: #f0f4f8; }
+        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .audio-box { background: #e8f4fd; border: 2px solid #3498db; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
+        .section-title { color: #2980b9; border-left: 5px solid #2980b9; padding-left: 10px; margin-top: 30px; }
+        .question-block { margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; transition: 0.3s; }
+        
+        /* Result Feedback Colors */
+        .correct-bg { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .incorrect-bg { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+        
+        button { display: block; width: 100%; background: #3498db; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 20px; }
+        button:hover { background: #2171a4; }
+        #final-score { text-align: center; margin-top: 20px; font-size: 24px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Turkey Weather: Listening Practice</h1>
+
+    <div class="audio-box">
+        <p>🎧 <b>Instruction:</b> Listen to audio file <b>song41</b> and answer the questions below.</p>
+        <!-- Replace 'song41.mp3' with your actual file path if needed -->
+        <audio controls>
+            <source src="song41.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <h3 class="section-title">Part 1: True or False</h3>
+    
+    <div class="question-block" id="q1-block">
+        <p>1. Elif is currently living in Turkey.</p>
+        <input type="radio" name="q1" value="correct"> True
+        <input type="radio" name="q1" value="wrong"> False
+    </div>
+
+    <div class="question-block" id="q2-block">
+        <p>2. It is winter in Turkey today.</p>
+        <input type="radio" name="q2" value="wrong"> True
+        <input type="radio" name="q2" value="correct"> False
+    </div>
+
+    <div class="question-block" id="q3-block">
+        <p>3. Elif says the flowers are opening in spring.</p>
+        <input type="radio" name="q3" value="correct"> True
+        <input type="radio" name="q3" value="wrong"> False
+    </div>
+
+    <div class="question-block" id="q4-block">
+        <p>4. Elif goes to the beach in the autumn.</p>
+        <input type="radio" name="q4" value="wrong"> True
+        <input type="radio" name="q4" value="correct"> False
+    </div>
+
+    <div class="question-block" id="q5-block">
+        <p>5. The sky is blue and clear today.</p>
+        <input type="radio" name="q5" value="correct"> True
+        <input type="radio" name="q5" value="wrong"> False
+    </div>
+
+    <h3 class="section-title">Part 2: Multiple Choice</h3>
+
+    <div class="question-block" id="q6-block">
+        <p>6. What is the weather like today?</p>
+        <select id="q6">
+            <option value="">--Select--</option>
+            <option value="wrong">Cold and snowy</option>
+            <option value="correct">Sunny and warm</option>
+            <option value="wrong">Windy and foggy</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="q7-block">
+        <p>7. When is the weather "very hot" for Elif?</p>
+        <select id="q7">
+            <option value="">--Select--</option>
+            <option value="wrong">Spring</option>
+            <option value="correct">Summer</option>
+            <option value="wrong">Winter</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="q8-block">
+        <p>8. What can you see near the lights at night in autumn?</p>
+        <select id="q8">
+            <option value="">--Select--</option>
+            <option value="wrong">Snow</option>
+            <option value="wrong">Flowers</option>
+            <option value="correct">Moths</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="q9-block">
+        <p>9. What is the weather like in the mountains in winter?</p>
+        <select id="q9">
+            <option value="">--Select--</option>
+            <option value="correct">It snows</option>
+            <option value="wrong">It is sunny</option>
+            <option value="wrong">It is hot</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="q10-block">
+        <p>10. What does Elif say about the morning weather in winter?</p>
+        <select id="q10">
+            <option value="">--Select--</option>
+            <option value="wrong">It is windy</option>
+            <option value="correct">It is foggy</option>
+            <option value="wrong">It is rainy</option>
+        </select>
+    </div>
+
+    <button onclick="checkAnswers()">Check My Answers</button>
+    <div id="final-score"></div>
+</div>
+
+<script>
+    function checkAnswers() {
+        let score = 0;
+
+        const checkRadio = (name, blockId) => {
+            const selected = document.querySelector(`input[name="${name}"]:checked`);
+            const block = document.getElementById(blockId);
+            if (selected && selected.value === "correct") {
+                block.className = "question-block correct-bg";
+                score++;
+            } else {
+                block.className = "question-block incorrect-bg";
+            }
+        };
+
+        const checkSelect = (id, blockId) => {
+            const val = document.getElementById(id).value;
+            const block = document.getElementById(blockId);
+            if (val === "correct") {
+                block.className = "question-block correct-bg";
+                score++;
+            } else {
+                block.className = "question-block incorrect-bg";
+            }
+        };
+
+        for(let i=1; i<=5; i++) checkRadio(`q${i}`, `q${i}-block`);
+        for(let i=6; i<=10; i++) checkSelect(`q${i}`, `q${i}-block`);
+
+        const display = document.getElementById('final-score');
+        display.style.display = "block";
+        display.innerHTML = "Final Score: " + score + " / 10";
+        display.style.color = score >= 8 ? "#28a745" : "#dc3545";
+    }
+</script>
+
+</body>
+</html>
