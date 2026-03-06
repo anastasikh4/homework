@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening Assessment: Song66</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --dark-blue: #003366;
+            --dark-green: #004d00;
+            --dark-brown: #3d2b1f;
+            --black: #000000;
+            --cream-bg: #fdfaf1;
+        }
+
+        /* Rule: No bold font used anywhere */
+        * {
+            font-weight: 400 !important;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--cream-bg);
+            color: var(--black);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .test-container {
+            width: 100%;
+            max-width: 700px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--dark-brown);
+            box-shadow: 10px 10px 0px var(--dark-brown);
+        }
+
+        h1 { color: var(--dark-blue); text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--dark-blue); padding-bottom: 10px; }
+        h2 { color: var(--dark-green); margin-top: 30px; font-size: 1.2rem; }
+
+        /* Audio Player Styling */
+        .audio-section {
+            background: #eef2f3;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 40px;
+            border: 1px solid var(--dark-blue);
+        }
+        
+        audio { width: 100%; margin-top: 10px; }
+
+        .question-block {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .q-text { margin-bottom: 12px; color: var(--black); line-height: 1.4; }
+
+        .options-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn-choice {
+            background: #ffffff;
+            border: 1px solid var(--dark-blue);
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--dark-blue);
+            font-family: 'Raleway';
+            transition: 0.2s;
+        }
+
+        .btn-choice.active { background: var(--dark-blue); color: var(--cream-bg); }
+
+        select {
+            padding: 5px;
+            border: 1px solid var(--dark-brown);
+            font-family: 'Raleway';
+            color: var(--dark-blue);
+            background: transparent;
+        }
+
+        #submit-button {
+            width: 100%;
+            padding: 20px;
+            margin-top: 30px;
+            background: var(--dark-green);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .correct { background-color: #d1e7dd !important; border-color: var(--dark-green) !important; color: var(--dark-green) !important; }
+        .wrong { background-color: #f8d7da !important; border-color: #842029 !important; color: #842029 !important; }
+
+        #score-output {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--dark-blue);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <h1>Listening Test: Song66</h1>
+
+    <!-- Audio Button Section -->
+    <div class="audio-section">
+        <p style="color: var(--dark-brown);">Listen to the monologue before answering:</p>
+        <!-- Replace the src below with your actual mp3 link -->
+        <audio controls>
+            <source src="song66.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <!-- 8 Questions Start Here -->
+    <div id="quiz-body">
+        
+        <!-- Part 1: True / False (2 Qs) -->
+        <h2>Part 1: True or False</h2>
+        <div class="question-block" data-ans="True">
+            <p class="q-text">1. Rob is in London today to meet Jenny.</p>
+            <div class="options-group">
+                <button class="btn-choice" onclick="pick(this)">True</button>
+                <button class="btn-choice" onclick="pick(this)">False</button>
+            </div>
+        </div>
+        <div class="question-block" data-ans="False">
+            <p class="q-text">2. Rob's meeting is at ten o'clock.</p>
+            <div class="options-group">
+                <button class="btn-choice" onclick="pick(this)">True</button>
+                <button class="btn-choice" onclick="pick(this)">False</button>
+            </div>
+        </div>
+
+        <!-- Part 2: ABCD Multiple Choice (3 Qs) -->
+        <h2>Part 2: Multiple Choice</h2>
+        <div class="question-block" data-ans="B">
+            <p class="q-text">3. What is the problem with Rob's shirt?</p>
+            <div class="options-group">
+                <button class="btn-choice" onclick="pick(this)">A. It is too small</button>
+                <button class="btn-choice" onclick="pick(this)">B. It has coffee on it</button>
+                <button class="btn-choice" onclick="pick(this)">C. It is very old</button>
+            </div>
+        </div>
+        <div class="question-block" data-ans="A">
+            <p class="q-text">4. What color is the new shirt he likes?</p>
+            <div class="options-group">
+                <button class="btn-choice" onclick="pick(this)">A. Blue</button>
+                <button class="btn-choice" onclick="pick(this)">B. Green</button>
+                <button class="btn-choice" onclick="pick(this)">C. White</button>
+            </div>
+        </div>
+        <div class="question-block" data-ans="B">
+            <p class="q-text">5. Where is Rob going to find Jenny?</p>
+            <div class="options-group">
+                <button class="btn-choice" onclick="pick(this)">A. To the station</button>
+                <button class="btn-choice" onclick="pick(this)">B. To the theatre</button>
+                <button class="btn-choice" onclick="pick(this)">C. To a restaurant</button>
+            </div>
+        </div>
+
+        <!-- Part 3: Gap Fill with Variants (3 Qs) -->
+        <h2>Part 3: Fill in the Gap</h2>
+        <div class="question-block">
+            <p class="q-text">6. Rob needs to buy a new shirt in a size 
+                <select class="gap-variant" data-correct="medium">
+                    <option value="">---</option>
+                    <option value="small">small</option>
+                    <option value="medium">medium</option>
+                    <option value="large">large</option>
+                </select>.
+            </p>
+        </div>
+        <div class="question-block">
+            <p class="q-text">7. The price of the shirt is forty-four 
+                <select class="gap-variant" data-correct="pounds">
+                    <option value="">---</option>
+                    <option value="pence">pence</option>
+                    <option value="pounds">pounds</option>
+                    <option value="euros">euros</option>
+                </select> ninety-nine.
+            </p>
+        </div>
+        <div class="question-block">
+            <p class="q-text">8. Rob says, "I'm really 
+                <select class="gap-variant" data-correct="sorry">
+                    <option value="">---</option>
+                    <option value="sorry">sorry</option>
+                    <option value="happy">happy</option>
+                    <option value="tired">tired</option>
+                </select> I'm late."
+            </p>
+        </div>
+    </div>
+
+    <button id="submit-button" onclick="evaluateQuiz()">CHECK MY ANSWERS</button>
+    <div id="score-output"></div>
+</div>
+
+<script>
+    function pick(btn) {
+        const row = btn.parentElement;
+        row.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function evaluateQuiz() {
+        let score = 0;
+        const total = 8;
+
+        // Check T/F and Multiple Choice
+        document.querySelectorAll('.question-block[data-ans]').forEach(block => {
+            const selected = block.querySelector('.btn-choice.active');
+            const correct = block.getAttribute('data-ans');
+            if (selected) {
+                const studentVal = selected.innerText.includes('.') ? selected.innerText.split('.')[0] : selected.innerText;
+                if (studentVal === correct) {
+                    block.classList.add('correct');
+                    block.classList.remove('wrong');
+                    score++;
+                } else {
+                    block.classList.add('wrong');
+                    block.classList.remove('correct');
+                }
+            } else {
+                block.classList.add('wrong');
+            }
+        });
+
+        // Check Gap Fills
+        document.querySelectorAll('.gap-variant').forEach(sel => {
+            const studentVal = sel.value;
+            const correctVal = sel.getAttribute('data-correct');
+            if (studentVal === correctVal) {
+                sel.style.backgroundColor = "#d1e7dd";
+                score++;
+            } else {
+                sel.style.backgroundColor = "#f8d7da";
+            }
+        });
+
+        const output = document.getElementById('score-output');
+        output.style.display = "block";
+        output.innerText = "Your Final Score: " + score + " / " + total;
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+</body>
+</html>
