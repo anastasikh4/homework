@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Listening Test</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #3c3c3c;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1100px;
+            width: 100%;
+            gap: 40px;
+            padding: 40px 20px;
+        }
+
+        .audio-section {
+            flex: 1;
+            background-color: #f7f7f7;
+            padding: 30px;
+            border-radius: 18px;
+            border: 2px solid #e5e5e5;
+            height: fit-content;
+            position: sticky;
+            top: 40px;
+            text-align: center;
+        }
+
+        .audio-player { width: 100%; margin-top: 20px; }
+
+        h2 { color: #58cc02; margin-top: 0; }
+
+        .quiz-section { flex: 1; display: flex; flex-direction: column; }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f1f1;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #4b4b4b;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 10px; }
+
+        .option {
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-bottom: 4px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: left;
+            font-size: 1rem;
+            color: #4b4b4b;
+            outline: none;
+        }
+
+        .option:hover { background-color: #f7f7f7; }
+
+        /* Selection and Feedback Styles */
+        .option.selected { background-color: #ddf4ff; border-color: #1899d6; color: #1899d6; }
+        
+        .option.correct { background-color: #d7ffb8 !important; border-color: #58cc02 !important; color: #257a00 !important; }
+        .option.wrong { background-color: #ffdfe0 !important; border-color: #ea2b2b !important; color: #ea2b2b !important; }
+
+        .finish-btn {
+            background-color: #58cc02;
+            color: white;
+            border: none;
+            border-bottom: 4px solid #46a302;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 20px;
+            align-self: flex-end;
+        }
+
+        .finish-btn:active { border-bottom-width: 0; transform: translateY(4px); }
+
+        @media (max-width: 850px) {
+            .container { flex-direction: column; }
+            .audio-section { position: relative; top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="audio-section">
+        <h2>Listening Task</h2>
+        <p>Воспользуйтесь плеером, чтобы прослушать запись.</p>
+        <audio controls class="audio-player">
+            <source src="mus21.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="quiz-section">
+        <!-- Question A -->
+        <div class="question-block" data-answer="2">
+            <div class="question-text">A. Lora went to school today.</div>
+            <div class="options">
+                <button class="option" data-value="1" onclick="select(this)">1) True</button>
+                <button class="option" data-value="2" onclick="select(this)">2) False</button>
+            </div>
+        </div>
+
+        <!-- Question B -->
+        <div class="question-block" data-answer="2">
+            <div class="question-text">B. At the English lesson the children read a text about an American farm.</div>
+            <div class="options">
+                <button class="option" data-value="1" onclick="select(this)">1) True</button>
+                <button class="option" data-value="2" onclick="select(this)">2) False</button>
+            </div>
+        </div>
+
+        <!-- Question C -->
+        <div class="question-block" data-answer="1">
+            <div class="question-text">C. Susie asks Lora to help her with the Maths homework.</div>
+            <div class="options">
+                <button class="option" data-value="1" onclick="select(this)">1) True</button>
+                <button class="option" data-value="2" onclick="select(this)">2) False</button>
+            </div>
+        </div>
+
+        <!-- Question D -->
+        <div class="question-block" data-answer="2">
+            <div class="question-text">D. The children had only one lesson after the Maths lesson.</div>
+            <div class="options">
+                <button class="option" data-value="1" onclick="select(this)">1) True</button>
+                <button class="option" data-value="2" onclick="select(this)">2) False</button>
+            </div>
+        </div>
+
+        <!-- Question E -->
+        <div class="question-block" data-answer="1">
+            <div class="question-text">E. Susie likes Music.</div>
+            <div class="options">
+                <button class="option" data-value="1" onclick="select(this)">1) True</button>
+                <button class="option" data-value="2" onclick="select(this)">2) False</button>
+            </div>
+        </div>
+
+        <button class="finish-btn" onclick="checkAnswers()">Finish Test</button>
+    </div>
+</div>
+
+<script>
+    function select(btn) {
+        const options = btn.parentElement.querySelectorAll('.option');
+        options.forEach(opt => opt.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+
+    function checkAnswers() {
+        const blocks = document.querySelectorAll('.question-block');
+        let score = 0;
+
+        blocks.forEach(block => {
+            const correctAnswer = block.getAttribute('data-answer');
+            const selectedBtn = block.querySelector('.option.selected');
+            const allOptions = block.querySelectorAll('.option');
+
+            allOptions.forEach(opt => {
+                const val = opt.getAttribute('data-value');
+                // Highlight correct answer
+                if (val === correctAnswer) opt.classList.add('correct');
+                // Highlight user's wrong answer
+                if (opt === selectedBtn && val !== correctAnswer) opt.classList.add('wrong');
+            });
+
+            if (selectedBtn && selectedBtn.getAttribute('data-value') === correctAnswer) score++;
+        });
+
+        alert(`You got ${score} out of ${blocks.length} correct!`);
+    }
+</script>
+
+</body>
+</html>
