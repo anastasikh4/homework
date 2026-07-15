@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fill in the Blank · Rooms & Furniture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f9fafb;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .progress-area {
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #afafaf;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            background-color: #e5e5e5;
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #58cc02;
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .quiz-content {
+            padding: 1.5rem;
+        }
+
+        .hint-card {
+            background: #f7f7f7;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4b4b4b;
+            text-align: center;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
+        }
+
+        .sentence-card {
+            background: #fff;
+            border-radius: 2rem;
+            padding: 1.8rem 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            border: 2px solid #e5e5e5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 80px;
+            background: #fff3cd;
+            border-bottom: 3px solid #ffc107;
+            border-radius: 12px;
+            padding: 0 8px;
+            color: #c78100;
+            font-weight: 800;
+            transition: all 0.2s ease;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e2e2;
+            border-bottom: 5px solid #d4d4d4;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            color: #2d2d2d;
+            cursor: pointer;
+            transition: all 0.08s linear;
+            width: 100%;
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .option-btn.correct {
+            background: #d7ffb7 !important;
+            border-color: #58cc02 !important;
+            border-bottom-color: #46a302 !important;
+            color: #2d6a0a !important;
+        }
+
+        .option-btn.wrong {
+            background: #ffe0e0 !important;
+            border-color: #ff4b4b !important;
+            border-bottom-color: #c03434 !important;
+            color: #b91c1c !important;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+        }
+
+        .shake {
+            animation: shakeAnim 0.4s ease-in-out;
+        }
+
+        @keyframes shakeAnim {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+
+        .next-btn {
+            background: #58cc02;
+            border: none;
+            border-bottom: 5px solid #46a302;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.08s;
+            display: none;
+        }
+
+        .next-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .result-screen {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #1cb0f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+        }
+
+        .restart-btn {
+            background: #1cb0f6;
+            border: none;
+            border-bottom: 5px solid #1899d6;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .restart-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .sentence-card {
+                font-size: 1.1rem;
+                padding: 1.2rem;
+                min-height: 60px;
+            }
+            .option-btn {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+            .hint-card {
+                font-size: 0.9rem;
+            }
+            .blank {
+                min-width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="progress-area">
+            <div class="progress-header">
+                <span>🏠 FILL IN THE BLANK</span>
+                <span id="counter">1 / 15</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Quiz screen -->
+        <div id="quizScreen">
+            <div class="quiz-content">
+                <div class="hint-card" id="hintText">🇷🇺 Russian hint</div>
+                <div class="sentence-card" id="sentenceText">English sentence with <span class="blank">______</span></div>
+                <div class="options-grid" id="optionsGrid"></div>
+                <button class="next-btn" id="nextBtn">Continue →</button>
+            </div>
+        </div>
+
+        <!-- Result screen -->
+        <div id="resultScreen" class="result-screen hidden">
+            <div class="result-icon" id="resultIcon">🏆</div>
+            <div class="result-title" id="resultTitle">Lesson Complete!</div>
+            <div class="result-score" id="finalScore">0 / 15</div>
+            <button class="restart-btn" id="restartBtn">Try Again →</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== QUIZ DATA =====
+        const quizData = [
+            { ru: "столовая", en: "We eat dinner in the dining-room.", target: "dining-room" },
+            { ru: "гостиная", en: "We watch TV in the living-room.", target: "living-room" },
+            { ru: "спальня", en: "I sleep in my bedroom.", target: "bedroom" },
+            { ru: "кухня", en: "My mother cooks in the kitchen.", target: "kitchen" },
+            { ru: "ванная", en: "I take a shower in the bathroom.", target: "bathroom" },
+            { ru: "кабинет", en: "My father works in his study.", target: "study" },
+            { ru: "часы (настенные)", en: "The clock on the wall shows the time.", target: "clock" },
+            { ru: "кровать", en: "I lie down on my bed.", target: "bed" },
+            { ru: "компьютер", en: "I use the computer to do homework.", target: "computer" },
+            { ru: "буфет", en: "We keep plates in the cupboard.", target: "cupboard" },
+            { ru: "шкаф", en: "I hang my clothes in the wardrobe.", target: "wardrobe" },
+            { ru: "таз", en: "She washes her face in the basin.", target: "basin" },
+            { ru: "зеркало", en: "I look at myself in the mirror.", target: "mirror" },
+            { ru: "ванна", en: "I take a bath in the bathtub.", target: "bathtub" },
+            { ru: "полки", en: "Books are on the shelves.", target: "shelves" }
+        ];
+
+        const allTargets = quizData.map(q => q.target);
+
+        let shuffledQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+        let currentCorrect = "";
+
+        // DOM refs
+        const quizScreen = document.getElementById('quizScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const hintText = document.getElementById('hintText');
+        const sentenceText = document.getElementById('sentenceText');
+        const optionsGrid = document.getElementById('optionsGrid');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressFill = document.getElementById('progressFill');
+        const counter = document.getElementById('counter');
+        const finalScore = document.getElementById('finalScore');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultIcon = document.getElementById('resultIcon');
+        const restartBtn = document.getElementById('restartBtn');
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function getWrongOptions(correct) {
+            const others = allTargets.filter(t => t !== correct);
+            const shuffled = shuffleArray([...others]);
+            return shuffled.slice(0, 3);
+        }
+
+        function updateProgress() {
+            const pct = (currentIndex / shuffledQuestions.length) * 100;
+            progressFill.style.width = `${pct}%`;
+            counter.innerText = `${currentIndex + 1} / ${shuffledQuestions.length}`;
+        }
+
+        function renderQuestion() {
+            answered = false;
+            nextBtn.style.display = 'none';
+            const q = shuffledQuestions[currentIndex];
+            currentCorrect = q.target;
+
+            hintText.innerText = `🇷🇺 ${q.ru}`;
+
+            // Replace target with blank
+            const regex = new RegExp(`\\b${q.target}\\b`, 'i');
+            const html = q.en.replace(regex, '<span class="blank" id="blankWord">______</span>');
+            sentenceText.innerHTML = html;
+
+            // Build options: correct + 3 wrong
+            const wrong = getWrongOptions(q.target);
+            const opts = [q.target, ...wrong];
+            const shuffledOpts = shuffleArray([...opts]);
+
+            optionsGrid.innerHTML = '';
+            shuffledOpts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(btn, opt);
+                optionsGrid.appendChild(btn);
+            });
+
+            updateProgress();
+        }
+
+        function handleAnswer(btn, chosen) {
+            if (answered) return;
+            answered = true;
+
+            const isCorrect = (chosen === currentCorrect);
+            const blankSpan = document.getElementById('blankWord');
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.classList.add('disabled'));
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                blankSpan.style.color = '#2d6a0a';
+                blankSpan.style.borderBottomColor = '#58cc02';
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                blankSpan.style.color = '#b91c1c';
+                blankSpan.style.borderBottomColor = '#ff4b4b';
+                // shake animation
+                const card = document.querySelector('.sentence-card');
+                card.classList.add('shake');
+                if (navigator.vibrate) navigator.vibrate(100);
+                setTimeout(() => card.classList.remove('shake'), 400);
+                // reveal correct answer
+                allBtns.forEach(b => {
+                    if (b.innerText === currentCorrect) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+            blankSpan.innerText = currentCorrect;
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            if (!answered) return;
+            currentIndex++;
+            if (currentIndex < shuffledQuestions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            finalScore.innerText = `${score} / ${shuffledQuestions.length}`;
+            const pct = score / shuffledQuestions.length;
+            if (pct === 1) {
+                resultTitle.innerText = "Perfect Score! 🌟";
+                resultIcon.innerText = "👑";
+            } else if (pct >= 0.7) {
+                resultTitle.innerText = "Great Job! 🎉";
+                resultIcon.innerText = "🎉";
+            } else if (pct >= 0.4) {
+                resultTitle.innerText = "Good Effort! 💪";
+                resultIcon.innerText = "💪";
+            } else {
+                resultTitle.innerText = "Keep Practicing! 📚";
+                resultIcon.innerText = "📚";
+            }
+        }
+
+        function restartQuiz() {
+            shuffledQuestions = shuffleArray([...quizData]);
+            currentIndex = 0;
+            score = 0;
+            answered = false;
+            quizScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            renderQuestion();
+        }
+
+        function init() {
+            shuffledQuestions = shuffleArray([...quizData]);
+            currentIndex = 0;
+            score = 0;
+            answered = false;
+            renderQuestion();
+        }
+
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+
+        init();
+    </script>
+</body>
+</html>
