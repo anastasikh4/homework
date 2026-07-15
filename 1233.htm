@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛏️ Minecraft · Family & Rooms Quest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', 'Segoe UI', monospace;
+        }
+        body {
+            background: #2d2d2d;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            max-width: 720px;
+            width: 100%;
+            background: #4a4a4a;
+            border-radius: 16px;
+            padding: 24px 22px 32px;
+            border: 4px solid #6b6b6b;
+            box-shadow: inset 0 -6px 0 #2d2d2d, 0 8px 0 #1a1a1a;
+            image-rendering: pixelated;
+        }
+        .quest-header {
+            background: #6b6b6b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-bottom: 6px solid #3d3d3d;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .quest-badge {
+            background: #f9c74f;
+            padding: 4px 14px;
+            font-weight: 900;
+            color: #1a1a1a;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border-bottom: 4px solid #b38a2a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quest-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 0 #1a1a1a;
+        }
+        .can-badge {
+            margin-left: auto;
+            background: #58cc02;
+            color: #1a1a1a;
+            padding: 4px 16px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            border-bottom: 4px solid #2d7a0a;
+        }
+
+        .mine-block {
+            background: #6b6b6b;
+            border-radius: 8px;
+            padding: 20px;
+            border-bottom: 6px solid #3d3d3d;
+            margin-bottom: 18px;
+        }
+        .mine-block p {
+            color: #f0f0f0;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 0 #1a1a1a;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .option-btn {
+            background: #8b8b8b;
+            border: none;
+            border-bottom: 6px solid #4d4d4d;
+            border-radius: 8px;
+            padding: 16px 12px;
+            font-weight: 800;
+            color: #f0f0f0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-shadow: 1px 1px 0 #1a1a1a;
+            text-align: center;
+        }
+        .option-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+        .option-btn.correct {
+            background: #58cc02;
+            border-bottom-color: #2d7a0a;
+        }
+        .option-btn.wrong {
+            background: #ff4b4b;
+            border-bottom-color: #8a1a1a;
+        }
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .nav-btn {
+            background: #f9c74f;
+            border: none;
+            border-bottom: 6px solid #b38a2a;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-weight: 900;
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+        .nav-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+        .nav-btn.secondary {
+            background: #4facfe;
+            border-bottom-color: #1a5c8a;
+            color: white;
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .feedback-area {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: #3d3d3d;
+            border-radius: 8px;
+            border-left: 6px solid #f9c74f;
+            color: #f0f0f0;
+            font-weight: 600;
+            min-height: 60px;
+            text-shadow: 1px 1px 0 #1a1a1a;
+        }
+
+        .img-preview {
+            background: #3d3d3d;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 3px solid #6b6b6b;
+            margin: 12px 0;
+        }
+        .img-preview img {
+            max-width: 100%;
+            border-radius: 4px;
+            max-height: 120px;
+            image-rendering: pixelated;
+        }
+
+        .progress-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 12px 0 6px;
+        }
+        .progress-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: #4d4d4d;
+            border-bottom: 3px solid #2d2d2d;
+        }
+        .progress-dot.done {
+            background: #58cc02;
+        }
+        .progress-dot.active {
+            background: #f9c74f;
+            border-bottom-color: #b38a2a;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #6b6b6b;
+            border: none;
+            border-bottom: 6px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 800;
+            color: #f0f0f0;
+            cursor: pointer;
+            transition: 0.05s linear;
+            flex: 1;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: #f9c74f;
+            border-bottom-color: #b38a2a;
+            color: #1a1a1a;
+        }
+        .tab-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 550px) {
+            .game-container { padding: 16px; }
+            .option-grid { grid-template-columns: 1fr; gap: 10px; }
+            .quest-title { font-size: 1.2rem; }
+            .tab-btn { font-size: 0.7rem; padding: 8px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="quest-header">
+        <span class="quest-badge">🏠 CAN DO</span>
+        <span class="quest-title">Family & Rooms</span>
+        <span class="can-badge">MINECRAFT</span>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab1" id="tab1Btn">🔗 Match</button>
+        <button class="tab-btn" data-tab="tab2" id="speakTabBtn" disabled>🗣️ Speak</button>
+        <button class="tab-btn" data-tab="tab3" id="wordsTabBtn" disabled>🎯 Words</button>
+    </div>
+
+    <!-- ========== TAB 1: MATCHING (Family & Rooms) ========== -->
+    <div id="tab1" class="tab-content active">
+        <div class="img-preview">
+            <img src="https://i.pinimg.com/originals/0f/d5/ed/0fd5ede1e15798a192c2ad942c7e5ffb.jpg?nii=t" alt="minecraft style" loading="lazy">
+        </div>
+        <div id="matchArea"></div>
+        <div class="feedback-area" id="matchFeedback">⚡ Match each beginning to the correct ending.</div>
+    </div>
+
+    <!-- ========== TAB 2: PERSONAL / SPEAKING ========== -->
+    <div id="tab2" class="tab-content">
+        <div class="img-preview">
+            <img src="https://static.vecteezy.com/system/resources/previews/023/142/924/large_2x/happy-family-stands-in-front-of-their-new-home-generative-ai-photo.jpg" alt="abilities" loading="lazy">
+        </div>
+        <div id="personalArea"></div>
+        <div class="feedback-area" id="personalFeedback">💬 Select your answers and click "Show Answers".</div>
+    </div>
+
+    <!-- ========== TAB 3: VOCABULARY ========== -->
+    <div id="tab3" class="tab-content">
+        <div class="img-preview">
+            <img src="https://t3.ftcdn.net/jpg/03/59/53/96/360_F_359539619_izbEfhEs1LQ4YSbfwtEoGSaNHt4P1BqZ.jpg" alt="sports and actions" loading="lazy">
+        </div>
+        <div id="vocabArea"></div>
+        <div class="feedback-area" id="vocabFeedback">🎯 Choose the correct word for each sentence.</div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  TAB SWITCHING & UNLOCKING
+    // ============================================================
+    const speakTabBtn = document.getElementById('speakTabBtn');
+    const wordsTabBtn = document.getElementById('wordsTabBtn');
+    let matchCompleted = false;
+    let speakCompleted = false;
+
+    function unlockSpeakTab() {
+        speakTabBtn.disabled = false;
+        speakTabBtn.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        speakTabBtn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.getElementById('tab2').classList.add('active');
+    }
+
+    function unlockWordsTab() {
+        wordsTabBtn.disabled = false;
+        wordsTabBtn.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        wordsTabBtn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (this.disabled) return;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.getElementById(this.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ============================================================
+    //  CHALLENGE 1: MATCHING (Family & Rooms)
+    // ============================================================
+    const matchData = [
+        { id: 1, left: 'My mother\'s sister is my', right: 'aunt.', correct: 'aunt' },
+        { id: 2, left: 'My father\'s brother is my', right: 'uncle.', correct: 'uncle' },
+        { id: 3, left: 'My brother is my', right: 'sibling.', correct: 'sibling' },
+        { id: 4, left: 'I cook in the', right: 'kitchen.', correct: 'kitchen' },
+        { id: 5, left: 'I sleep in the', right: 'bedroom.', correct: 'bedroom' },
+        { id: 6, left: 'I take a bath in the', right: 'bathroom.', correct: 'bathroom' }
+    ];
+
+    let matchIndex = 0;
+    let matchScore = 0;
+    let currentMatchItem = null;
+
+    const matchArea = document.getElementById('matchArea');
+    const matchFeedback = document.getElementById('matchFeedback');
+
+    function renderMatchItem() {
+        if (matchIndex >= matchData.length) {
+            matchArea.innerHTML = `
+                <div class="mine-block" style="background:#58cc02; border-bottom-color:#2d7a0a;">
+                    <p style="font-size:1.5rem;">✅ ALL MATCHED!</p>
+                    <p style="font-size:1rem;">You completed the block matching quest!</p>
+                </div>
+            `;
+            matchFeedback.innerHTML = `🎉 Perfect! You matched all ${matchData.length} correctly!`;
+            if (!matchCompleted) {
+                matchCompleted = true;
+                unlockSpeakTab();
+            }
+            return;
+        }
+
+        const item = matchData[matchIndex];
+        currentMatchItem = item;
+
+        const allRight = matchData.map(i => i.right);
+        const wrongRight = allRight.filter(r => r !== item.right);
+        const shuffled = [item.right, ...wrongRight.slice(0, 3)].sort(() => Math.random() - 0.5);
+
+        let optionsHtml = shuffled.map(opt => `
+            <button class="option-btn" data-value="${opt}">${opt}</button>
+        `).join('');
+
+        matchArea.innerHTML = `
+            <div class="mine-block">
+                <p>🔹 ${item.left} …</p>
+            </div>
+            <div class="option-grid" id="matchOptions">
+                ${optionsHtml}
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+                <button class="nav-btn secondary" id="matchNextBtn" style="display:none;">⏩ Next →</button>
+            </div>
+            <div class="progress-indicator">
+                ${matchData.map((_, idx) => `
+                    <div class="progress-dot ${idx < matchIndex ? 'done' : idx === matchIndex ? 'active' : ''}"></div>
+                `).join('')}
+            </div>
+        `;
+
+        document.querySelectorAll('#matchOptions .option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                const selected = this.dataset.value;
+                const isCorrect = (selected === item.right);
+                const allBtns = document.querySelectorAll('#matchOptions .option-btn');
+                allBtns.forEach(b => b.classList.add('disabled'));
+
+                if (isCorrect) {
+                    this.classList.add('correct');
+                    matchScore++;
+                    matchFeedback.innerHTML = '✅ Correct! Well done!';
+                    matchFeedback.style.borderLeftColor = '#58cc02';
+                } else {
+                    this.classList.add('wrong');
+                    matchFeedback.innerHTML = `❌ Oops! The correct answer was: "${item.right}"`;
+                    matchFeedback.style.borderLeftColor = '#ff4b4b';
+                    allBtns.forEach(b => {
+                        if (b.dataset.value === item.right) b.classList.add('correct');
+                    });
+                }
+                document.getElementById('matchNextBtn').style.display = 'block';
+            });
+        });
+
+        document.getElementById('matchNextBtn')?.addEventListener('click', function() {
+            matchIndex++;
+            renderMatchItem();
+        });
+    }
+
+    renderMatchItem();
+
+    // ============================================================
+    //  CHALLENGE 2: PERSONAL / SPEAKING
+    // ============================================================
+    const personalQuestions = [
+        { id: 1, emoji: '👨‍👩‍👧', text: 'Do you have a big family?', options: ['Yes, I do.', 'No, I don\'t.'] },
+        { id: 2, emoji: '🛏️', text: 'Do you have your own bedroom?', options: ['Yes, I do.', 'No, I don\'t.'] },
+        { id: 3, emoji: '👩‍🍳', text: 'Can you cook in the kitchen?', options: ['Yes, I can.', 'No, I can\'t.'] },
+        { id: 4, emoji: '🚿', text: 'Is there a bathtub in your bathroom?', options: ['Yes, there is.', 'No, there isn\'t.'] }
+    ];
+
+    let pIndex = 0;
+
+    const personalArea = document.getElementById('personalArea');
+    const personalFeedback = document.getElementById('personalFeedback');
+
+    function renderPersonalItem() {
+        if (pIndex >= personalQuestions.length) {
+            personalArea.innerHTML = `
+                <div class="mine-block" style="background:#58cc02; border-bottom-color:#2d7a0a;">
+                    <p style="font-size:1.5rem;">🎤 ALL ANSWERED!</p>
+                    <p style="font-size:1rem;">Your personal quest is complete.</p>
+                </div>
+            `;
+            if (!speakCompleted) {
+                speakCompleted = true;
+                unlockWordsTab();
+            }
+            return;
+        }
+
+        const q = personalQuestions[pIndex];
+        personalArea.innerHTML = `
+            <div class="mine-block">
+                <p>${q.emoji} ${q.text}</p>
+            </div>
+            <div class="option-grid" id="personalOptions">
+                ${q.options.map(opt => `
+                    <button class="option-btn" data-value="${opt}">${opt}</button>
+                `).join('')}
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+                <button class="nav-btn secondary" id="personalNextBtn" style="display:none;">⏩ Next →</button>
+            </div>
+            <div class="progress-indicator">
+                ${personalQuestions.map((_, idx) => `
+                    <div class="progress-dot ${idx < pIndex ? 'done' : idx === pIndex ? 'active' : ''}"></div>
+                `).join('')}
+            </div>
+        `;
+
+        document.querySelectorAll('#personalOptions .option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                const allBtns = document.querySelectorAll('#personalOptions .option-btn');
+                allBtns.forEach(b => b.classList.add('disabled'));
+                this.classList.add('correct');
+                personalFeedback.innerHTML = `✅ You answered: ${this.dataset.value}`;
+                personalFeedback.style.borderLeftColor = '#58cc02';
+                document.getElementById('personalNextBtn').style.display = 'block';
+            });
+        });
+
+        document.getElementById('personalNextBtn')?.addEventListener('click', function() {
+            pIndex++;
+            renderPersonalItem();
+        });
+    }
+
+    renderPersonalItem();
+
+    // ============================================================
+    //  CHALLENGE 3: VOCABULARY (Family & Rooms)
+    // ============================================================
+    const vocabData = [
+        { id: 1, emoji: '👩', text: 'My mother\'s mother is my …', options: ['grandmother', 'aunt', 'sister'], correct: 'grandmother' },
+        { id: 2, emoji: '👨', text: 'My father\'s father is my …', options: ['grandfather', 'uncle', 'cousin'], correct: 'grandfather' },
+        { id: 3, emoji: '🛋️', text: 'I watch TV in the …', options: ['living-room', 'kitchen', 'bathroom'], correct: 'living-room' },
+        { id: 4, emoji: '🍳', text: 'I cook food in the …', options: ['kitchen', 'bedroom', 'study'], correct: 'kitchen' },
+        { id: 5, emoji: '🛏️', text: 'I sleep in the …', options: ['bedroom', 'bathroom', 'living-room'], correct: 'bedroom' },
+        { id: 6, emoji: '🚿', text: 'I take a shower in the …', options: ['bathroom', 'kitchen', 'study'], correct: 'bathroom' }
+    ];
+
+    let vIndex = 0;
+    let vScore = 0;
+
+    const vocabArea = document.getElementById('vocabArea');
+    const vocabFeedback = document.getElementById('vocabFeedback');
+
+    function renderVocabItem() {
+        if (vIndex >= vocabData.length) {
+            vocabArea.innerHTML = `
+                <div class="mine-block" style="background:#58cc02; border-bottom-color:#2d7a0a;">
+                    <p style="font-size:1.5rem;">🎯 VOCAB MASTER!</p>
+                    <p style="font-size:1rem;">You scored ${vScore} / ${vocabData.length} correct!</p>
+                </div>
+            `;
+            vocabFeedback.innerHTML = vScore === vocabData.length ? '🌟 Perfect! You are a Word Crafter!' : `📝 You got ${vScore}/${vocabData.length}. Try again!`;
+            return;
+        }
+
+        const item = vocabData[vIndex];
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+
+        vocabArea.innerHTML = `
+            <div class="mine-block">
+                <p>${item.emoji} ${item.text}</p>
+            </div>
+            <div class="option-grid" id="vocabOptions">
+                ${shuffled.map(opt => `
+                    <button class="option-btn" data-value="${opt}">${opt}</button>
+                `).join('')}
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+                <button class="nav-btn secondary" id="vocabNextBtn" style="display:none;">⏩ Next →</button>
+            </div>
+            <div class="progress-indicator">
+                ${vocabData.map((_, idx) => `
+                    <div class="progress-dot ${idx < vIndex ? 'done' : idx === vIndex ? 'active' : ''}"></div>
+                `).join('')}
+            </div>
+        `;
+
+        document.querySelectorAll('#vocabOptions .option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                const allBtns = document.querySelectorAll('#vocabOptions .option-btn');
+                allBtns.forEach(b => b.classList.add('disabled'));
+                const isCorrect = (this.dataset.value === item.correct);
+                if (isCorrect) {
+                    this.classList.add('correct');
+                    vScore++;
+                    vocabFeedback.innerHTML = '✅ Correct! Nice block choice!';
+                    vocabFeedback.style.borderLeftColor = '#58cc02';
+                } else {
+                    this.classList.add('wrong');
+                    vocabFeedback.innerHTML = `❌ Oops! Correct answer: "${item.correct}"`;
+                    vocabFeedback.style.borderLeftColor = '#ff4b4b';
+                    allBtns.forEach(b => {
+                        if (b.dataset.value === item.correct) b.classList.add('correct');
+                    });
+                }
+                document.getElementById('vocabNextBtn').style.display = 'block';
+            });
+        });
+
+        document.getElementById('vocabNextBtn')?.addEventListener('click', function() {
+            vIndex++;
+            renderVocabItem();
+        });
+    }
+
+    renderVocabItem();
+</script>
+</body>
+</html>
