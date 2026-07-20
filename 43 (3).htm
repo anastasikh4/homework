@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Language Grand Prix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f6f7;
+            --card: #ffffff;
+            --text: #1e272e;
+            --muted: #808e9b;
+            --red: #e74c3c;
+            --dark-red: #c0392b;
+            --green: #2ecc71;
+            --dark-green: #27ae60;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(#dcdde1 15%, transparent 15%);
+            background-size: 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .quiz-container {
+            background: var(--card);
+            width: 100%;
+            max-width: 540px;
+            border: 3px solid var(--text);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 0 var(--text);
+        }
+        .progress-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .progress-track {
+            flex: 1;
+            height: 18px;
+            background: #eff1f3;
+            border: 2px solid var(--text);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--green);
+            border-radius: 12px;
+            transition: width 0.3s;
+        }
+        .counter {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Image box */
+        .image-box {
+            width: 100%;
+            height: 180px;
+            border: 3px solid var(--text);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: #f1f2f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .directive-box {
+            background: #eccc68;
+            border: 2px solid var(--text);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            box-shadow: 3px 3px 0 var(--text);
+        }
+        .sentence {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            color: var(--text);
+        }
+        .blank {
+            display: inline-block;
+            min-width: 100px;
+            border-bottom: 3px dashed var(--text);
+            text-align: center;
+            color: var(--red);
+            padding: 0 5px;
+        }
+        .options-grid {
+            display: grid;
+            gap: 14px;
+        }
+        .option-btn {
+            background: var(--card);
+            border: 2px solid var(--text);
+            border-bottom: 5px solid var(--text);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: left;
+        }
+        .option-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 3px;
+        }
+        .option-btn.correct {
+            background: #d7ffb8 !important;
+            border-color: var(--green) !important;
+            border-bottom-color: var(--dark-green) !important;
+            color: #4a7c00 !important;
+        }
+        .option-btn.incorrect {
+            background: #ffdfe0 !important;
+            border-color: var(--red) !important;
+            border-bottom-color: var(--dark-red) !important;
+            color: #b33939 !important;
+        }
+        .shake {
+            animation: shake 0.35s ease;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60% { transform: translateX(-8px); }
+            40%,80% { transform: translateX(8px); }
+        }
+        .finish-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .trophy {
+            font-size: 5rem;
+            margin-bottom: 15px;
+        }
+        .rank {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2rem;
+            color: #ffa502;
+            margin-bottom: 10px;
+        }
+        .score {
+            font-size: 1.3rem;
+            color: var(--muted);
+            margin-bottom: 30px;
+        }
+        .restart-btn {
+            width: 100%;
+            background: var(--red);
+            border: 2px solid var(--text);
+            border-bottom: 5px solid var(--text);
+            border-radius: 16px;
+            color: white;
+            padding: 16px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-container" id="quizBox">
+    <div class="progress-header" id="progressHeader">
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="counter" id="questionCounter">1/6</div>
+    </div>
+
+    <!-- Game screen -->
+    <div class="screen active" id="gameScreen">
+        <!-- Картинка -->
+        <div class="image-box">
+            <img id="questionImage" src="" alt="F1 image" />
+        </div>
+        <div class="directive-box" id="directive">🏁 Loading...</div>
+        <div class="sentence" id="sentenceText">Loading question...</div>
+        <div class="options-grid" id="optionsContainer"></div>
+    </div>
+
+    <!-- Finish screen -->
+    <div class="screen" id="finishScreen">
+        <div class="finish-screen">
+            <div class="trophy" id="trophyIcon">🏆</div>
+            <div class="rank" id="rankText">Session Ended</div>
+            <div class="score" id="scoreText">0/6</div>
+            <button class="restart-btn" id="restartButton">Restart Race</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Question bank — теперь у каждого вопроса есть картинка
+        const questions = [
+            {
+                image: "https://live.staticflickr.com/5507/31275585685_a9d4a6122c_b.jpg",
+                directive: "Quantifier Challenge: Look at the race track conditions.",
+                sentence: 'Drivers will be on a track with <span class="blank" id="currentBlank">...</span> light today.',
+                correct: "much",
+                distractors: ["many", "few", "any"]
+            },
+            {
+                image: "https://avatars.mds.yandex.net/i?id=5d746a48d45a6cd984844c33420348a6_l-4507724-images-thumbs&n=13",
+                directive: "Quantifier Challenge: The post-race celebration arena.",
+                sentence: 'He will have a big party, and there will be <span class="blank" id="currentBlank">...</span> people.',
+                correct: "many",
+                distractors: ["much", "any", "one"]
+            },
+            {
+                image: "https://i.pinimg.com/736x/5d/b4/89/5db4898fa701f32099c7d3aa5add92ac.jpg",
+                directive: "Past Simple Check: Review yesterday's garage data log.",
+                sentence: 'The head mechanic worked in the <span class="blank" id="currentBlank">...</span> yesterday.',
+                correct: "garage",
+                distractors: ["roads", "party", "clouds"]
+            },
+            {
+                image: "https://f1report.ru/img/uploads/2026/01/303116101211.jpg",
+                directive: "Past Simple Check: Study the physical appearance of the grid.",
+                sentence: 'They stood next to the car and they had <span class="blank" id="currentBlank">...</span> on their heads.',
+                correct: "caps",
+                distractors: ["tracks", "roads", "sun"]
+            },
+            {
+                image: "https://i.ytimg.com/vi/dPVG750xmvs/maxresdefault.jpg",
+                directive: "Present Simple Q&A: Analyze the drivers' locations.",
+                sentence: 'Do the mechanics stay outside on the track? No, they <span class="blank" id="currentBlank">...</span> stay outside.',
+                correct: "don't",
+                distractors: ["doesn't", "aren't", "not"]
+            },
+            {
+                image: "https://media.gettyimages.com/id/723507237/photo/male-formula-one-driver-kissing-trophy-celebrating-victory-on-sports-track.jpg?s=612x612&w=gi&k=20&c=zw9I8ELTlR4zUAiF33tQY806uMEZ10GSQxRHeP-8LIo=",
+                directive: "Mood Tracking: Evaluate the final podium emotions.",
+                sentence: 'He  kissed the winner cup because he wasn\'t <span class="blank" id="currentBlank">...</span>.',
+                correct: "sad",
+                distractors: ["clever", "happy", "relaxed"]
+            }
+        ];
+
+        // State
+        let shuffled = [];
+        let currentIndex = 0;
+        let score = 0;
+        let locked = false;
+
+        // DOM elements
+        const gameScreen = document.getElementById('gameScreen');
+        const finishScreen = document.getElementById('finishScreen');
+        const progressHeader = document.getElementById('progressHeader');
+        const progressFill = document.getElementById('progressFill');
+        const questionCounter = document.getElementById('questionCounter');
+        const questionImage = document.getElementById('questionImage');
+        const directiveEl = document.getElementById('directive');
+        const sentenceEl = document.getElementById('sentenceText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const trophyIcon = document.getElementById('trophyIcon');
+        const rankText = document.getElementById('rankText');
+        const scoreText = document.getElementById('scoreText');
+        const restartBtn = document.getElementById('restartButton');
+        const quizBox = document.getElementById('quizBox');
+
+        // Helper to shuffle array
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Start quiz
+        function startQuiz() {
+            shuffled = shuffle([...questions]);
+            currentIndex = 0;
+            score = 0;
+            locked = false;
+            progressHeader.style.display = 'flex';
+            finishScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            renderQuestion();
+        }
+
+        // Display current question
+        function renderQuestion() {
+            locked = false;
+            const q = shuffled[currentIndex];
+            // Update progress
+            const percent = (currentIndex / shuffled.length) * 100;
+            progressFill.style.width = percent + '%';
+            questionCounter.textContent = (currentIndex + 1) + '/' + shuffled.length;
+            
+            // Устанавливаем картинку
+            questionImage.src = q.image;
+            directiveEl.textContent = '🏁 ' + q.directive;
+            sentenceEl.innerHTML = q.sentence;
+            
+            // Build options (correct + distractors, shuffled)
+            const allOptions = shuffle([q.correct, ...q.distractors]);
+            optionsContainer.innerHTML = '';
+            allOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => handleAnswer(btn, opt));
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // Handle answer selection
+        function handleAnswer(btn, chosen) {
+            if (locked) return;
+            locked = true;
+            const correctAnswer = shuffled[currentIndex].correct;
+            const blankSpan = document.getElementById('currentBlank');
+            
+            // Disable all buttons
+            const allBtns = optionsContainer.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+            
+            if (chosen.toLowerCase() === correctAnswer.toLowerCase()) {
+                btn.classList.add('correct');
+                if (blankSpan) {
+                    blankSpan.textContent = correctAnswer;
+                    blankSpan.style.color = 'var(--green)';
+                }
+                score++;
+            } else {
+                btn.classList.add('incorrect');
+                quizBox.classList.add('shake');
+                if (blankSpan) {
+                    blankSpan.textContent = correctAnswer;
+                    blankSpan.style.color = 'var(--red)';
+                }
+                // Highlight correct answer
+                allBtns.forEach(b => {
+                    if (b.textContent.toLowerCase() === correctAnswer.toLowerCase()) {
+                        b.classList.add('correct');
+                    }
+                });
+                setTimeout(() => quizBox.classList.remove('shake'), 350);
+            }
+            
+            // Move to next question after delay
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < shuffled.length) {
+                    renderQuestion();
+                } else {
+                    showFinishScreen();
+                }
+            }, 1500);
+        }
+
+        // Finish screen
+        function showFinishScreen() {
+            progressFill.style.width = '100%';
+            progressHeader.style.display = 'none';
+            gameScreen.classList.remove('active');
+            finishScreen.classList.add('active');
+            scoreText.textContent = 'You scored ' + score + ' out of ' + shuffled.length + '!';
+            
+            if (score === shuffled.length) {
+                rankText.textContent = 'P1: World Champion! 👑';
+                trophyIcon.textContent = '🏆';
+            } else if (score >= shuffled.length * 0.7) {
+                rankText.textContent = 'Podium Finish! 🥈';
+                trophyIcon.textContent = '🏎️';
+            } else {
+                rankText.textContent = 'Pit Stop Needed! 🔧';
+                trophyIcon.textContent = '⚙️';
+            }
+        }
+
+        // Restart
+        restartBtn.addEventListener('click', startQuiz);
+
+        // Initialize
+        startQuiz();
+    })();
+</script>
+</body>
+</html>

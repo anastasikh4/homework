@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MISSION: F1 RACE CONTROL PROTOCOL</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --carbon: #1a1a1a;
+            --telemetry-green: #00e676;
+            --panel-bg: rgba(10, 10, 10, 0.96);
+            --text-glow: #ff6b6b;
+            --accent-yellow: #ffd700;
+            --cyber-blue: #00b4d8;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a0000 50%, #000000 100%);
+            background-image: 
+                radial-gradient(circle at 25% 15%, rgba(225,6,0,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 75% 85%, rgba(0,180,216,0.12) 0%, transparent 50%);
+            color: var(--text-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            animation: engineVibration 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes engineVibration {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.04); }
+        }
+
+        .scanner-card {
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid var(--f1-red);
+            max-width: 750px;
+            width: 95%;
+            box-shadow: 0 0 45px rgba(225,6,0,0.35), inset 0 0 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanner-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            animation: scanline 3s infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            border-bottom: 2px solid var(--f1-red);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+        }
+
+        .hud-top .phase { color: var(--telemetry-green); }
+
+        .main-img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px solid var(--accent-yellow);
+            box-shadow: 0 0 25px rgba(255,215,0,0.4);
+            filter: saturate(1.2) contrast(1.15);
+            transition: all 0.3s;
+        }
+
+        .main-img:hover { filter: saturate(1.4) contrast(1.25) brightness(1.05); }
+
+        .quest-container { margin-bottom: 25px; line-height: 1.7; }
+
+        .question {
+            margin-bottom: 22px;
+            font-size: 1rem;
+            text-shadow: 0 0 8px rgba(255,107,107,0.6);
+            border-left: 4px solid var(--f1-red);
+            padding-left: 15px;
+        }
+
+        .select-box, .drag-zone {
+            background: rgba(20,5,5,0.8);
+            color: var(--accent-yellow);
+            border: 2px solid var(--f1-red);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            margin: 0 4px 5px 0;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .select-box:focus, .drag-zone:focus {
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 15px var(--accent-yellow);
+        }
+
+        .drag-zone {
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,215,0,0.08);
+            border-style: dashed;
+        }
+
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .draggable-word {
+            padding: 6px 12px;
+            background: rgba(225,6,0,0.7);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .draggable-word:hover { background: var(--f1-red); transform: scale(1.05); }
+        .draggable-word:active { cursor: grabbing; transform: scale(0.95); }
+        .draggable-word.used { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-execute {
+            background: linear-gradient(45deg, var(--f1-red), #ff4500);
+            color: #fff;
+            border: none;
+            padding: 18px 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            width: 100%;
+            letter-spacing: 3px;
+            font-size: 1.1rem;
+            transition: 0.4s;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(225,6,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-execute:hover {
+            filter: brightness(1.15) drop-shadow(0 0 20px var(--f1-red));
+            transform: translateY(-3px);
+        }
+
+        .btn-execute:active { transform: translateY(0); }
+
+        #status-report {
+            margin-top: 25px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            display: none;
+            border: 2px dashed var(--accent-yellow);
+            padding: 18px;
+            border-radius: 8px;
+            background: rgba(255,215,0,0.1);
+            animation: scanComplete 0.5s ease-out;
+        }
+
+        @keyframes scanComplete {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--f1-red), var(--accent-yellow), transparent);
+            margin: 25px 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="scanner-card">
+    <div class="hud-top">
+        <span>Target: F1 Pit Lane</span>
+        <span>Phase: <span class="phase">Active Telemetry</span></span>
+    </div>
+
+    <!-- Main F1 image -->
+    <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&h=350&fit=crop" 
+         class="main-img" alt="Formula 1 car on track" />
+
+    <!-- Section 1: Vocabulary & Present Simple -->
+    <div class="quest-container">
+        <div class="question">
+            <strong>SECTION 1: DRIVER SCAN</strong><br>
+            The driver 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">has</option>
+                <option value="wrong">have</option>
+            </select> a fast 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">car</option>
+                <option value="wrong">cars</option>
+            </select>.<br>
+            He 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">isn't running</option>
+                <option value="wrong">is run</option>
+            </select> 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">now</option>
+                <option value="wrong">yesterday</option>
+            </select>.
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Section 2: Reading & Observation -->
+    <div class="quest-container">
+        <div class="question">
+            <strong>SECTION 2: PIT CREW ANALYSIS</strong><br>
+            The mechanics in the garage 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">are fixing</option>
+                <option value="wrong">is fixing</option>
+            </select> 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">some door</option>
+                <option value="wrong">door</option>
+            </select>.<br>
+            The car has got 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="wrong">much colours</option>
+                <option value="correct">many colours</option>
+            </select> 
+            on the 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="wrong">metal window</option>
+                <option value="correct">glass window</option>
+            </select>.
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Section 3: Grammar - some/any/negative -->
+    <div class="quest-container">
+        <div class="question">
+            <strong>SECTION 3: QUANTIFIER SCAN</strong><br>
+            The team driver 
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="wrong">didn't stood on the track</option>
+                <option value="correct">didn't stand on the track</option>
+            </select>.<br>
+            In the car fans didn't
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="wrong">drove fast</option>
+                <option value="correct">drive fast</option>
+            </select>.<br>
+            There wasn't
+            <select class="select-box">
+                <option value="">___</option>
+                <option value="correct">any rain</option>
+                <option value="wrong">any people</option>
+            </select> 
+            on the track.
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    
+
+    <button class="btn-execute" onclick="executeProtocol()">EXECUTE PROTOCOL</button>
+    <div id="status-report">SYSTEM: Race data synchronized. Observation complete.</div>
+</div>
+
+<script>
+    let draggedLetters = [];
+
+    const spellingZone = document.getElementById('spelling-zone');
+    const draggableWords = document.querySelectorAll('.draggable-word');
+
+    draggableWords.forEach(word => {
+        word.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', word.dataset.letter);
+        });
+    });
+
+    spellingZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+
+    spellingZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const letter = e.dataTransfer.getData('text/plain');
+        const draggedWord = document.querySelector(`[data-letter="${letter}"]`);
+
+        if (!spellingZone.querySelector(`[data-letter="${letter}"]`) && draggedLetters.length < 6) {
+            const letterSpan = document.createElement('span');
+            letterSpan.textContent = letter;
+            letterSpan.dataset.letter = letter;
+            letterSpan.style.cssText = 'margin: 0 2px; font-size: 1.2rem; font-weight: bold; color: var(--accent-yellow);';
+            letterSpan.draggable = true;
+
+            spellingZone.appendChild(letterSpan);
+            draggedLetters.push(letter);
+            draggedWord.classList.add('used');
+
+            letterSpan.addEventListener('dragstart', (ev) => {
+                ev.dataTransfer.setData('text/plain', letter);
+            });
+        }
+    });
+
+    function executeProtocol() {
+        const selects = document.querySelectorAll('.select-box');
+        const spellingZoneEl = document.getElementById('spelling-zone');
+        let allCorrect = true;
+        let score = 0;
+        let totalChecks = selects.length + 1;
+
+        selects.forEach(select => {
+            if (select.value === "correct") {
+                select.style.borderColor = "#00e676";
+                select.style.color = "#00e676";
+                select.style.boxShadow = "0 0 12px #00e676";
+                score++;
+            } else if (select.value) {
+                select.style.borderColor = "#e10600";
+                select.style.color = "#e10600";
+                select.style.boxShadow = "0 0 12px #e10600";
+                allCorrect = false;
+            }
+        });
+
+        const spellingResult = Array.from(spellingZoneEl.children)
+            .map(span => span.dataset.letter ? span.dataset.letter.toLowerCase() : '')
+            .join('');
+
+        if (spellingResult === 'engine') {
+            spellingZoneEl.style.borderColor = "#00e676";
+            spellingZoneEl.style.boxShadow = "0 0 15px #00e676";
+            score++;
+        } else {
+            spellingZoneEl.style.borderColor = "#e10600";
+            spellingZoneEl.style.boxShadow = "0 0 15px #e10600";
+            allCorrect = false;
+        }
+
+        const statusReport = document.getElementById('status-report');
+
+        if (score === totalChecks) {
+            statusReport.innerHTML = 'PROTOCOL: S-RANK VERIFICATION<br><strong>Race data 100% synchronized.</strong>';
+            statusReport.style.color = '#00e676';
+            statusReport.style.borderColor = '#00e676';
+        } else {
+            statusReport.innerHTML = `SCAN RESULT: ${score}/${totalChecks}<br><strong>Recalibrate telemetry matrix.</strong>`;
+            statusReport.style.color = '#ff6b6b';
+            statusReport.style.borderColor = '#e10600';
+        }
+
+        statusReport.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
