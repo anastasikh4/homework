@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fill in the Blank · Jobs & Work (12 questions)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f9fafb;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .progress-area {
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #afafaf;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            background-color: #e5e5e5;
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #58cc02;
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .quiz-content {
+            padding: 1.5rem;
+        }
+
+        .hint-card {
+            background: #f7f7f7;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4b4b4b;
+            text-align: center;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
+        }
+
+        .sentence-card {
+            background: #fff;
+            border-radius: 2rem;
+            padding: 1.8rem 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            border: 2px solid #e5e5e5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 80px;
+            background: #fff3cd;
+            border-bottom: 3px solid #ffc107;
+            border-radius: 12px;
+            padding: 0 8px;
+            color: #c78100;
+            font-weight: 800;
+            transition: all 0.2s ease;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e2e2;
+            border-bottom: 5px solid #d4d4d4;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            color: #2d2d2d;
+            cursor: pointer;
+            transition: all 0.08s linear;
+            width: 100%;
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .option-btn.correct {
+            background: #d7ffb7 !important;
+            border-color: #58cc02 !important;
+            border-bottom-color: #46a302 !important;
+            color: #2d6a0a !important;
+        }
+
+        .option-btn.wrong {
+            background: #ffe0e0 !important;
+            border-color: #ff4b4b !important;
+            border-bottom-color: #c03434 !important;
+            color: #b91c1c !important;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+        }
+
+        .shake {
+            animation: shakeAnim 0.4s ease-in-out;
+        }
+
+        @keyframes shakeAnim {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+
+        .next-btn {
+            background: #58cc02;
+            border: none;
+            border-bottom: 5px solid #46a302;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.08s;
+            display: none;
+        }
+
+        .next-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .result-screen {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #1cb0f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+        }
+
+        .restart-btn {
+            background: #1cb0f6;
+            border: none;
+            border-bottom: 5px solid #1899d6;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .restart-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .sentence-card {
+                font-size: 1.1rem;
+                padding: 1.2rem;
+                min-height: 60px;
+            }
+            .option-btn {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+            .hint-card {
+                font-size: 0.9rem;
+            }
+            .blank {
+                min-width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="progress-area">
+            <div class="progress-header">
+                <span>💼 JOBS &amp; WORK</span>
+                <span id="counter">1 / 12</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Quiz screen -->
+        <div id="quizScreen">
+            <div class="quiz-content">
+                <div class="hint-card" id="hintText">🇷🇺 Russian hint</div>
+                <div class="sentence-card" id="sentenceText"></div>
+                <div class="options-grid" id="optionsGrid"></div>
+                <button class="next-btn" id="nextBtn">Continue →</button>
+            </div>
+        </div>
+
+        <!-- Result screen -->
+        <div id="resultScreen" class="result-screen hidden">
+            <div class="result-icon" id="resultIcon">🏆</div>
+            <div class="result-title" id="resultTitle">Lesson Complete!</div>
+            <div class="result-score" id="finalScore">0 / 12</div>
+            <button class="restart-btn" id="restartBtn" onclick="initQuiz()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Полный набор из 12 вопросов по теме «Работа и профессии»
+        const quizData = [
+            { ru: "Кем ты работаешь?", sentence: ["— Hi, Sarah! ", "? — I'm an engineer."], key: "What do you do", alternates: ["What are you doing", "Where do you work", "Who do you do"] },
+            { ru: "офисный работник", sentence: ["He is an ", ", so he spends all day at a computer."], key: "office worker", alternates: ["artist", "builder", "chef"] },
+            { ru: "работать на улице", sentence: ["I prefer to ", " because I don't like sitting inside rooms."], key: "work outdoors", alternates: ["work indoors", "wear at work", "work with"] },
+            { ru: "работать в помещении", sentence: ["In winter, it's nice to ", " where it is warm and dry."], key: "work indoors", alternates: ["work outdoors", "work with", "wear at work"] },
+            { ru: "носить на работе (об одежде)", sentence: ["What clothes do you usually ", "?"], key: "wear at work", alternates: ["work with", "work indoors", "work outdoors"] },
+            { ru: "работать с чем-либо или кем-либо", sentence: ["As a teacher, you have to ", " many different children."], key: "work with", alternates: ["wear at work", "work indoors", "work outdoors"] },
+            { ru: "шеф-повар", sentence: ["The restaurant's new ", " makes delicious vegetable soups."], key: "chef", alternates: ["builder", "driver", "scientist"] },
+            { ru: "художник", sentence: ["The ", " is drawing a beautiful picture in the studio."], key: "artist", alternates: ["pilot", "vet", "nurse"] },
+            { ru: "водитель", sentence: ["The bus ", " always greets passengers with a warm smile."], key: "driver", alternates: ["teacher", "scientist", "builder"] },
+            { ru: "ветеринар", sentence: ["If your dog is sick, you should take it to the ", "."], key: "vet", alternates: ["doctor", "nurse", "pilot"] },
+            { ru: "ученый", sentence: ["The professional ", " is studying alternative energy options."], key: "scientist", alternates: ["actor", "shop assistant", "police officer"] },
+            { ru: "полицейский", sentence: ["The ", " stopped the car because it was moving too fast."], key: "police officer", alternates: ["office worker", "chef", "farmer"] }
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        const totalQuestions = 12;
+
+        function initQuiz() {
+            // Перемешиваем копию массива вопросов для разнообразия
+            currentQuestions = [...quizData].sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            correctCount = 0;
+            document.getElementById("quizScreen").classList.remove("hidden");
+            document.getElementById("resultScreen").classList.add("hidden");
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = currentQuestions[currentIndex];
+            // Обновляем прогресс
+            document.getElementById("counter").innerText = `${currentIndex + 1} / ${totalQuestions}`;
+            const progressPct = (currentIndex / totalQuestions) * 100;
+            document.getElementById("progressFill").style.width = `${progressPct}%`;
+
+            // Русская подсказка
+            document.getElementById("hintText").innerHTML = `🇷🇺 ${q.ru}`;
+
+            // Строим предложение с пропуском
+            const sentenceContainer = document.getElementById("sentenceText");
+            sentenceContainer.innerHTML = '';
+            // Первая часть предложения
+            sentenceContainer.appendChild(document.createTextNode(q.sentence[0]));
+            // Пустой пропуск
+            const gapSpan = document.createElement("span");
+            gapSpan.className = "blank";
+            gapSpan.id = "activeGap";
+            gapSpan.innerText = "_______";
+            sentenceContainer.appendChild(gapSpan);
+            // Вторая часть предложения
+            sentenceContainer.appendChild(document.createTextNode(q.sentence[1]));
+
+            // Перемешиваем варианты ответов
+            const options = [q.key, ...q.alternates].sort(() => Math.random() - 0.5);
+            const grid = document.getElementById("optionsGrid");
+            grid.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.addEventListener("click", function() {
+                    checkAnswer(btn, opt, q.key);
+                });
+                grid.appendChild(btn);
+            });
+
+            // Прячем кнопку "Далее", пока не будет дан ответ
+            document.getElementById("nextBtn").style.display = "none";
+        }
+
+        function checkAnswer(selectedBtn, selectedText, correctText) {
+            const grid = document.getElementById("optionsGrid");
+            const buttons = grid.getElementsByClassName("option-btn");
+            const gap = document.getElementById("activeGap");
+
+            // Блокируем все кнопки
+            for (let btn of buttons) {
+                btn.classList.add("disabled");
+                if (btn.innerText === correctText) {
+                    btn.classList.add("correct");
+                }
+            }
+
+            if (selectedText === correctText) {
+                selectedBtn.classList.add("correct");
+                gap.innerText = correctText;
+                gap.style.background = "#d7ffb7";
+                gap.style.color = "#2d6a0a";
+                gap.style.borderBottomColor = "#58cc02";
+                correctCount++;
+            } else {
+                selectedBtn.classList.add("wrong");
+                gap.innerText = correctText;
+                gap.style.background = "#ffe0e0";
+                gap.style.color = "#b91c1c";
+                gap.style.borderBottomColor = "#ff4b4b";
+
+                // Эффект тряски
+                const app = document.getElementById("app");
+                app.classList.add("shake");
+                if (navigator.vibrate) {
+                    navigator.vibrate(150);
+                }
+                setTimeout(() => app.classList.remove("shake"), 400);
+            }
+
+            // Показываем кнопку "Далее"
+            document.getElementById("nextBtn").style.display = "block";
+            document.getElementById("nextBtn").onclick = function() {
+                currentIndex++;
+                if (currentIndex < totalQuestions) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            };
+        }
+
+        function showResults() {
+            document.getElementById("progressFill").style.width = "100%";
+            document.getElementById("quizScreen").classList.add("hidden");
+            document.getElementById("resultScreen").classList.remove("hidden");
+            document.getElementById("finalScore").innerText = `${correctCount} / ${totalQuestions}`;
+
+            const icon = document.getElementById("resultIcon");
+            const title = document.getElementById("resultTitle");
+            if (correctCount === totalQuestions) {
+                icon.innerText = "👑";
+                title.innerText = "Perfect! Work Master!";
+            } else if (correctCount >= totalQuestions * 0.7) {
+                icon.innerText = "🏆";
+                title.innerText = "Great Job!";
+            } else {
+                icon.innerText = "⚡";
+                title.innerText = "Keep Practicing!";
+            }
+        }
+
+        // Старт при загрузке страницы
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>

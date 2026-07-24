@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs Quiz · A1 Level</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #fef9e7;
+            --ink: #2c3e50;
+            --orange: #f39c12;
+            --green: #27ae60;
+            --red: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background-color: #34495e;
+            color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0 10px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            background: #1a252f;
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid var(--orange);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 12px;
+            background: #2c3e50;
+            border-radius: 6px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--orange);
+            transition: width 0.4s ease;
+        }
+
+        .badge {
+            font-family: 'Special Elite', cursive;
+            color: #f1c40f;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        main {
+            width: 100%;
+            max-width: 500px;
+            background: var(--paper);
+            margin: 25px auto;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.3);
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .instruction {
+            font-family: 'Special Elite', cursive;
+            text-transform: uppercase;
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .question-box {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .blank-space {
+            color: var(--orange);
+            border-bottom: 3px dashed var(--orange);
+            padding: 0 8px;
+            font-weight: 900;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .option-card {
+            background: rgba(255,255,255,0.8);
+            border: 2px solid #dcdcdc;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .option-card:hover {
+            background: white;
+            border-color: var(--orange);
+            transform: translateY(-1px);
+        }
+
+        .option-card.correct {
+            background: #dff9fb !important;
+            border-color: var(--green) !important;
+            color: var(--green) !important;
+        }
+
+        .option-card.wrong {
+            background: #ffe0e0 !important;
+            border-color: var(--red) !important;
+            color: var(--red) !important;
+        }
+
+        .option-card.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        #feedback-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: none;
+            justify-content: center;
+            background: #1a252f;
+            color: white;
+            z-index: 10;
+        }
+
+        .feedback-content {
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #feedback-text {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .next-btn {
+            background: var(--orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Special Elite', cursive;
+            white-space: nowrap;
+        }
+
+        .results-box {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .results-badge {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .results-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--orange);
+            margin-bottom: 15px;
+        }
+
+        .results-score {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: var(--orange);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 18px;
+                min-height: 300px;
+                margin: 15px auto;
+            }
+            .question-box {
+                font-size: 1.2rem;
+            }
+            .option-card {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">👨‍🚒 JOBS QUIZ</div>
+    <div class="progress-container"><div id="progress-fill"></div></div>
+    <div id="step-count" style="color:white; font-size:13px; font-weight:700;">1/6</div>
+</header>
+
+<main id="case-file">
+    <!-- Questions loaded here -->
+</main>
+
+<div id="feedback-bar">
+    <div class="feedback-content">
+        <span id="feedback-text">Analyzing...</span>
+        <button class="next-btn" onclick="nextClue()">NEXT ➤</button>
+    </div>
+</div>
+
+<script>
+    // A1 level — professions only, no Russian translation
+    const caseData = [
+        { emoji: "🩺", q: "A ________ helps sick people.", a: "doctor", options: ["doctor", "teacher", "driver", "cook"] },
+        { emoji: "📚", q: "A ________ works in a school.", a: "teacher", options: ["teacher", "farmer", "police officer", "doctor"] },
+        { emoji: "🚌", q: "A ________ drives a bus.", a: "driver", options: ["driver", "cook", "teacher", "doctor"] },
+        { emoji: "🍳", q: "A ________ makes food in a restaurant.", a: "cook", options: ["cook", "farmer", "driver", "teacher"] },
+        { emoji: "🌾", q: "A ________ works on a farm.", a: "farmer", options: ["farmer", "police officer", "cook", "doctor"] },
+        { emoji: "👮", q: "A ________ catches criminals.", a: "police officer", options: ["police officer", "teacher", "driver", "farmer"] }
+    ];
+
+    let currentIdx = 0;
+    let answered = false;
+    let scoreTally = 0;
+
+    function shuffleSession() {
+        caseData.sort(() => Math.random() - 0.5);
+        currentIdx = 0;
+        scoreTally = 0;
+        document.getElementById('progress-fill').style.width = '0%';
+        document.getElementById('step-count').innerText = `1/${caseData.length}`;
+        loadClue();
+    }
+
+    function loadClue() {
+        answered = false;
+        const clue = caseData[currentIdx];
+        const container = document.getElementById('case-file');
+        document.getElementById('feedback-bar').style.display = 'none';
+        document.getElementById('step-count').innerText = `${currentIdx + 1}/${caseData.length}`;
+
+        const formattedQuestion = clue.q.replace("________", '<span class="blank-space">_______</span>');
+        const mixedOptions = [...clue.options].sort(() => Math.random() - 0.5);
+
+        let html = `
+            <div class="instruction">${clue.emoji} WHO IS IT?</div>
+            <div class="question-box">${formattedQuestion}</div>
+            <div class="options-list">
+        `;
+        mixedOptions.forEach(opt => {
+            html += `<div class="option-card" onclick="analyzeEvidence('${opt.replace(/'/g, "\\'")}', this)">${opt}</div>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    function analyzeEvidence(val, el) {
+        if (answered) return;
+        answered = true;
+        const correct = caseData[currentIdx].a;
+        const status = document.getElementById('feedback-bar');
+        const txt = document.getElementById('feedback-text');
+        const rootCard = document.getElementById('case-file');
+
+        document.querySelectorAll('.option-card').forEach(item => {
+            item.classList.add('disabled');
+            if (item.innerText.trim() === correct) {
+                item.classList.add('correct');
+            }
+        });
+
+        if (val === correct) {
+            scoreTally++;
+            el.classList.add('correct');
+            txt.innerText = "✅ CORRECT!";
+            status.style.background = "#27ae60";
+        } else {
+            el.classList.add('wrong');
+            rootCard.classList.add('shake-effect');
+            if (navigator.vibrate) navigator.vibrate(150);
+            setTimeout(() => rootCard.classList.remove('shake-effect'), 400);
+            txt.innerText = "❌ WRONG!";
+            status.style.background = "#c0392b";
+        }
+        status.style.display = 'flex';
+        document.getElementById('progress-fill').style.width = ((currentIdx + 1) / caseData.length * 100) + '%';
+    }
+
+    function nextClue() {
+        currentIdx++;
+        if (currentIdx < caseData.length) {
+            loadClue();
+        } else {
+            renderFinalSummary();
+        }
+    }
+
+    function renderFinalSummary() {
+        document.getElementById('feedback-bar').style.display = 'none';
+        document.getElementById('step-count').innerText = `${caseData.length}/${caseData.length}`;
+        document.getElementById('progress-fill').style.width = '100%';
+
+        let titleFeedback = "Good try!";
+        let iconStamp = "📝";
+        if (scoreTally === caseData.length) {
+            titleFeedback = "🏆 PERFECT!";
+            iconStamp = "👑";
+        } else if (scoreTally >= 4) {
+            titleFeedback = "👍 Great job!";
+            iconStamp = "🌟";
+        } else if (scoreTally >= 2) {
+            titleFeedback = "📚 Keep learning!";
+            iconStamp = "📖";
+        }
+
+        document.getElementById('case-file').innerHTML = `
+            <div class="results-box">
+                <div class="results-badge">${iconStamp}</div>
+                <div class="results-title">${titleFeedback}</div>
+                <div class="results-score">Score: ${scoreTally} / ${caseData.length}</div>
+                <button class="restart-btn" onclick="shuffleSession()">PLAY AGAIN</button>
+            </div>
+        `;
+    }
+
+    window.addEventListener('DOMContentLoaded', shuffleSession);
+</script>
+</body>
+</html>
