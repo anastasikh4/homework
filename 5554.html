@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Starlight 2: Chores & Help Quest 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #14213d 0%, #2a3b5c 50%, #0d1b2a 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow-x: hidden;
+        }
+        .app { max-width: 800px; width: 95%; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { font-family: 'Arial Black', sans-serif; font-size: 2.8em; color: #ffb703; text-shadow: 0 0 15px #ff8c00; margin-bottom: 10px; }
+        
+        .progress-container { width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: #ffb703; width: 0%; border-radius: 10px; transition: width 0.4s; }
+        
+        .stats { display: flex; justify-content: space-between; font-size: 1.5em; margin-bottom: 20px; }
+        .hearts { color: #ff4757; }
+
+        .card { background: rgba(255,255,255,0.07); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 40px; text-align: center; }
+        .visual { font-size: 5.5em; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        .question-text { font-size: 1.8em; margin-bottom: 30px; color: #f0f0f0; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .btn { 
+            padding: 18px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); 
+            border-radius: 20px; cursor: pointer; font-size: 1.2em; font-weight: bold; color: white;
+            transition: 0.3s; 
+        }
+        .btn:hover { background: rgba(255,255,255,0.2); border-color: #ffb703; transform: scale(1.03); }
+        .btn.correct { background: #00ff88 !important; color: #000; border-color: #00ff88; }
+        .btn.wrong { background: #ff4757 !important; border-color: #ff4757; }
+
+        .win-screen { display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="logo">Chores Help Quest</div>
+            <div class="progress-container"><div class="progress-fill" id="pFill"></div></div>
+            <div class="stats">
+                <div id="qCounter">Question 1/7</div>
+                <div class="hearts" id="heartBox">❤️❤️❤️</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="visual" id="visual">🐶</div>
+            <div class="question-text" id="qText">...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen">
+        <h1 style="font-size: 4em; color: #ffb703;">EXCELLENT!</h1>
+        <p style="font-size: 2em;">You are a big helper! 🧹</p>
+        <button class="btn" onclick="location.reload()" style="margin-top:30px; padding: 20px 50px;">Play Again</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { v: "🐶🍖", q: "The dogs are very hungry! What do you say?", a: ["No problem. I can feed them.", "No problem. I can walk them."], c: "No problem. I can feed them." },
+        { v: "👕🧺", q: "There are lots of dirty clothes. What do you say?", a: ["No problem. I can wash them.", "No problem. I can iron them."], c: "No problem. I can wash them." },
+        { v: "🗑️🚮", q: "The bin in the kitchen is full. What do you say?", a: ["No problem. I can clean it.", "No problem. I can empty it."], c: "No problem. I can empty it." },
+        { v: "🧹🛋️", q: "The carpet in the living room is dirty. What do you say?", a: ["No problem. I can vacuum it.", "No problem. I can sweep it."], c: "No problem. I can vacuum it." },
+        { v: "🍽️✨", q: "The dishes in the dishwasher are clean. What do you say?", a: ["No problem. I can put them away.", "No problem. I can wash them."], c: "No problem. I can put them away." },
+        { v: "🍲🍽️", q: "Dinner's ready! What do you say?", a: ["Great! I can cook.", "Great! I can set the table."], c: "Great! I can set the table." },
+        { v: "🌱💧", q: "Look at the poor plants! What do you say?", a: ["No problem. I can water them.", "No problem. I can feed them."], c: "No problem. I can water them." }
+    ];
+
+    let current = 0;
+    let lives = 3;
+
+    function load() {
+        if (current >= questions.length) {
+            document.getElementById('gameUI').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('visual').innerText = data.v;
+        document.getElementById('qText').innerText = data.q;
+        document.getElementById('qCounter').innerText = `Question ${current + 1}/${questions.length}`;
+        
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+        
+        data.a.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        if (choice === questions[current].c) {
+            btn.classList.add('correct');
+            setTimeout(() => { current++; load(); }, 700);
+        } else {
+            btn.classList.add('wrong');
+            lives--;
+            updateHearts();
+            if (lives <= 0) {
+                alert("Game Over! Let's try again!");
+                location.reload();
+            }
+        }
+    }
+
+    function updateHearts() {
+        let h = "";
+        for(let i=0; i<3; i++) h += i < lives ? "❤️" : "🖤";
+        document.getElementById('heartBox').innerText = h;
+    }
+
+    load();
+</script>
+
+</body>
+</html>
