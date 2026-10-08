@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questions & Short Answers · A1 Quiz</title>
+<style>
+    :root { --primary: #0984e3; --success: #00b894; --error: #d63031; --bg: #fdfdfd; }
+    * { box-sizing: border-box; font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; }
+    body { background: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; }
+    .quiz-container {
+        background: white; width: 100%; max-width: 800px; padding: 30px;
+        border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        text-align: center; border: 4px solid #eee; min-height: 600px;
+    }
+    .progress-header { font-weight: bold; color: #aaa; text-transform: uppercase; margin-bottom: 10px; font-size: 0.9rem; letter-spacing: 1px; }
+    .q-title { font-size: 1.4rem; color: #2d3436; margin: 8px 0 12px; }
+    .visual-box { font-size: 4.5rem; margin: 20px 0; display: flex; justify-content: center; gap: 20px; align-items: center; min-height: 140px; }
+
+    .sentence-builder {
+        border-bottom: 3px dashed #ddd; min-height: 80px; margin: 20px 0;
+        display: flex; justify-content: center; align-items: center; gap: 10px;
+        flex-wrap: wrap; padding: 10px;
+    }
+    .word-tag {
+        background: var(--primary); color: white; padding: 12px 20px;
+        border-radius: 12px; font-weight: bold; font-size: 1.3rem;
+        animation: pop 0.3s;
+    }
+    @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+
+    .btn-pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .action-btn {
+        background: #fff; padding: 15px 25px; border: 2px solid #ddd;
+        border-radius: 15px; cursor: pointer; font-weight: bold;
+        font-size: 1.2rem; box-shadow: 0 4px 0 #ccc;
+        transition: 0.15s; font-family: inherit; color: #2d3436;
+    }
+    .action-btn:hover { background: #eef7ff; border-color: var(--primary); }
+    .action-btn:active { transform: translateY(3px); box-shadow: none; }
+    .action-btn.hidden-btn { visibility: hidden; }
+
+    .feedback { margin-top: 20px; font-size: 1.8rem; font-weight: bold; min-height: 50px; }
+
+    @media (max-width: 520px) {
+        .quiz-container { padding: 20px; }
+        .q-title { font-size: 1.15rem; }
+        .visual-box { font-size: 3.2rem; }
+        .action-btn { font-size: 1rem; padding: 12px 16px; }
+        .word-tag { font-size: 1.05rem; padding: 9px 14px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress-header">Loading...</div>
+    <h2 id="q-title" class="q-title">Title</h2>
+    <div id="visual-content" class="visual-box"></div>
+
+    <div id="game-ui">
+        <div class="sentence-builder" id="builder"></div>
+        <div id="pool" class="btn-pool"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let currentSentence = [];
+
+    /* Each question: 
+       - mode: 'words' (click word tiles) or 'letters' (click letter tiles)
+       - items: array of tiles to shuffle
+       - correct: the target string
+    */
+    const rawData = [
+        /* ══ Exercise 1 · Personal questions ══ */
+        { mode: 'words', title: "What's your name?", visual: "👦 💬",
+          items: ["I'm", "Wen"], correct: "I'm Wen" },
+        { mode: 'words', title: "Are you a teacher?", visual: "👩‍🏫 ❌",
+          items: ["No", "I'm", "not"], correct: "No, I'm not" },
+        { mode: 'words', title: "How old are you?", visual: "❓19",
+          items: ["I'm", "nineteen"], correct: "I'm nineteen" },
+        { mode: 'words', title: "Is Lee your brother?", visual: "👦 ✅",
+          items: ["Yes", "he", "is"], correct: "Yes, he is" },
+        { mode: 'words', title: "Is Kim your sister?", visual: "👩 ❌",
+          items: ["No", "she", "isn't"], correct: "No, she isn't" },
+
+        /* ══ Exercise 2 · Yes/No short answers ══ */
+        { mode: 'words', title: "Is it a pencil?", visual: "✏️ ✅",
+          items: ["Yes", "it", "is"], correct: "Yes, it is" },
+        { mode: 'words', title: "Is it a kangaroo?", visual: "🦊 ❌",
+          items: ["No", "it", "isn't"], correct: "No, it isn't" },
+        { mode: 'words', title: "Is he an elf?", visual: "🧝 ❌",
+          items: ["No", "he", "isn't"], correct: "No, he isn't" },
+        { mode: 'words', title: "Is it a sharpener?", visual: "🧽 ✅",
+          items: ["Yes", "it", "is"], correct: "Yes, it is" },
+        { mode: 'words', title: "Is it a dog?", visual: "🐶 ✅",
+          items: ["Yes", "it", "is"], correct: "Yes, it is" },
+        { mode: 'words', title: "Is she a singer?", visual: "👩‍🎤 ❌",
+          items: ["No", "she", "isn't"], correct: "No, she isn't" },
+
+        /* ══ Exercise 3 · Long answers ══ */
+        { mode: 'words', title: "Is it a kangaroo? — No, it isn't.", visual: "🦊",
+          items: ["It's", "a", "fox"], correct: "It's a fox" },
+        { mode: 'words', title: "Is it a pencil? — Yes, it is.", visual: "✏️",
+          items: ["It's", "a", "pencil"], correct: "It's a pencil" },
+        { mode: 'words', title: "Is it a dog? — Yes, it is.", visual: "🐶",
+          items: ["It's", "a", "dog"], correct: "It's a dog" },
+
+        /* ══ Exercise 4 · Spelling ══ */
+        { mode: 'letters', title: "Spell the word!", visual: "👦",  correct: "BROTHER" },
+        { mode: 'letters', title: "Spell the word!", visual: "👩",  correct: "SISTER" },
+        { mode: 'letters', title: "Spell the word!", visual: "👩‍🏫", correct: "TEACHER" },
+        { mode: 'letters', title: "Spell the word!", visual: "✏️",  correct: "PENCIL" },
+        { mode: 'letters', title: "Spell the word!", visual: "🐶",  correct: "DOG" }
+    ];
+
+    /* ── Normalize strings for comparison ──
+       - lowercase
+       - strip punctuation (, . ! ? ' etc.)
+       - collapse whitespace
+    */
+    function normalize(str) {
+        return String(str)
+            .toLowerCase()
+            .replace(/[.,!?;:'"]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    /* ── Fisher–Yates shuffle ── */
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if (!q) return;
+
+        document.getElementById('progress').innerText =
+            `Step ${currentStep + 1} of ${rawData.length}`;
+        document.getElementById('q-title').innerText = q.title;
+        document.getElementById('visual-content').innerHTML = q.visual;
+        document.getElementById('feedback').innerText = "";
+
+        const builder = document.getElementById('builder');
+        const pool = document.getElementById('pool');
+        builder.innerHTML = "";
+        pool.innerHTML = "";
+        currentSentence = [];
+
+        /* Build tiles */
+        const tiles = q.mode === 'letters'
+            ? q.correct.split("")     // individual letters
+            : q.items;                // words
+
+        const shuffledTiles = shuffle(tiles);
+
+        shuffledTiles.forEach(tile => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = tile;
+            btn.dataset.tile = tile;
+            btn.onclick = () => handleTileClick(btn, tile, q);
+            pool.appendChild(btn);
+        });
+
+        /* Update total tile count for validation */
+        builder.dataset.total = shuffledTiles.length;
+    }
+
+    function handleTileClick(btn, tile, q) {
+        if (btn.classList.contains('hidden-btn')) return;
+
+        btn.classList.add('hidden-btn');
+        currentSentence.push(tile);
+
+        const builder = document.getElementById('builder');
+        builder.innerHTML += `<span class="word-tag">${tile}</span>`;
+
+        const totalTiles = parseInt(builder.dataset.total, 10);
+
+        /* Only check when ALL tiles have been used */
+        if (currentSentence.length === totalTiles) {
+            const userAnswer = q.mode === 'letters'
+                ? currentSentence.join("")
+                : currentSentence.join(" ");
+
+            if (normalize(userAnswer) === normalize(q.correct)) {
+                success();
+            } else {
+                fail();
+            }
+        }
+    }
+
+    function success() {
+        document.getElementById('feedback').innerHTML =
+            "<span style='color:var(--success)'>🌟 WELL DONE! 🌟</span>";
+        setTimeout(() => {
+            currentStep++;
+            if (currentStep < rawData.length) {
+                loadGame();
+            } else {
+                finish();
+            }
+        }, 1100);
+    }
+
+    function fail() {
+        document.getElementById('feedback').innerHTML =
+            "<span style='color:var(--error)'>❌ Try again!</span>";
+        setTimeout(() => {
+            /* Simply reload the same question */
+            loadGame();
+        }, 1200);
+    }
+
+    function finish() {
+        document.getElementById('q-title').innerText =
+            "Questions Master Achieved!";
+        document.getElementById('visual-content').innerHTML = "🏆";
+        document.getElementById('game-ui').innerHTML =
+            "<h3>Excellent! You know all the questions and answers!</h3>";
+        document.getElementById('feedback').innerText = "";
+    }
+
+    loadGame();
+</script>
+</body>
+</html>

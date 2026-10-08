@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonics Safari: 3 Levels</title>
+    <style>
+        :root {
+            --jungle-green: #2e7d32;
+            --safari-sand: #f4e1d2;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+            --primary: #7c4dff;
+            --bg-color: #a5d6a7;
+        }
+        body { 
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif; 
+            background: var(--bg-color); 
+            background-image: url('https://www.transparenttextures.com');
+            text-align: center; color: #1b5e20; margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .game-container { 
+            max-width: 850px; margin: 0 auto; padding: 30px; background: var(--safari-sand); 
+            border-radius: 30px; border: 8px solid var(--jungle-green); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 2;
+        }
+        h1 { margin-top: 0; color: var(--jungle-green); font-size: 2.2em; }
+        
+        .level { display: none; }
+        .active { display: block; }
+        
+        #score-board { 
+            font-size: 1.1em; background: white; padding: 10px 25px; 
+            border-radius: 20px; border: 3px dashed var(--jungle-green); 
+            margin-bottom: 20px; display: inline-flex; gap: 20px; font-weight: bold;
+        }
+
+        .game-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+        }
+        
+        .column h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.2em;
+        }
+
+        .card { 
+            padding: 15px 20px; 
+            background: white; 
+            border-radius: 15px; 
+            border: 3px solid #ccc;
+            font-size: 1.1em; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            word-wrap: break-word;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            text-align: center;
+        }
+        
+        /* Level 1 Styling */
+        .card.phonetic-card { background: #e3f2fd; border-color: #1976d2; color: #0d47a1; font-family: 'Courier New', monospace; font-size: 1em; }
+        .card.sentence-card { background: #fff9c4; border-color: #fbc02d; color: #f57f17; }
+        
+        /* Level 2 Styling (Math) */
+        .card.math-phonetic-card { background: #f3e5f5; border-color: #8e24aa; color: #4a148c; font-family: 'Courier New', monospace; font-size: 1em; }
+        .card.math-sentence-card { background: #e8eaf6; border-color: #3f51b5; color: #1a237e; }
+
+        /* Level 3 Styling (Grammar) */
+        .card.animal-card { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
+        .card.answer-card { background: #fce4ec; border-color: #e91e63; color: #880e4f; }
+
+        .card:hover { transform: scale(1.03); }
+        .card.selected { border-color: #ff9800; box-shadow: 0 0 15px rgba(255,152,0,0.6); transform: scale(1.05); }
+        .card.matched { background: #c8e6c9; border-color: #4caf50; color: #2e7d32; cursor: default; pointer-events: none; opacity: 0.7; transform: none; }
+        .card.wrong-match { background: #ffcdd2; border-color: #f44336; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .feedback { font-weight: bold; min-height: 30px; margin-top: 20px; font-size: 1.3em; }
+        
+        button { 
+            padding: 12px 30px; font-size: 1.1em; cursor: pointer; 
+            color: white; border: none; border-radius: 25px; transition: 0.2s;
+            font-family: inherit; font-weight: bold; margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-restart { background: var(--primary); }
+        .btn-restart:hover { background: #651fff; transform: scale(1.05); }
+
+        /* SALUTE ANIMATION */
+        .salute {
+            position: absolute; width: 10px; height: 10px; background: gold;
+            border-radius: 50%; pointer-events: none; z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🦁 Phonics Safari 🐘</h1>
+    <div id="score-board">
+        <span>Level: <span id="level-display">1</span> / 3</span>
+        <span>Score: <span id="score">0</span></span>
+    </div>
+
+    <!-- MAIN EXERCISE LEVEL -->
+    <div id="level1" class="level active">
+        <h3 id="level-title">Level 1: Read and match the sentence</h3>
+        
+        <div class="game-board">
+            <div class="column" id="left-col">
+                <h3>🔤 Read</h3>
+            </div>
+            <div class="column" id="right-col">
+                <h3>✍️ Write</h3>
+            </div>
+        </div>
+        
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 2.5em; color: var(--jungle-green);">ZOO-PER! 🏆</h2>
+        <p style="font-size: 1.2em;">You completed all 3 levels of the Safari!</p>
+        <button class="btn-restart" onclick="initGame()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentLevel = 1;
+    let matchesFound = 0;
+    let selectedLeft = null;
+    let selectedRight = null;
+    let isChecking = false;
+
+    // --- LEVEL DATA ---
+
+    // Level 1: Based on the photo
+    const level1Data = [
+        { id: 1, left: "[faɪv ənd faɪv ɪz ten]", right: "five and five is ten" },
+        { id: 2, left: "['sevən 'maɪnəs θri: ɪz fɔ:]", right: "seven minus three is four" },
+        { id: 3, left: "[θri: ənd θri: ɪz sɪks]", right: "three and three is six" },
+        { id: 4, left: "[ten 'maɪnəs tu: ɪz eɪt]", right: "ten minus two is eight" },
+        { id: 5, left: "[tu: ənd eɪt ɪz ten]", right: "two and eight is ten" }
+    ];
+
+    // Level 2: More Math Phonics (Same theme as Level 1)
+    const level2Data = [
+        { id: 1, left: "[sɪks ənd fɔ: ɪz ten]", right: "six and four is ten" },
+        { id: 2, left: "[naɪn 'maɪnəs faɪv ɪz fɔ:]", right: "nine minus five is four" },
+        { id: 3, left: "[wʌn ənd sevən ɪz eɪt]", right: "one and seven is eight" },
+        { id: 4, left: "[twelv 'maɪnəs sɪks ɪz sɪks]", right: "twelve minus six is six" },
+        { id: 5, left: "[fɔ: ənd fɔ: ɪz eɪt]", right: "four and four is eight" }
+    ];
+
+    // Level 3: Grammar (All About Me)
+    const level3Data = [
+        { id: 1, left: "What's your name?", right: "My name is Kim." },
+        { id: 2, left: "Is she your sister?", right: "Yes, she is." },
+        { id: 3, left: "Are they teachers?", right: "No, they aren't." },
+        { id: 4, left: "Can you swim?", right: "Yes, I can." },
+        { id: 5, left: "How old are you?", right: "I am eight." }
+    ];
+
+    const allLevels = [level1Data, level2Data, level3Data];
+    const levelTitles = [
+        "Level 1: Read and match the sentence",
+        "Level 2: More Math Phonics",
+        "Level 3: All About Me"
+    ];
+
+    // --- SALUTE EFFECT ---
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 20; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 700;
+            const y = Math.random() * 400;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 250 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 250 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // --- GAME LOGIC ---
+    function initGame() {
+        score = 0;
+        currentLevel = 1;
+        document.getElementById('score').innerText = score;
+        document.getElementById('level-display').innerText = currentLevel;
+        document.getElementById('win-screen').classList.remove('active');
+        document.getElementById('level1').classList.add('active');
+        loadLevel(currentLevel);
+    }
+
+    function loadLevel(levelNum) {
+        matchesFound = 0;
+        selectedLeft = null;
+        selectedRight = null;
+        isChecking = false;
+        
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('level-title').innerText = levelTitles[levelNum - 1];
+        
+        const data = allLevels[levelNum - 1];
+        renderCards(data);
+    }
+
+    function renderCards(data) {
+        const leftCol = document.getElementById('left-col');
+        const rightCol = document.getElementById('right-col');
+        
+        // Clear existing cards (keep the h3 headers)
+        leftCol.querySelectorAll('.card').forEach(c => c.remove());
+        rightCol.querySelectorAll('.card').forEach(c => c.remove());
+
+        // Determine styles based on level
+        let leftCardClass = 'phonetic-card';
+        let rightCardClass = 'sentence-card';
+        
+        if (currentLevel === 2) { 
+            leftCardClass = 'math-phonetic-card'; 
+            rightCardClass = 'math-sentence-card'; 
+        }
+        if (currentLevel === 3) { 
+            leftCardClass = 'animal-card'; 
+            rightCardClass = 'answer-card'; 
+        }
+
+        // Create Left Cards (in original order)
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `card ${leftCardClass}`;
+            card.innerText = item.left;
+            card.dataset.id = item.id;
+            card.onclick = () => handleCardClick(card, 'left');
+            leftCol.appendChild(card);
+        });
+
+        // Shuffle Right Cards
+        const shuffledRight = [...data].sort(() => Math.random() - 0.5);
+        shuffledRight.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `card ${rightCardClass}`;
+            card.innerText = item.right;
+            card.dataset.id = item.id;
+            card.onclick = () => handleCardClick(card, 'right');
+            rightCol.appendChild(card);
+        });
+    }
+
+    function handleCardClick(card, side) {
+        if (isChecking || card.classList.contains('matched')) return;
+        
+        // Deselect if clicked again
+        if (card.classList.contains('selected')) {
+            card.classList.remove('selected');
+            if (side === 'left') selectedLeft = null;
+            else selectedRight = null;
+            return;
+        }
+
+        // Clear previous selection of the same side
+        if (side === 'left') {
+            if (selectedLeft) selectedLeft.classList.remove('selected');
+            selectedLeft = card;
+        } else {
+            if (selectedRight) selectedRight.classList.remove('selected');
+            selectedRight = card;
+        }
+        
+        card.classList.add('selected');
+
+        // Check if both are selected
+        if (selectedLeft && selectedRight) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        isChecking = true;
+        const leftId = selectedLeft.dataset.id;
+        const rightId = selectedRight.dataset.id;
+        const feed = document.getElementById('feedback');
+
+        if (leftId === rightId) {
+            // Match!
+            score += 10;
+            matchesFound++;
+            document.getElementById('score').innerText = score;
+            
+            feed.innerText = "Match found! ✅";
+            feed.style.color = "#2e7d32";
+            
+            selectedLeft.classList.remove('selected');
+            selectedRight.classList.remove('selected');
+            selectedLeft.classList.add('matched');
+            selectedRight.classList.add('matched');
+            
+            triggerSalute();
+            
+            selectedLeft = null;
+            selectedRight = null;
+            isChecking = false;
+
+            // Check if level is complete
+            const totalPairs = allLevels[currentLevel - 1].length;
+            if (matchesFound === totalPairs) {
+                setTimeout(nextLevel, 1200);
+            }
+        } else {
+            // No match
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+            
+            const lCard = selectedLeft;
+            const rCard = selectedRight;
+            
+            lCard.classList.add('wrong-match');
+            rCard.classList.add('wrong-match');
+            
+            setTimeout(() => {
+                lCard.classList.remove('wrong-match', 'selected');
+                rCard.classList.remove('wrong-match', 'selected');
+                selectedLeft = null;
+                selectedRight = null;
+                isChecking = false;
+                feed.innerText = "";
+            }, 800);
+        }
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        if (currentLevel > 3) {
+            showWin();
+        } else {
+            document.getElementById('level-display').innerText = currentLevel;
+            loadLevel(currentLevel);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('level1').classList.remove('active');
+        document.getElementById('win-screen').classList.add('active');
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // Start the game
+    initGame();
+</script>
+</body>
+</html>

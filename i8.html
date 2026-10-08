@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Family & Friends</title>
+    <style>
+        :root {
+            --primary-purple: #7c4dff;
+            --light-purple: #ede7f6;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+            --bg-color: #e8eaf6;
+        }
+        body { 
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif; 
+            background: var(--bg-color); 
+            text-align: center; color: #311b92; margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .game-container { 
+            max-width: 650px; margin: 0 auto; padding: 25px; background: white; 
+            border-radius: 30px; border: 6px solid var(--primary-purple); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 2;
+        }
+        .level { display: none; }
+        .active { display: block; }
+        
+        /* Text Styling */
+        .text-display { 
+            font-size: 1.2em; 
+            line-height: 2; 
+            margin: 15px 0; 
+            padding: 20px; 
+            background: var(--light-purple); 
+            border-radius: 15px; 
+            border: 2px dashed var(--primary-purple);
+            text-align: left;
+        }
+        .completed-text-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #1b5e20;
+            text-align: left;
+        }
+        .completed-text-box h4 {
+            margin: 0 0 10px 0;
+            color: #2e7d32;
+            text-align: center;
+        }
+        
+        /* Blanks */
+        .blank { 
+            display: inline-block; 
+            min-width: 50px; 
+            border-bottom: 3px solid var(--primary-purple); 
+            text-align: center; 
+            font-weight: bold; 
+            color: var(--primary-purple);
+            background: #fff9c4;
+            border-radius: 4px;
+            padding: 0 5px;
+        }
+        .blank.filled {
+            color: #2e7d32;
+            border-bottom: 3px solid #4caf50;
+            background: #e8f5e9;
+        }
+        .blank.current {
+            background: #fff176;
+            border-bottom: 3px solid #f57c00;
+        }
+
+        .options-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        button { 
+            padding: 10px 20px; font-size: 1em; cursor: pointer; 
+            color: white; border: none; border-radius: 12px; transition: 0.2s;
+            font-family: inherit; font-weight: bold;
+        }
+        .btn-option { background: var(--primary-purple); }
+        .btn-option:hover { transform: scale(1.05); opacity: 0.9; }
+        .btn-option:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        
+        .feedback { font-weight: bold; height: 30px; margin-top: 15px; font-size: 1.2em; }
+        #score-board { font-size: 1.1em; background: var(--light-purple); padding: 10px 20px; border-radius: 20px; border: 2px solid var(--primary-purple); margin-bottom: 20px; display: inline-block; }
+
+        /* SALUTE ANIMATION */
+        .salute {
+            position: absolute; width: 10px; height: 10px; background: gold;
+            border-radius: 50%; pointer-events: none; z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🌟 Starlight English 🌟</h1>
+    <div id="score-board">Level: <span id="current-level">1</span> | Score: <span id="score">0</span></div>
+
+    <!-- LEVEL 1: Complete the Text -->
+    <div id="level1" class="level active">
+        <h3>Exercise 2: Read and complete the text.</h3>
+        <div id="l1-text" class="text-display"></div>
+        <div id="l1-options" class="options-row"></div>
+        <div id="l1-feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 2: Answer the Questions -->
+    <div id="level2" class="level">
+        <h3>Exercise 3: You are Kim. Read again and answer the questions.</h3>
+        
+        <!-- Completed text provided as requested -->
+        <div class="completed-text-box">
+            <h4>📖 Completed Text:</h4>
+            I am Kim and this is Pat. She is my sister. My mum and dad are teachers. Their names are Peter and Alison. They are great! We are a happy family. I am very lucky!
+        </div>
+
+        <div id="l2-question" class="text-display" style="text-align: center; font-weight: bold; font-size: 1.3em;"></div>
+        <div id="l2-options" class="options-row"></div>
+        <div id="l2-feedback" class="feedback"></div>
+    </div>
+
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 2.5em; color: var(--primary-purple);">🌟 STAR STUDENT! 🌟</h2>
+        <p style="font-size: 1.2em;">You finished all the exercises!</p>
+        <button onclick="location.reload()" style="background: var(--primary-purple); margin-top: 20px;">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentLvl = 1;
+
+    // --- LEVEL 1 DATA ---
+    const l1Blanks = [
+        { id: 1, correct: "am" },
+        { id: 2, correct: "is" },
+        { id: 3, correct: "is" },
+        { id: 4, correct: "are" },
+        { id: 5, correct: "are" },
+        { id: 6, correct: "are" },
+        { id: 7, correct: "are" },
+        { id: 8, correct: "am" }
+    ];
+    const l1Options = ["am", "is", "are"];
+    let currentBlankIndex = 0;
+
+    // --- LEVEL 2 DATA ---
+    const l2Data = [
+        { q: "What's your name?", correct: "Kim", options: ["Kim", "Pat", "Peter"] },
+        { q: "Is Pat your mum?", correct: "No, she is my sister.", options: ["Yes, she is.", "No, she is my sister.", "No, she is my aunt."] },
+        { q: "Are your mum and dad teachers?", correct: "Yes, they are.", options: ["Yes, they are.", "No, they aren't.", "Yes, she is."] }
+    ];
+    let l2Index = 0;
+
+    // SALUTE EFFECT FUNCTION
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 15; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 600;
+            const y = Math.random() * 400;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // --- LEVEL 1 LOGIC ---
+    function initLevel1() {
+        renderL1Text();
+        renderL1Options();
+        updateScore();
+    }
+
+    function renderL1Text() {
+        const textContainer = document.getElementById('l1-text');
+        let html = "I <span class='blank' id='blank1'>___</span> Kim and this <span class='blank' id='blank2'>___</span> Pat. ";
+        html += "She <span class='blank' id='blank3'>___</span> my sister. ";
+        html += "My mum and dad <span class='blank' id='blank4'>___</span> teachers. ";
+        html += "Their names <span class='blank' id='blank5'>___</span> Peter and Alison. ";
+        html += "They <span class='blank' id='blank6'>___</span> great! ";
+        html += "We <span class='blank' id='blank7'>___</span> a happy family. ";
+        html += "I <span class='blank' id='blank8'>___</span> very lucky!";
+        
+        textContainer.innerHTML = html;
+
+        // Highlight the current blank
+        if (currentBlankIndex < l1Blanks.length) {
+            const currentBlankEl = document.getElementById('blank' + l1Blanks[currentBlankIndex].id);
+            if (currentBlankEl) {
+                currentBlankEl.classList.add('current');
+                currentBlankEl.innerText = "___";
+            }
+        }
+
+        // Fill in previously correct answers
+        for (let i = 0; i < currentBlankIndex; i++) {
+            const blankEl = document.getElementById('blank' + l1Blanks[i].id);
+            if (blankEl) {
+                blankEl.innerText = l1Blanks[i].correct;
+                blankEl.classList.add('filled');
+                blankEl.classList.remove('current');
+            }
+        }
+    }
+
+    function renderL1Options() {
+        const optionsContainer = document.getElementById('l1-options');
+        optionsContainer.innerHTML = "";
+        
+        // Only show options if there are blanks left to fill
+        if (currentBlankIndex >= l1Blanks.length) return;
+
+        l1Options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkL1(opt);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkL1(choice) {
+        const feed = document.getElementById('l1-feedback');
+        const currentBlank = l1Blanks[currentBlankIndex];
+        
+        if (choice === currentBlank.correct) {
+            score += 10; 
+            feed.innerText = "Correct! ✅"; 
+            feed.style.color = "#2e7d32";
+            triggerSalute();
+            
+            currentBlankIndex++;
+            updateScore();
+            renderL1Text();
+            renderL1Options();
+
+            if (currentBlankIndex >= l1Blanks.length) {
+                feed.innerText = "Excellent! You completed the text! 🎉";
+                setTimeout(nextLevel, 1500);
+            }
+        } else {
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+        }
+    }
+
+    // --- LEVEL 2 LOGIC ---
+    function initLevel2() {
+        if (l2Index >= l2Data.length) return showWin();
+        
+        const currentTask = l2Data[l2Index];
+        document.getElementById('l2-question').innerText = currentTask.q;
+        
+        const optionsContainer = document.getElementById('l2-options');
+        optionsContainer.innerHTML = "";
+        currentTask.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkL2(opt);
+            optionsContainer.appendChild(btn);
+        });
+        
+        document.getElementById('l2-feedback').innerText = "";
+        updateScore();
+    }
+
+    function checkL2(choice) {
+        const feed = document.getElementById('l2-feedback');
+        const currentTask = l2Data[l2Index];
+        
+        if (choice === currentTask.correct) {
+            score += 10; 
+            feed.innerText = "Correct! ✅"; 
+            feed.style.color = "#2e7d32";
+            triggerSalute();
+            l2Index++;
+            setTimeout(initLevel2, 1000);
+        } else {
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+        }
+    }
+
+    function updateScore() { 
+        document.getElementById('score').innerText = score; 
+    }
+
+    function nextLevel() {
+        document.getElementById(`level${currentLvl}`).classList.remove('active');
+        currentLvl++; 
+        document.getElementById('current-level').innerText = currentLvl;
+        
+        if (currentLvl === 2) initLevel2();
+        
+        document.getElementById(`level${currentLvl}`).classList.add('active');
+    }
+
+    function showWin() {
+        document.getElementById('level2').classList.remove('active');
+        document.getElementById('win-screen').classList.add('active');
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // Start the game
+    initLevel1();
+</script>
+</body>
+</html>
