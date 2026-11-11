@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Quiz: Personal Info (Easy)</title>
+<style>
+  /* Underwater Theme CSS */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, #0076a3 0%, #00bfff 100%);
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Bubble background animation */
+  .bubble {
+    position: absolute;
+    bottom: -100px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: rise 15s infinite ease-in;
+    pointer-events: none;
+  }
+  .bubble:nth-child(2) { width: 15px; height: 15px; animation-duration: 10s; left: 10%; }
+  .bubble:nth-child(3) { width: 25px; height: 25px; animation-duration: 12s; left: 20%; background-color: rgba(255, 255, 255, 0.4); }
+  .bubble:nth-child(4) { width: 18px; height: 18px; animation-duration: 8s; left: 30%; }
+  .bubble:nth-child(5) { width: 22px; height: 22px; animation-duration: 14s; left: 40%; }
+  .bubble:nth-child(6) { width: 16px; height: 16px; animation-duration: 9s; left: 50%; background-color: rgba(255, 255, 255, 0.5); }
+  .bubble:nth-child(7) { width: 20px; height: 20px; animation-duration: 11s; left: 60%; }
+  @keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-120vh) scale(0.7); opacity: 0.1; }
+  }
+
+  .quiz-container {
+    max-width: 650px;
+    width: 100%;
+    background: rgba(0, 50, 100, 0.85);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    text-align: center;
+    border: 2px solid #4dceff;
+    position: relative;
+    z-index: 10;
+  }
+  h1 {
+    color: #4dceff;
+    font-size: 2em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  #question-number-bubble {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      background-color: #ffeb3b;
+      color: #003366;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      font-size: 1.1em;
+  }
+  
+  .question-area h2 {
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    color: #ffeb3b;
+    min-height: 2em;
+  }
+  
+  .visual {
+    font-size: 4em;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+
+  /* Simplified Options */
+  .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+  }
+
+  .options button {
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    background-color: #00bcd4;
+    color: white;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s, transform 0.1s;
+  }
+  
+  .options button:hover:enabled {
+    background-color: #0097a7;
+    transform: scale(1.02);
+  }
+  
+  .options button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+  }
+
+  .feedback {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .correct { background-color: #a7f3d0; color: #065f46; }
+  .wrong { background-color: #fecaca; color: #991b1b; }
+  
+  #nextButton {
+    margin-top: 20px;
+    padding: 15px 40px;
+    background-color: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s;
+  }
+  #nextButton:active { transform: scale(0.95); }
+  
+  #results {
+    font-size: 1.6em;
+    color: #ffeb3b;
+    text-shadow: 1px 1px 0 #000;
+    line-height: 1.5;
+  }
+
+  .status-msg {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 20px;
+  }
+</style>
+</head>
+<body>
+
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+
+<div class="quiz-container">
+  <h1>Personal Info & Spelling</h1>
+  <div id="question-number-bubble"></div>
+  
+  <div id="quiz-area">
+    <div class="question-area">
+      <h2 id="question-text"></h2>
+      <div class="visual" id="question-visual"></div>
+      
+      <div class="options" id="options-container"></div>
+    </div>
+    <div class="feedback" id="feedback-area"></div>
+    <button id="nextButton" onclick="nextAction()">Next Question</button>
+  </div>
+  
+  <div id="results"></div>
+  <div id="send-status" class="status-msg"></div>
+</div>
+
+<script>
+  // ========== TRACKING DATA ==========
+  const TEST_NAME = "Easy Personal Information & Spelling";
+  let userMistakes = [];
+  let score = 0;
+
+  const questions_data = [
+    { 
+      question: "Answer: Diego Alvarez", 
+      visual: "👤", 
+      options: ["What's your name?", "Where do you live?", "How old are you?"], 
+      answer: "What's your name?" 
+    },
+    { 
+      question: "Answer: 17 North Road", 
+      visual: "🏠", 
+      options: ["What's your email?", "What's your phone number?", "Where do you live?"], 
+      answer: "Where do you live?" 
+    },
+    { 
+      question: "Answer: diego@xnet.com", 
+      visual: "📧", 
+      options: ["What's your name?", "What's your email address?", "Where are you from?"], 
+      answer: "What's your email address?" 
+    },
+    { 
+      question: "Answer: 06657 241682", 
+      visual: "📞", 
+      options: ["What's your phone number?", "How do you spell it?", "What's your address?"], 
+      answer: "What's your phone number?" 
+    },
+    { 
+      question: "Answer: D-I-E-G-O", 
+      visual: "🔤", 
+      options: ["How are you?", "What's your name?", "How do you spell that?"], 
+      answer: "How do you spell that?" 
+    },
+    { 
+      question: "How do you say @ in an email?", 
+      visual: "📧", 
+      options: ["at", "dot", "and"], 
+      answer: "at" 
+    },
+    { 
+      question: "How do you say .com in an email?", 
+      visual: "📧", 
+      options: ["dot com", "at com", "point com"], 
+      answer: "dot com" 
+    },
+    { 
+      question: "How do you say 0 in a phone number?", 
+      visual: "📞", 
+      options: ["oh or zero", "only zero", "only oh"], 
+      answer: "oh or zero" 
+    },
+    { 
+      question: "How do you say 33 in a phone number?", 
+      visual: "📞", 
+      options: ["thirty three", "double three", "three three"], 
+      answer: "double three" 
+    },
+    { 
+      question: "Answer: Kate", 
+      visual: "👧", 
+      options: ["How old are you?", "What's your name?", "Where do you live?"], 
+      answer: "What's your name?" 
+    }
+  ];
+
+  let questions = [...questions_data];
+  let currentQuestionIndex = 0;
+  let answered = false;
+  const totalQuestionsCount = questions_data.length;
+
+  const questionNumberBubble = document.getElementById('question-number-bubble');
+  const questionTextElem = document.getElementById('question-text');
+  const questionVisualElem = document.getElementById('question-visual');
+  const optionsContainer = document.getElementById('options-container');
+  const feedbackArea = document.getElementById('feedback-area');
+  const nextButton = document.getElementById('nextButton');
+
+  function loadQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+      showResults();
+      return;
+    }
+    
+    questionNumberBubble.textContent = `${currentQuestionIndex + 1}/${questions.length}`;
+    answered = false;
+    nextButton.style.display = 'none';
+    feedbackArea.style.display = 'none';
+    optionsContainer.innerHTML = '';
+
+    const currentQ = questions[currentQuestionIndex];
+    questionTextElem.textContent = currentQ.question;
+    questionVisualElem.textContent = currentQ.visual || '';
+    
+    // Shuffle options for replayability
+    const shuffledOptions = [...currentQ.options].sort(() => Math.random() - 0.5);
+    
+    shuffledOptions.forEach(option => {
+      const button = document.createElement('button');
+      button.textContent = option;
+      button.onclick = () => checkAnswer(option, currentQ.answer, button);
+      optionsContainer.appendChild(button);
+    });
+  }
+
+  function checkAnswer(selectedOption, correctAnswer, buttonElement) {
+    if (answered) return;
+    answered = true;
+
+    // Disable all buttons
+    const allButtons = optionsContainer.querySelectorAll('button');
+    allButtons.forEach(btn => btn.disabled = true);
+
+    if (selectedOption === correctAnswer) {
+      // Correct
+      buttonElement.style.backgroundColor = '#28a745';
+      feedbackArea.style.display = 'block';
+      feedbackArea.innerHTML = '✅ Great!';
+      feedbackArea.classList.add('correct');
+      feedbackArea.classList.remove('wrong');
+      score++;
+    } else {
+      // Wrong
+      userMistakes.push(selectedOption);
+      buttonElement.style.backgroundColor = '#dc3545';
+      
+      // Highlight correct button
+      allButtons.forEach(btn => {
+        if (btn.textContent === correctAnswer) {
+          btn.style.backgroundColor = '#28a745';
+        }
+      });
+
+      feedbackArea.style.display = 'block';
+      feedbackArea.innerHTML = `❌ Oops! The answer is: ${correctAnswer}`;
+      feedbackArea.classList.add('wrong');
+      feedbackArea.classList.remove('correct');
+    }
+
+    nextButton.style.display = 'block';
+  }
+
+  function nextAction() {
+    currentQuestionIndex++;
+    loadQuestion();
+  }
+
+  function showResults() {
+    document.getElementById('quiz-area').style.display = 'none';
+    questionNumberBubble.style.display = 'none';
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = `🌟 Quiz Finished!<br>Your score: ${score} out of ${totalQuestionsCount}!<br>🎉 Great job!`;
+    
+    sendResultsToGoogle();
+  }
+
+  // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+  function sendResultsToGoogle() {
+      const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+      
+      const formData = new URLSearchParams();
+      formData.append("name", TEST_NAME);
+      formData.append("score", score);
+      formData.append("total", totalQuestionsCount);
+      formData.append("mistakes", userMistakes.join(', '));
+
+      const statusEl = document.getElementById('send-status');
+      statusEl.style.color = "#ffeb3b";
+      statusEl.innerText = "Sending telemetry data...";
+
+      fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData.toString()
+      })
+      .then(() => {
+          statusEl.style.color = '#28a745'; // Green
+          statusEl.innerText = "Results sent successfully! ✅";
+      })
+      .catch((error) => {
+          console.error("Error sending results:", error);
+          statusEl.style.color = '#dc3545'; // Red
+          statusEl.innerText = "Failed to send results ❌.";
+      });
+  }
+  
+  window.onload = loadQuestion;
+</script>
+
+</body>
+</html>

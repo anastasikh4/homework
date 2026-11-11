@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports & Hobbies Unscramble Quiz</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --chip-bg: #f1f2f6;
+            --chip-border: #dfe4ea;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: var(--text-dark);
+            width: 100%;
+            max-width: 650px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 60%;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .instruction {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* Text Area */
+        .text-display {
+            font-size: 1.15rem;
+            line-height: 2.2;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 3px solid #bdc3c7;
+            text-align: center;
+            font-weight: bold;
+            color: #bdc3c7;
+            padding: 0 5px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        .gap.filled {
+            border-bottom-color: var(--quiz-green);
+            color: var(--quiz-green);
+        }
+
+        /* Chip Areas */
+        .pool-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #dfe4ea;
+            min-height: 80px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .word-chip {
+            background: var(--chip-bg);
+            border: 2px solid var(--chip-border);
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: 0.2s;
+            user-select: none;
+            color: #333;
+        }
+
+        .word-chip:hover {
+            background: var(--quiz-light-purple);
+            color: white;
+            border-color: var(--quiz-light-purple);
+            transform: scale(1.05);
+        }
+
+        .word-chip:active {
+            transform: scale(0.95);
+        }
+
+        /* Feedback & Buttons */
+        #feedback, #feedback2 {
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+        }
+
+        .btn-reset {
+            background: #bdc3c7;
+        }
+        .btn-reset:hover { background: #95a5a6; }
+
+        .btn-next {
+            background: var(--quiz-green);
+            display: none;
+        }
+        .btn-next:hover { background: #20bf6b; }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        .status-msg {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        /* Shake Animation for Wrong Answers */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: shake 0.4s; border-color: var(--quiz-red) !important; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    <div class="header">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">Level 1: Questions</div>
+    </div>
+
+    <!-- LEVEL 1: Complete the Questions -->
+    <div id="level1">
+        <div class="instruction">1. Click the correct word (do or does) to complete the questions.</div>
+        <div class="text-display" id="text-area">
+            1. <span class="gap" id="g1">[1]</span> Tom play tennis?<br>
+            2. <span class="gap" id="g2">[2]</span> Sarah and Tom go to the gym?<br>
+            3. <span class="gap" id="g3">[3]</span> Sarah like swimming?<br>
+            4. <span class="gap" id="g4">[4]</span> your friends play football?<br>
+            5. What <span class="gap" id="g5">[5]</span> they do on weekends?
+        </div>
+        <div class="pool-area" id="pool1"></div>
+        <div id="feedback"></div>
+        <button class="btn btn-next" id="next1" onclick="goToLevel2()">Next Level ➡️</button>
+    </div>
+
+    <!-- LEVEL 2: Complete the Dialogue -->
+    <div id="level2" class="hidden">
+        <div class="instruction">2. Click the correct word to complete the dialogue.</div>
+        <div class="text-display" id="vocab-area">
+            <b>Alex:</b> <span class="gap" id="d1">[1]</span> you like sports, Sarah?<br>
+            <b>Sarah:</b> Yes, I <span class="gap" id="d2">[2]</span>. I play volleyball.<br>
+            <b>Alex:</b> <span class="gap" id="d3">[3]</span> your brother play too?<br>
+            <b>Sarah:</b> No, he <span class="gap" id="d4">[4]</span>. He prefers video games.<br>
+            <b>Alex:</b> What time <span class="gap" id="d5">[5]</span> you usually practice?
+        </div>
+        <div class="pool-area" id="pool2"></div>
+        <div id="feedback2"></div>
+        <button class="btn btn-next" id="next2" onclick="showWinScreen()">Finish! 🏆</button>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="final-screen hidden">
+        <h1 style="font-size: 3rem;">🏆</h1>
+        <h2>Quiz Complete!</h2>
+        <p style="font-size: 1.2rem;">You mastered the Present Simple rules!</p>
+        <p style="margin-top:12px; font-size:1.15rem; font-weight:900; color:var(--quiz-purple);">
+            Final Score: <span id="finalScore">0</span> / 10
+        </p>
+        
+        <!-- Status Message for Google Sheets Sync -->
+        <div id="send-status" class="status-msg"></div>
+
+        <button class="btn btn-reset" style="display:inline-block; margin-top:20px;" onclick="location.reload()">TRY AGAIN 🔄</button>
+    </div>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Present Simple: Do/Does Questions & Short Answers";
+    let userMistakes = [];
+    let scoreCount = 0;
+    const totalQuestions = 10;
+
+    // --- LEVEL 1 DATA ---
+    const level1Answers = {
+        g1: "Does",
+        g2: "Do",
+        g3: "Does",
+        g4: "Do",
+        g5: "do"
+    };
+    const level1Pool = ["Does", "Do", "Does", "Do", "do"];
+    let currentLevel1Index = 1; // Start from gap 1 (g1)
+
+    // --- LEVEL 2 DATA ---
+    const level2Answers = {
+        d1: "Do",
+        d2: "do",
+        d3: "Does",
+        d4: "doesn't",
+        d5: "do"
+    };
+    const level2Pool = ["Do", "do", "Does", "doesn't", "do"];
+    let currentLevel2Index = 1; // Start from gap 1 (d1)
+
+    // --- INITIALIZATION ---
+    function initLevel1() {
+        const poolContainer = document.getElementById('pool1');
+        poolContainer.innerHTML = '';
+        
+        // Shuffle pool
+        const shuffledPool = [...level1Pool].sort(() => Math.random() - 0.5);
+        
+        shuffledPool.forEach(word => {
+            const chip = document.createElement('div');
+            chip.className = 'word-chip';
+            chip.innerText = word;
+            chip.onclick = () => handleLevel1Click(word, chip);
+            poolContainer.appendChild(chip);
+        });
+    }
+
+    function handleLevel1Click(word, chip) {
+        const currentGapId = 'g' + currentLevel1Index;
+        const correctAnswer = level1Answers[currentGapId];
+
+        if (word === correctAnswer) {
+            // Correct
+            const gapElement = document.getElementById(currentGapId);
+            gapElement.innerText = word;
+            gapElement.classList.add('filled');
+            
+            // Remove chip from pool
+            chip.remove();
+            
+            // Move to next gap
+            currentLevel1Index++;
+            scoreCount++;
+            updateProgress();
+
+            // Check if level 1 is complete
+            if (currentLevel1Index > 5) {
+                document.getElementById('feedback').innerText = "Perfect! Level 1 Complete! 🎉";
+                document.getElementById('feedback').style.color = "var(--quiz-green)";
+                document.getElementById('next1').style.display = 'block';
+            }
+        } else {
+            // Wrong
+            chip.classList.add('shake');
+            userMistakes.push(word); // Track mistake
+            document.getElementById('feedback').innerText = "Oops! Try again.";
+            document.getElementById('feedback').style.color = "var(--quiz-red)";
+            
+            setTimeout(() => {
+                chip.classList.remove('shake');
+                document.getElementById('feedback').innerText = "";
+            }, 500);
+        }
+    }
+
+    function goToLevel2() {
+        document.getElementById('level1').classList.add('hidden');
+        document.getElementById('level2').classList.remove('hidden');
+        document.getElementById('category').innerText = "Level 2: Dialogue";
+        document.getElementById('progress-bar').style.width = "50%";
+        initLevel2();
+    }
+
+    function initLevel2() {
+        const poolContainer = document.getElementById('pool2');
+        poolContainer.innerHTML = '';
+        
+        // Shuffle pool
+        const shuffledPool = [...level2Pool].sort(() => Math.random() - 0.5);
+        
+        shuffledPool.forEach(word => {
+            const chip = document.createElement('div');
+            chip.className = 'word-chip';
+            chip.innerText = word;
+            chip.onclick = () => handleLevel2Click(word, chip);
+            poolContainer.appendChild(chip);
+        });
+    }
+
+    function handleLevel2Click(word, chip) {
+        const currentGapId = 'd' + currentLevel2Index;
+        const correctAnswer = level2Answers[currentGapId];
+
+        if (word === correctAnswer) {
+            const gapElement = document.getElementById(currentGapId);
+            gapElement.innerText = word;
+            gapElement.classList.add('filled');
+            
+            chip.remove();
+            
+            currentLevel2Index++;
+            scoreCount++;
+            updateProgress();
+
+            if (currentLevel2Index > 5) {
+                document.getElementById('feedback2').innerText = "Incredible! You finished the quiz! 🎉";
+                document.getElementById('feedback2').style.color = "var(--quiz-green)";
+                document.getElementById('next2').style.display = 'block';
+            }
+        } else {
+            chip.classList.add('shake');
+            userMistakes.push(word); // Track mistake
+            document.getElementById('feedback2').innerText = "Oops! Try again.";
+            document.getElementById('feedback2').style.color = "var(--quiz-red)";
+            
+            setTimeout(() => {
+                chip.classList.remove('shake');
+                document.getElementById('feedback2').innerText = "";
+            }, 500);
+        }
+    }
+
+    function showWinScreen() {
+        document.getElementById('level2').classList.add('hidden');
+        document.getElementById('win-screen').classList.remove('hidden');
+        document.getElementById('progress-bar').style.width = "100%";
+        document.getElementById('finalScore').innerText = scoreCount;
+        
+        sendResultsToGoogle();
+    }
+
+    function updateProgress() {
+        if (currentLevel1Index <= 5) {
+            document.getElementById('progress-bar').style.width = ((currentLevel1Index - 1) / 5) * 50 + "%";
+        } else if (currentLevel2Index <= 5) {
+            document.getElementById('progress-bar').style.width = 50 + ((currentLevel2Index - 1) / 5) * 50 + "%";
+        }
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", scoreCount);
+        formData.append("total", totalQuestions);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending telemetry data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#26de81'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#eb3b5a'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    // Start the game
+    initLevel1();
+</script>
+
+</body>
+</html>

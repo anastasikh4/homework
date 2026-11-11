@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>English Quiz: Math & Friends</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --secondary-dark: #1899d6;
+            --danger: #ff4b4b;
+            --danger-dark: #ea2b2b;
+            --bg: #f7f9fc;
+            --card-bg: #ffffff;
+            --text-main: #3c3c3c;
+            --text-muted: #777777;
+            --border: #e5e5e5;
+            --correct-bg: #d7ffb8;
+            --correct-text: #58a700;
+            --correct-border: #a5ed6e;
+            --wrong-bg: #ffdfe0;
+            --wrong-text: #ea2b2b;
+            --wrong-border: #ff4b4b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- TOP PROGRESS BAR --- */
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            height: 16px;
+            background-color: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-weight: 800;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        /* --- QUIZ CONTAINER --- */
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 20px 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 0 var(--border);
+            margin-bottom: 30px;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .russian-hint {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .english-sentence {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .blank-space {
+            display: inline-block;
+            min-width: 100px;
+            border-bottom: 3px dashed var(--secondary);
+            color: var(--secondary);
+            font-weight: 900;
+            transition: all 0.3s;
+        }
+
+        /* --- OPTIONS GRID --- */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .english-sentence {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* --- TACTILE BUTTONS --- */
+        .option-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--border);
+            transition: transform 0.1s, box-shadow 0.1s, background 0.2s, border-color 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            word-break: break-word;
+        }
+
+        .option-btn:active:not(.disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+        }
+
+        /* --- STATES --- */
+        .option-btn.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--correct-text);
+            box-shadow: 0 4px 0 var(--correct-border);
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--wrong-text);
+            box-shadow: 0 4px 0 var(--wrong-border);
+        }
+
+        /* --- ANIMATIONS --- */
+        .flash-green {
+            animation: flashGreen 0.5s ease;
+        }
+        .flash-red {
+            animation: flashRed 0.5s ease;
+        }
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes flashGreen {
+            0% { background-color: var(--card-bg); }
+            50% { background-color: var(--correct-bg); }
+            100% { background-color: var(--card-bg); }
+        }
+
+        @keyframes flashRed {
+            0% { background-color: var(--card-bg); }
+            50% { background-color: var(--wrong-bg); }
+            100% { background-color: var(--card-bg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
+        /* --- NEXT BUTTON --- */
+        .next-btn-container {
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .next-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--secondary-dark);
+            transition: transform 0.1s, box-shadow 0.1s;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .next-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        /* --- FINAL SCREEN --- */
+        .final-screen {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 0 var(--border);
+            width: 100%;
+        }
+
+        .final-screen h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .score-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--primary-dark);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .restart-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-container">
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">1/10</div>
+    </div>
+
+    <!-- MAIN QUIZ CONTAINER -->
+    <div class="quiz-container" id="quizContainer">
+        <div class="question-card" id="questionCard">
+            <div class="russian-hint" id="russianHint">Loading...</div>
+            <div class="english-sentence" id="englishSentence"></div>
+        </div>
+
+        <div class="options-grid" id="optionsGrid"></div>
+
+        <div class="next-btn-container" id="nextBtnContainer">
+            <button class="next-btn" onclick="nextQuestion()">Continue</button>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="quiz-container" id="finalScreenContainer">
+        <div class="final-screen" id="finalScreen">
+            <h1 id="finalTitle">Great Job!</h1>
+            <div class="score-text" id="finalScoreText">You got 0 out of 10 correct</div>
+            <button class="restart-btn" onclick="startQuiz()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== DATA ==========
+        const rawData = [
+            { ru: "Что случилось?", en: "What's wrong?" },
+            { ru: "Я готовлюсь к экзамену по математике.", en: "I'm studying for a math exam." },
+            { ru: "Ответ неверный!", en: "The answer is incorrect!" },
+            { ru: "Как у тебя получается это решать?", en: "How did you solve it?" },
+            { ru: "Взгляни на это!", en: "Look at this!" },
+            { ru: "Ты нас недооцениваешь?", en: "Are you looking down on us?" },
+            { ru: "Сначала нужно делать умножение.", en: "You have to calculate multiplication first." },
+            { ru: "Я не понимаю, что такое дробь.", en: "I don't understand what a fraction is." },
+            { ru: "Математика слишком сложная.", en: "Mathematics is too hard." },
+            { ru: "Это отличная идея!", en: "That's a great idea!" }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let canClick = true;
+
+        // ========== HELPER FUNCTIONS ==========
+        function shuffle(array) {
+            const a = [...array];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // Extract a random word to be the blank (ignoring punctuation)
+        function createQuestionObject(item, allItems) {
+            const words = item.en.split(" ");
+            
+            // Find a suitable word to blank out (not too short, not the first word if possible)
+            let targetIndex = Math.floor(Math.random() * words.length);
+            // Simple heuristic: don't pick a 1-2 letter word if possible
+            while (words[targetIndex].replace(/[^a-zA-Z]/g, '').length < 3 && words.length > 3) {
+                targetIndex = Math.floor(Math.random() * words.length);
+            }
+
+            const correctWord = words[targetIndex];
+            const cleanCorrectWord = correctWord.replace(/[^a-zA-Z']/g, ''); // Remove punctuation for the option button
+
+            // Create the sentence with a blank
+            const blankSentence = [...words];
+            blankSentence[targetIndex] = "<span class='blank-space'>____</span>";
+            const displayEn = blankSentence.join(" ");
+
+            // Generate 3 distractors from other sentences
+            let distractors = [];
+            let pool = allItems.filter(q => q.en !== item.en); // Don't use the same sentence
+            pool = shuffle(pool); // Shuffle the pool
+
+            for (let q of pool) {
+                // Pick a random word from the pool sentence
+                const poolWords = q.en.split(" ");
+                const randomWord = poolWords[Math.floor(Math.random() * poolWords.length)];
+                const cleanDistractor = randomWord.replace(/[^a-zA-Z']/g, '');
+                
+                // Ensure it's different from the correct word and not already in distractors
+                if (cleanDistractor.length > 0 && 
+                    cleanDistractor.toLowerCase() !== cleanCorrectWord.toLowerCase() && 
+                    !distractors.includes(cleanDistractor)) {
+                    distractors.push(cleanDistractor);
+                }
+                if (distractors.length === 3) break;
+            }
+
+            // If we didn't get 3, add some fallback words
+            const fallbacks = ["the", "and", "play", "want", "know", "good", "really", "might"];
+            while(distractors.length < 3) {
+                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                if (fb.toLowerCase() !== cleanCorrectWord.toLowerCase() && !distractors.includes(fb)) {
+                    distractors.push(fb);
+                }
+            }
+
+            // Combine and shuffle options
+            const options = shuffle([cleanCorrectWord, ...distractors]);
+
+            return {
+                ru: item.ru,
+                en: displayEn,
+                correct: cleanCorrectWord,
+                options: options
+            };
+        }
+
+        // ========== QUIZ LOGIC ==========
+        function startQuiz() {
+            // Shuffle the raw data first
+            const shuffledData = shuffle(rawData);
+            // Create question objects
+            questions = shuffledData.map(item => createQuestionObject(item, rawData));
+            
+            currentIndex = 0;
+            score = 0;
+            canClick = true;
+
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('finalScreenContainer').style.display = 'none';
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= questions.length) {
+                showFinalScreen();
+                return;
+            }
+
+            canClick = true;
+            const q = questions[currentIndex];
+
+            // Update Progress Bar
+            const progressPercent = (currentIndex / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            document.getElementById('progressText').innerText = `${currentIndex + 1}/${questions.length}`;
+
+            // Update Card Content
+            document.getElementById('russianHint').innerText = q.ru;
+            document.getElementById('englishSentence').innerHTML = q.en;
+
+            // Reset Card Styles
+            const card = document.getElementById('questionCard');
+            card.classList.remove('flash-green', 'flash-red', 'shake');
+            card.style.borderColor = 'var(--border)';
+
+            // Hide Next Button
+            document.getElementById('nextBtnContainer').style.display = 'none';
+
+            // Render Options
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            q.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = option;
+                btn.onclick = () => checkAnswer(btn, option, q.correct);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btnClicked, selectedOption, correctAnswer) {
+            if (!canClick) return;
+            canClick = false;
+
+            const card = document.getElementById('questionCard');
+            const allBtns = document.querySelectorAll('.option-btn');
+            
+            // Disable all buttons
+            allBtns.forEach(b => b.classList.add('disabled'));
+
+            if (selectedOption.toLowerCase() === correctAnswer.toLowerCase()) {
+                // CORRECT
+                score++;
+                btnClicked.classList.add('correct');
+                card.classList.add('flash-green');
+                card.style.borderColor = 'var(--correct-border)';
+            } else {
+                // WRONG
+                btnClicked.classList.add('wrong');
+                card.classList.add('flash-red', 'shake');
+                card.style.borderColor = 'var(--wrong-border)';
+
+                // Mobile Vibration
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+
+                // Reveal correct answer
+                allBtns.forEach(b => {
+                    if (b.innerText.toLowerCase() === correctAnswer.toLowerCase()) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            // Show Next Button
+            setTimeout(() => {
+                document.getElementById('nextBtnContainer').style.display = 'block';
+            }, 500);
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function showFinalScreen() {
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('progressText').innerText = `${questions.length}/${questions.length}`;
+            
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('finalScreenContainer').style.display = 'block';
+            
+            // Update final screen text based on score
+            let title = "Great Job!";
+            if (score < 5) title = "Keep Practicing!";
+            else if (score === 10) title = "Perfect Score!";
+            
+            document.getElementById('finalTitle').innerText = title;
+            document.getElementById('finalScoreText').innerText = `You got ${score} out of ${questions.length} correct`;
+        }
+
+        // Start automatically on load
+        window.onload = startQuiz;
+    </script>
+</body>
+</html>
