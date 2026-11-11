@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening Comprehension: Life on the Oil Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-blue: #003366;
+            --dark-green: #006400;
+            --dark-brown: #3d2b1f;
+            --black: #000000;
+            --bg-cream: #fdfaf1;
+        }
+
+        * {
+            font-weight: 400 !important; /* Strictly no bold font */
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--black);
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid var(--dark-brown);
+            box-shadow: 10px 10px 0px var(--dark-brown);
+        }
+
+        h1 { color: var(--dark-blue); text-align: center; font-size: 2rem; margin-bottom: 20px; }
+        h2 { color: var(--dark-green); margin-top: 30px; border-bottom: 1px solid var(--dark-green); padding-bottom: 5px; }
+
+        .instructions {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--dark-blue);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: var(--dark-brown);
+        }
+
+        /* Audio Player Styling */
+        .audio-container {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #eef2f5;
+            border-radius: 10px;
+            border: 1px dashed var(--dark-blue);
+        }
+        
+        audio {
+            width: 100%;
+            max-width: 400px;
+            outline: none;
+        }
+
+        .exercise-block {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+        }
+
+        .q-text { margin-bottom: 15px; font-size: 1.1rem; color: var(--dark-brown); }
+
+        .options-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .opt-btn {
+            background: #ffffff;
+            border: 1px solid var(--dark-blue);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            color: var(--dark-blue);
+            transition: 0.3s;
+        }
+
+        .opt-btn.active {
+            background: var(--dark-blue);
+            color: var(--bg-cream);
+        }
+
+        .status-correct { background-color: #d1e7dd !important; border-color: var(--dark-green) !important; }
+        .status-wrong { background-color: #f8d7da !important; border-color: #842029 !important; }
+
+        #check-button {
+            width: 100%;
+            padding: 20px;
+            background: var(--dark-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background 0.3s;
+        }
+
+        #check-button:hover {
+            background: #002244;
+        }
+
+        #final-score {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 1.4rem;
+            color: var(--dark-green);
+            display: none;
+        }
+
+        #success-msg {
+            display: none;
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--dark-green);
+            margin-top: 15px;
+            padding: 10px;
+            background: #d1e7dd;
+            border-radius: 5px;
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; border: none; }
+            #check-button, .audio-container, #success-msg { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Listening Comprehension</h1>
+    
+    <div class="instructions">
+        <strong>Instructions:</strong> Listen to the audio recording (file so09) and complete the exercises below. Do not look at the text while answering.
+    </div>
+
+    <!-- Audio Player -->
+    <div class="audio-container">
+        <p style="margin-bottom: 10px; color: var(--dark-blue);">Play Audio (so09.mp3)</p>
+        <audio controls>
+            <source src="so09.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <h2>Part 1: True or False</h2>
+    <p style="margin-bottom: 15px; color: var(--dark-green); font-style: italic;">Read the statements and select True or False based on what you hear.</p>
+    
+    <div id="tf-area">
+        <div class="exercise-block" data-answer="False">
+            <div class="q-text">1. Alex works three weeks on and one week off.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="mark(this)">True</button>
+                <button class="opt-btn" onclick="mark(this)">False</button>
+            </div>
+        </div>
+        <div class="exercise-block" data-answer="True">
+            <div class="q-text">2. Alex reports to the Chief Engineer.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="mark(this)">True</button>
+                <button class="opt-btn" onclick="mark(this)">False</button>
+            </div>
+        </div>
+        <div class="exercise-block" data-answer="False">
+            <div class="q-text">3. Tore is operating cranes right now.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="mark(this)">True</button>
+                <button class="opt-btn" onclick="mark(this)">False</button>
+            </div>
+        </div>
+    </div>
+
+    <h2>Part 2: Multiple Choice</h2>
+    <p style="margin-bottom: 15px; color: var(--dark-green); font-style: italic;">Choose the best answer (A, B, or C) to complete the sentences.</p>
+    
+    <div id="mc-area">
+        <div class="exercise-block" data-answer="B">
+            <div class="q-text">4. What does Alex usually do every day?</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="mark(this)">A. He operates cranes.</button>
+                <button class="opt-btn" onclick="mark(this)">B. He inspects the machines.</button>
+                <button class="opt-btn" onclick="mark(this)">C. He supervises a new team.</button>
+            </div>
+        </div>
+        <div class="exercise-block" data-answer="A">
+            <div class="q-text">5. Why is Tore doing a different job today?</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="mark(this)">A. Because someone is sick.</button>
+                <button class="opt-btn" onclick="mark(this)">B. Because he is the Chief Engineer.</button>
+                <button class="opt-btn" onclick="mark(this)">C. Because the cranes are broken.</button>
+            </div>
+        </div>
+        <div class="exercise-block" data-answer="C">
+            <div class="q-text">6. What does Alex sometimes do in the morning?</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="mark(this)">A. He repairs broken pipes.</button>
+                <button class="opt-btn" onclick="mark(this)">B. He goes home to his family.</button>
+                <button class="opt-btn" onclick="mark(this)">C. He attends a meeting.</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="check-button" onclick="evaluateQuiz()">CHECK MY ANSWERS</button>
+    
+    <div id="final-score"></div>
+    <div id="success-msg">Results sent successfully! ✅</div>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Rig Operations - Listening Comprehension (so09)";
+    let userMistakes = [];
+    let score = 0;
+    let totalQuestions = 0;
+
+    function mark(btn) {
+        const row = btn.parentElement;
+        row.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function evaluateQuiz() {
+        score = 0;
+        userMistakes = [];
+        totalQuestions = 0;
+
+        const blocks = document.querySelectorAll('.exercise-block[data-answer]');
+        
+        blocks.forEach(block => {
+            totalQuestions++;
+            const selected = block.querySelector('.opt-btn.active');
+            const correctValue = block.getAttribute('data-answer');
+            
+            if (selected) {
+                // Extract 'A', 'B', 'C' or 'True', 'False'
+                const studentValue = selected.innerText.includes('.') 
+                    ? selected.innerText.split('.')[0].trim() 
+                    : selected.innerText.trim();
+                    
+                if (studentValue === correctValue) {
+                    block.classList.add('status-correct');
+                    block.classList.remove('status-wrong');
+                    score++;
+                } else {
+                    block.classList.add('status-wrong');
+                    block.classList.remove('status-correct');
+                    // Push the exact text of the wrong button clicked
+                    userMistakes.push(selected.innerText.trim());
+                }
+            } else {
+                block.classList.add('status-wrong');
+                userMistakes.push("skipped");
+            }
+        });
+
+        const scoreDiv = document.getElementById('final-score');
+        scoreDiv.innerText = "Total Score: " + score + " / " + totalQuestions;
+        scoreDiv.style.display = "block";
+        
+        // Send to Google Sheets
+        sendResultsToGoogle();
+
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION
+    // ================================================================
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams();
+        params.append('name', TEST_NAME);
+        params.append('score', score);
+        params.append('total', totalQuestions);
+        params.append('mistakes', userMistakes.join(', '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        })
+        .then(() => {
+            document.getElementById('success-msg').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error sending results:', error);
+        });
+    }
+</script>
+
+</body>
+</html>

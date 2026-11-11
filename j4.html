@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechPro Academy | Rig Operations Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-primary: #0ea5e9;
+    --brand-primary-hover: #0284c7;
+    --brand-secondary: #8b5cf6;
+    --brand-dark: #0f172a;
+    --brand-light: #f8fafc;
+    --success: #10b981;
+    --success-light: #ecfdf5;
+    --error: #ef4444;
+    --error-light: #fef2f2;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --card-bg: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  body {
+    background-color: #0b1120;
+    background-image: radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.15), transparent 25%),
+                      radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 850px;
+    background: var(--card-bg);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* MARKETING HEADER */
+  .hero-header {
+    background: linear-gradient(135deg, var(--brand-dark) 0%, #1e1b4b 100%);
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 H 90 V 90 H 10 Z" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/></svg>');
+    opacity: 0.5;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #38bdf8;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+  }
+  .hero-header h1 {
+    color: white;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+  .hero-header p {
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: 500;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* PROGRESS TRACKER */
+  .progress-section {
+    padding: 20px 40px;
+    background: var(--brand-light);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .progress-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .progress-bar-bg {
+    flex-grow: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    margin: 0 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* CONTENT AREA */
+  .content-area {
+    padding: 40px;
+  }
+  .level-screen { display: none; }
+  .level-screen.active { display: block; animation: slideUp 0.4s ease; }
+  
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .level-badge {
+    background: #e0f2fe;
+    color: var(--brand-primary);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+  }
+  .level-title { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+  .level-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 25px; }
+
+  /* LEVEL 1: MATCHING */
+  .memory-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+  }
+  .mem-card {
+    background: white; color: var(--text-main); border-radius: 12px;
+    padding: 20px 15px; text-align: center; font-weight: 700; font-size: 14px;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+    display: flex; align-items: center; justify-content: center; min-height: 90px;
+    border: 2px solid var(--border);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  }
+  .mem-card:hover:not(.matched) { border-color: var(--brand-primary); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(14, 165, 233, 0.1); }
+  .mem-card.selected { background: #e0f2fe; border-color: var(--brand-primary); }
+  .mem-card.matched { background: var(--success-light); color: var(--success); border-color: var(--success); pointer-events: none; opacity: 0.7; }
+  .mem-card.wrong { background: var(--error-light); border-color: var(--error); color: var(--error); animation: shake 0.4s; }
+
+  /* LEVEL 2: GAP FILL */
+  .word-bank {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px;
+    padding: 20px; background: var(--brand-light); border-radius: 16px; border: 1px dashed var(--border);
+  }
+  .chip {
+    background: white; border: 2px solid var(--border); border-radius: 8px;
+    padding: 10px 18px; font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--text-main);
+    box-shadow: 0 2px 0 var(--border);
+  }
+  .chip:hover { border-color: var(--brand-secondary); transform: translateY(-2px); }
+  .chip.selected { background: var(--brand-primary); color: white; border-color: var(--brand-primary); box-shadow: 0 2px 0 var(--brand-primary-hover); }
+  .chip.used { opacity: 0.3; pointer-events: none; box-shadow: none; }
+  
+  .text-content { font-size: 18px; line-height: 2.2; font-weight: 600; color: var(--text-main); }
+  .blank {
+    display: inline-block; min-width: 120px; border-bottom: 3px solid var(--border);
+    text-align: center; color: var(--text-muted); cursor: pointer; margin: 0 5px; transition: 0.2s;
+  }
+  .blank.filled { border-color: var(--brand-primary); color: var(--brand-primary); background: #f0f9ff; border-radius: 4px 4px 0 0; }
+  .blank.correct { border-color: var(--success); color: var(--success); background: var(--success-light); pointer-events: none; }
+  .blank.wrong { border-color: var(--error); color: var(--error); background: var(--error-light); animation: shake 0.4s; }
+
+  /* LEVEL 3: MATCHING */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .match-col { display: flex; flex-direction: column; gap: 10px; }
+  .match-item {
+    background: white; border: 2px solid var(--border); border-radius: 12px;
+    padding: 15px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; color: var(--text-main);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02); line-height: 1.4;
+  }
+  .match-item:hover { border-color: var(--brand-primary); }
+  .match-item.selected { background: #e0f2fe; border-color: var(--brand-primary); }
+  .match-item.matched { background: var(--success-light); border-color: var(--success); color: var(--success); pointer-events: none; opacity: 0.7; }
+  .match-item.wrong { background: var(--error-light); border-color: var(--error); animation: shake 0.4s; }
+
+  /* BUTTONS */
+  .action-btn {
+    background: var(--brand-primary); color: white;
+    padding: 16px 32px; border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 800; cursor: pointer;
+    transition: all 0.2s; font-family: inherit;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    width: 100%; margin-top: 30px;
+    box-shadow: 0 4px 0 var(--brand-primary-hover);
+  }
+  .action-btn:hover { background: var(--brand-primary-hover); transform: translateY(-1px); }
+  .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--brand-primary-hover); }
+  .action-btn:disabled { background: #cbd5e1; box-shadow: 0 4px 0 #94a3b8; cursor: not-allowed; }
+
+  /* FINAL SCREEN */
+  .final-screen {
+    display: none; text-align: center; padding: 20px 0;
+  }
+  .final-screen.active { display: block; animation: slideUp 0.5s ease; }
+  .trophy-icon { font-size: 70px; margin-bottom: 20px; line-height: 1; }
+  .final-title { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+  .final-subtitle { font-size: 18px; color: var(--text-muted); margin-bottom: 30px; font-weight: 500; }
+  
+  .score-card {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+  }
+  .score-number { font-size: 48px; font-weight: 800; color: var(--brand-primary); line-height: 1; }
+  .score-total { font-size: 20px; color: var(--text-muted); font-weight: 600; }
+  
+  .success-msg {
+    display: none; color: var(--success); font-weight: 800; font-size: 16px;
+    padding: 15px; background: var(--success-light); border-radius: 12px; margin-bottom: 20px;
+    border: 1px solid var(--success);
+  }
+
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+  @media (max-width: 650px) {
+    .memory-grid { grid-template-columns: repeat(2, 1fr); }
+    .match-grid { grid-template-columns: 1fr; }
+    .hero-header { padding: 30px 20px; }
+    .hero-header h1 { font-size: 24px; }
+    .content-area { padding: 20px; }
+    .progress-section { padding: 15px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <div class="hero-header">
+    <div class="badge">Global Rig Certification</div>
+    <h1>Rig Operations Assessment</h1>
+    <p>Prove your readiness for offshore work. Validate your technical vocabulary, daily operations, and grammar skills.</p>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-text">Progress</div>
+    <div class="progress-bar-bg">
+      <div class="progress-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressPercent">0%</div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- LEVEL 1 -->
+    <div class="level-screen active" id="level1">
+      <div class="level-badge">Module 01</div>
+      <h2 class="level-title">Job Actions</h2>
+      <p class="level-desc">Match the technical terms with their definitions to demonstrate core vocabulary.</p>
+      <div class="memory-grid" id="memoryGrid"></div>
+    </div>
+
+    <!-- LEVEL 2 -->
+    <div class="level-screen" id="level2">
+      <div class="level-badge">Module 02</div>
+      <h2 class="level-title">A Day on the Rig</h2>
+      <p class="level-desc">Complete the daily report. Click a word from the bank, then click a blank. Instant feedback will tell you if you're right!</p>
+      
+      <div class="word-bank" id="gapBank"></div>
+
+      <div class="text-content">
+        Every day, I <span class="blank" data-answer="operate">_____</span> 
+        big machines. I always <span class="blank" data-answer="report to">_____</span> 
+        the manager. My friend <span class="blank" data-answer="repair">_____</span> 
+        broken pipes. We <span class="blank" data-answer="maintain">_____</span> 
+        the equipment.
+      </div>
+      
+      <!-- Auto-advance message -->
+      <div id="gapSuccess" style="display:none; text-align:center; color:var(--success); font-weight:800; margin-top:20px; font-size: 18px;">
+        Great job! Moving to the next module...
+      </div>
+    </div>
+
+    <!-- LEVEL 3 -->
+    <div class="level-screen" id="level3">
+      <div class="level-badge">Module 03</div>
+      <h2 class="level-title">Professional Communication</h2>
+      <p class="level-desc">Match the interview questions with the appropriate technical responses.</p>
+      
+      <div class="match-grid">
+        <div class="match-col" id="matchLeft"></div>
+        <div class="match-col" id="matchRight"></div>
+      </div>
+      <button class="action-btn" id="checkMatchBtn" onclick="checkMatch()" style="display: none;">Complete Assessment</button>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="final-screen" id="finalScreen">
+      <div class="trophy-icon">🏅</div>
+      <h2 class="final-title">Assessment Complete</h2>
+      <p class="final-subtitle">You are ready to work with global teams on the rig.</p>
+      
+      <div class="score-card">
+        <div class="score-number" id="finalScoreText">0</div>
+        <div class="score-total">out of 14 points</div>
+      </div>
+      
+      <div class="success-msg" id="successMsg">Results sent successfully! ✅</div>
+      
+      <button class="action-btn" style="background: var(--brand-dark); box-shadow: 0 4px 0 #000;" onclick="location.reload()">Start New Session</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // --- CONFIGURATION & RESULTS TRACKING ---
+  const TEST_NAME = "TechPro Academy - Rig Operations Assessment (Instant Feedback)";
+  let userMistakes = [];
+  let score = 0;
+  const maxScore = 14; // 4 (Memory) + 4 (Gaps) + 6 (Matching) = 14
+
+  function shuffleArray(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  }
+
+  /* =====================================================
+     LEVEL 1: MEMORY
+     ===================================================== */
+  const memoryPairs = [
+    { id: 1, word: "Supervise", def: "To watch and manage people" },
+    { id: 2, word: "Operate", def: "To use a machine" },
+    { id: 3, word: "Maintain", def: "To keep things in good condition" },
+    { id: 4, word: "Report to", def: "To have a boss" }
+  ];
+
+  let selectedMemCard = null;
+  let matchedMemory = 0;
+  let lockBoard = false;
+
+  function initMemory() {
+    const grid = document.getElementById('memoryGrid');
+    grid.innerHTML = '';
+    let cards = [];
+    memoryPairs.forEach(p => {
+      cards.push({ id: p.id, text: p.word });
+      cards.push({ id: p.id, text: p.def });
+    });
+    shuffleArray(cards);
+
+    cards.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'mem-card';
+      div.innerText = c.text;
+      div.dataset.id = c.id;
+      div.dataset.text = c.text;
+      
+      div.onclick = () => selectMemoryCard(div);
+      grid.appendChild(div);
+    });
+  }
+
+  function selectMemoryCard(card) {
+    if (lockBoard || card.classList.contains('matched')) return;
+
+    if (!selectedMemCard) {
+      selectedMemCard = card;
+      card.classList.add('selected');
+      return;
+    }
+
+    if (selectedMemCard === card) {
+      card.classList.remove('selected');
+      selectedMemCard = null;
+      return;
+    }
+
+    lockBoard = true;
+    card.classList.add('selected');
+    
+    const c1 = selectedMemCard;
+    const c2 = card;
+
+    if (c1.dataset.id === c2.dataset.id && c1.dataset.text !== c2.dataset.text) {
+      setTimeout(() => {
+        c1.classList.remove('selected');
+        c2.classList.remove('selected');
+        c1.classList.add('matched');
+        c2.classList.add('matched');
+        
+        score++;
+        matchedMemory++;
+        updateProgress();
+        
+        selectedMemCard = null;
+        lockBoard = false;
+
+        if (matchedMemory === 4) {
+          setTimeout(() => goToLevel(2), 800);
+        }
+      }, 300);
+    } else {
+      setTimeout(() => {
+        c1.classList.add('wrong');
+        c2.classList.add('wrong');
+        setTimeout(() => {
+          c1.classList.remove('selected', 'wrong');
+          c2.classList.remove('selected', 'wrong');
+          selectedMemCard = null;
+          lockBoard = false;
+        }, 600);
+      }, 300);
+    }
+  }
+
+  /* =====================================================
+     LEVEL 2: GAP FILL (Instant Feedback)
+     ===================================================== */
+  const gapWords = [
+    "operate", "report to", "repair", "maintain", // Correct
+    "check", "fix", "use" // Distractors
+  ];
+
+  let selectedBankWord = null;
+  let gapsCompleted = 0;
+
+  function initGapFill() {
+    const bank = document.getElementById('gapBank');
+    bank.innerHTML = '';
+    const shuffledWords = shuffleArray([...gapWords]);
+    
+    shuffledWords.forEach(word => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.dataset.word = word;
+      chip.innerText = word;
+      chip.onclick = () => {
+        if (chip.classList.contains('used')) return;
+        if (selectedBankWord) selectedBankWord.classList.remove('selected');
+        selectedBankWord = chip;
+        chip.classList.add('selected');
+      };
+      bank.appendChild(chip);
+    });
+
+    const blanks = document.querySelectorAll('.blank');
+    blanks.forEach(blank => {
+      blank.onclick = () => {
+        if (blank.classList.contains('correct')) return; // Locked if correct
+
+        // If blank is filled but not yet correct, allow removing the word
+        if (blank.classList.contains('filled')) {
+          const wordToFree = blank.innerText;
+          const targetChip = document.querySelector(`.chip[data-word="${wordToFree}"]`);
+          if(targetChip) targetChip.classList.remove('used');
+          
+          blank.innerText = '_____';
+          blank.classList.remove('filled');
+          blank.style.color = 'var(--text-muted)';
+          blank.style.borderColor = 'var(--border)';
+          return;
+        }
+
+        // If a bank word is selected, place it and check immediately
+        if (selectedBankWord) {
+          const word = selectedBankWord.dataset.word;
+          const correctAnswer = blank.dataset.answer;
+
+          if (word === correctAnswer) {
+            // CORRECT INSTANT FEEDBACK
+            blank.innerText = word;
+            blank.classList.add('filled', 'correct');
+            blank.style.color = 'var(--success)';
+            blank.style.borderColor = 'var(--success)';
+            
+            selectedBankWord.classList.remove('selected');
+            selectedBankWord.classList.add('used');
+            selectedBankWord = null;
+            
+            score++;
+            gapsCompleted++;
+            updateProgress();
+
+            if (gapsCompleted === 4) { // Changed to 4
+              document.getElementById('gapSuccess').style.display = 'block';
+              setTimeout(() => goToLevel(3), 1500);
+            }
+          } else {
+            // WRONG INSTANT FEEDBACK
+            blank.innerText = word;
+            blank.classList.add('wrong');
+            
+            // Track mistake
+            userMistakes.push(word);
+
+            // Shake and reset after 500ms
+            setTimeout(() => {
+              blank.classList.remove('wrong');
+              blank.innerText = '_____';
+              if (selectedBankWord) {
+                selectedBankWord.classList.remove('selected');
+                selectedBankWord = null;
+              }
+            }, 500);
+          }
+        }
+      };
+    });
+  }
+
+  /* =====================================================
+     LEVEL 3: MATCHING (Shuffled Columns)
+     ===================================================== */
+  const matchData = [
+    { q: "What is your job?", a: "I am an assistant worker.", id: 1 },
+    { q: "Who is your boss?", a: "I report to the manager.", id: 2 },
+    { q: "What is your daily task?", a: "I operate machines and repair pipes.", id: 3 },
+    { q: "What are you doing now?", a: "I am supervising the team.", id: 4 },
+    { q: "When do you work?", a: "I work two weeks on and two weeks off.", id: 5 },
+    { q: "Where do you work?", a: "On an oil platform.", id: 6 }
+  ];
+
+  let selectedMatch = null;
+  let matchedPairs = 0;
+
+  function initMatching() {
+    const leftCol = document.getElementById('matchLeft');
+    const rightCol = document.getElementById('matchRight');
+    leftCol.innerHTML = '';
+    rightCol.innerHTML = '';
+
+    const questions = shuffleArray(matchData.map(item => ({ id: item.id, text: item.q })));
+    const answers = shuffleArray(matchData.map(item => ({ id: item.id, text: item.a })));
+
+    questions.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'match-item';
+      div.dataset.id = q.id;
+      div.dataset.type = 'q';
+      div.innerText = q.text;
+      div.onclick = () => handleMatchClick(div);
+      leftCol.appendChild(div);
+    });
+
+    answers.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'match-item';
+      div.dataset.id = a.id;
+      div.dataset.type = 'a';
+      div.innerText = a.text;
+      div.onclick = () => handleMatchClick(div);
+      rightCol.appendChild(div);
+    });
+  }
+
+  function handleMatchClick(item) {
+    if (item.classList.contains('matched')) return;
+
+    if (!selectedMatch) {
+      selectedMatch = item;
+      item.classList.add('selected');
+      return;
+    }
+
+    if (selectedMatch === item) {
+      item.classList.remove('selected');
+      selectedMatch = null;
+      return;
+    }
+
+    if (selectedMatch.dataset.type === item.dataset.type) {
+      selectedMatch.classList.remove('selected');
+      selectedMatch = item;
+      item.classList.add('selected');
+      return;
+    }
+
+    if (selectedMatch.dataset.id === item.dataset.id) {
+      selectedMatch.classList.remove('selected');
+      selectedMatch.classList.add('matched');
+      item.classList.add('matched');
+      selectedMatch = null;
+      matchedPairs++;
+      score++;
+      updateProgress();
+
+      if (matchedPairs === 6) {
+        document.getElementById('checkMatchBtn').style.display = 'block';
+      }
+    } else {
+      item.classList.add('wrong');
+      selectedMatch.classList.add('wrong');
+      userMistakes.push(`Wrong match: ${selectedMatch.innerText} -> ${item.innerText}`);
+      
+      const prev = selectedMatch;
+      setTimeout(() => {
+        item.classList.remove('wrong');
+        prev.classList.remove('wrong', 'selected');
+        selectedMatch = null;
+      }, 600);
+    }
+  }
+
+  function checkMatch() {
+    goToFinal();
+  }
+
+  /* =====================================================
+     NAVIGATION & PROGRESS
+     ===================================================== */
+  function goToLevel(lvl) {
+    document.querySelectorAll('.level-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('level' + lvl).classList.add('active');
+    
+    if (lvl === 2) initGapFill();
+    if (lvl === 3) initMatching();
+  }
+
+  function updateProgress() {
+    const pct = Math.round((score / maxScore) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressPercent').innerText = pct + '%';
+  }
+
+  function goToFinal() {
+    document.querySelectorAll('.level-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('finalScreen').classList.add('active');
+    document.getElementById('finalScoreText').innerText = score;
+    sendResultsToGoogle();
+  }
+
+  /* =====================================================
+     GOOGLE SHEETS INTEGRATION
+     ===================================================== */
+  async function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams({
+      name: TEST_NAME,
+      score: score,
+      total: maxScore,
+      mistakes: userMistakes.join(' | ')
+    });
+
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+      document.getElementById('successMsg').style.display = 'block';
+    } catch (error) {
+      console.error("Error sending results:", error);
+    }
+  }
+
+  // Init
+  initMemory();
+  updateProgress();
+</script>
+
+</body>
+</html>
