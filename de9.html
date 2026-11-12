@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translate into English · Sentence Builder</title>
+    <style>
+        :root {
+            --primary: #0984e3;
+            --success: #00b894;
+            --error: #d63031;
+            --bg: #fdfdfd;
+        }
+        * { box-sizing: border-box; font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; }
+        body {
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 4px solid #eee;
+            min-height: 600px;
+        }
+        .progress-header {
+            font-weight: bold;
+            color: #aaa;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .q-title {
+            font-size: 1.4rem;
+            color: #2d3436;
+            margin: 8px 0 12px;
+            min-height: 60px;
+            font-weight: bold;
+        }
+        .visual-box {
+            font-size: 4.5rem;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            min-height: 100px;
+        }
+        .sentence-builder {
+            border-bottom: 3px dashed #ddd;
+            min-height: 80px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+        .word-tag {
+            background: var(--primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: pop 0.3s;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            100% { transform: scale(1); }
+        }
+        .btn-pool {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .action-btn {
+            background: #fff;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 0 #ccc;
+            transition: 0.15s;
+            font-family: inherit;
+            color: #2d3436;
+            text-align: center;
+        }
+        .action-btn:hover {
+            background: #eef7ff;
+            border-color: var(--primary);
+        }
+        .action-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+        .action-btn.hidden-btn {
+            visibility: hidden;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            min-height: 50px;
+        }
+        .status-msg {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+        @media (max-width: 520px) {
+            .quiz-container { padding: 20px; }
+            .q-title { font-size: 1.15rem; }
+            .visual-box { font-size: 3.2rem; }
+            .action-btn { font-size: 1rem; padding: 12px 16px; }
+            .word-tag { font-size: 1.05rem; padding: 9px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress-header">Loading...</div>
+    <h2 id="q-title" class="q-title">Translate the sentence by putting the blocks in order</h2>
+
+    <div id="visual-content" class="visual-box"></div>
+
+    <div id="game-ui">
+        <div class="sentence-builder" id="builder"></div>
+        <div id="pool" class="btn-pool"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    // ======== TRACKING DATA ======
+    const TEST_NAME = "Translation Practice: 2-Word Chunks (A1/A2)";
+    let userMistakes = [];
+    let correctAnswers = 0;
+    let currentStep = 0;
+    let currentSentence = [];
+
+    /* 
+      Adapted Data based on the photo. 
+      Words are grouped strictly into 2-word chunks (or remainder).
+    */
+    const rawData = [
+        { 
+            title: "С днём рождения!", 
+            visual: "🎂 🎉", 
+            items: ["Happy birthday", "to you!"], 
+            correct: "Happy birthday to you!" 
+        },
+        { 
+            title: "Давай купим этот большой фотоаппарат для папы!", 
+            visual: "📷 👨", 
+            items: ["Let's buy", "this big", "camera for", "our dad!"], 
+            correct: "Let's buy this big camera for our dad!" 
+        },
+        { 
+            title: "Посмотри! Там мои новые роликовые коньки!", 
+            visual: "🛼 👀", 
+            items: ["Look! Those", "are my", "new roller", "skates!"], 
+            correct: "Look! Those are my new roller skates!" 
+        },
+        { 
+            title: "Эта кукла старая, но она очень симпатичная.", 
+            visual: "🪆", 
+            items: ["This doll", "is old,", "but it", "is very", "nice."], 
+            correct: "This doll is old, but it is very nice." 
+        },
+        { 
+            title: "Можно мне ту гитару? Она классная.", 
+            visual: "🎸", 
+            items: ["Can I", "have that", "guitar? It", "is cool."], 
+            correct: "Can I have that guitar? It is cool." 
+        },
+        { 
+            title: "Давай купим этот игрушечный паровоз для нашего малыша.", 
+            visual: "🚂 👶", 
+            items: ["Let's buy", "this toy", "train for", "our baby."], 
+            correct: "Let's buy this toy train for our baby." 
+        },
+        { 
+            title: "Можно мне те прекрасные цветы?", 
+            visual: "💐", 
+            items: ["Can I", "have those", "lovely flowers?"], 
+            correct: "Can I have those lovely flowers?" 
+        }
+    ];
+
+    /* ── Normalize strings for comparison ── */
+    function normalize(str) {
+        return String(str)
+            .toLowerCase()
+            .replace(/[.,!?;:'"]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    /* ── Fisher–Yates shuffle ── */
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if (!q) return;
+
+        document.getElementById('progress').innerText = `Step ${currentStep + 1} of ${rawData.length}`;
+        document.getElementById('visual-content').innerHTML = q.visual;
+        document.getElementById('q-title').innerText = q.title;
+        document.getElementById('feedback').innerText = "";
+
+        const builder = document.getElementById('builder');
+        const pool = document.getElementById('pool');
+        builder.innerHTML = "";
+        pool.innerHTML = "";
+        currentSentence = [];
+
+        // Shuffle the 2-word chunks
+        const shuffledTiles = shuffle([...q.items]);
+
+        shuffledTiles.forEach(tile => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = tile;
+            btn.dataset.tile = tile;
+            btn.onclick = () => handleTileClick(btn, tile, q);
+            pool.appendChild(btn);
+        });
+
+        builder.dataset.total = shuffledTiles.length;
+    }
+
+    function handleTileClick(btn, tile, q) {
+        if (btn.classList.contains('hidden-btn')) return;
+
+        btn.classList.add('hidden-btn');
+        currentSentence.push(tile);
+
+        const builder = document.getElementById('builder');
+        builder.innerHTML += `<span class="word-tag">${tile}</span>`;
+
+        const totalTiles = parseInt(builder.dataset.total, 10);
+
+        // Check if the sentence is complete
+        if (currentSentence.length === totalTiles) {
+            const userAnswer = currentSentence.join(" ");
+            if (normalize(userAnswer) === normalize(q.correct)) {
+                success();
+            } else {
+                fail(userAnswer);
+            }
+        }
+    }
+
+    function success() {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--success)'>🌟 WELL DONE! 🌟</span>";
+        correctAnswers++;
+        setTimeout(() => {
+            currentStep++;
+            if (currentStep < rawData.length) {
+                loadGame();
+            } else {
+                finish();
+            }
+        }, 1100);
+    }
+
+    function fail(userAnswer) {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--error)'>❌ Try again!</span>";
+        
+        // Track the mistake
+        userMistakes.push(userAnswer);
+
+        setTimeout(() => {
+            loadGame(); // Reload the same question so they can try again
+        }, 1500);
+    }
+
+    function finish() {
+        document.getElementById('progress').innerText = "Complete!";
+        document.getElementById('q-title').innerText = "Master of English!";
+        document.getElementById('visual-content').innerHTML = "🏆";
+        document.getElementById('game-ui').innerHTML = `
+            <h3>Excellent! You translated all the sentences!</h3>
+            <p>Final Score: ${correctAnswers} / ${rawData.length}</p>
+            <div id="send-status" class="status-msg"></div>
+        `;
+        document.getElementById('feedback').innerText = "";
+        
+        sendResultsToGoogle();
+    }
+
+    // ====== GOOGLE SHEETS SENDING FUNCTION ========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", correctAnswers);
+        formData.append("total", rawData.length);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#00b894'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#d63031'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    loadGame();
+</script>
+</body>
+</html>

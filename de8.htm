@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Hero: This / That / These / Those 🛍️</title>
+<style>
+  :root {
+    --blue: #2196f3;
+    --pink: #e91e63;
+    --green: #4caf50;
+    --yellow: #ffb300;
+    --purple: #7e57c2;
+    --bg1: #fff9e6;
+    --bg2: #ffe0f0;
+    --card-bg: #ffffff;
+    --text-dark: #1a2a4a;
+    --border-soft: #e0d5c8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #fff9e6 0%, #ffe0f0 50%, #e0f7fa 100%);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255, 200, 100, 0.35) 0%, transparent 30%),
+      radial-gradient(circle at 85% 80%, rgba(150, 220, 255, 0.35) 0%, transparent 30%),
+      radial-gradient(circle, rgba(255, 255, 255, 0.9) 2px, transparent 2px);
+    background-size: auto, auto, 34px 34px;
+    color: var(--text-dark);
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1 {
+    color: var(--purple);
+    text-transform: uppercase;
+    font-size: 26px;
+    text-shadow: 3px 3px 0 rgba(255, 200, 100, 0.6);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  h2 { color: var(--purple); font-size: 22px; margin-bottom: 10px; }
+
+  .score-banner {
+    display: inline-block;
+    background: #ffffff;
+    color: var(--purple);
+    font-weight: 700;
+    font-size: 18px;
+    padding: 8px 24px;
+    border-radius: 30px;
+    border: 3px solid var(--yellow);
+    box-shadow: 0 4px 0 rgba(255, 179, 0, 0.35);
+    margin-bottom: 20px;
+  }
+
+  .box {
+    max-width: 750px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 26px 24px 28px;
+    border-radius: 24px;
+    border: 4px solid var(--purple);
+    box-shadow: 8px 8px 0 rgba(126, 87, 194, 0.25);
+    display: none;
+  }
+
+  /* ===== GRID ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: #f5f0ff;
+    border: 3px solid #d1c4e9;
+    border-radius: 14px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px;
+    transition: 0.2s;
+    user-select: none;
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.35;
+    color: var(--text-dark);
+  }
+
+  .card.emoji {
+    font-size: 32px;
+    letter-spacing: 2px;
+    background: #fff9e6;
+    border-color: var(--yellow);
+  }
+
+  .card:hover:not(.matched) {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(126, 87, 194, 0.18);
+  }
+
+  .card.selected {
+    border-color: var(--blue);
+    background: #e3f2fd;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.25);
+    transform: scale(1.03);
+  }
+
+  .card.matched {
+    background: #d5f0dd;
+    border-color: var(--green);
+    cursor: default;
+    color: #1b5e20;
+  }
+
+  /* ===== CHOICE BUTTONS ===== */
+  .choice-btn {
+    background: #ffffff;
+    color: var(--text-dark);
+    border: 3px solid #d1c4e9;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border-radius: 14px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 560px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: left;
+    font-family: inherit;
+    transition: 0.15s;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: #e3f2fd;
+    transform: translateX(4px);
+  }
+
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-btn.correct {
+    background: #d5f0dd !important;
+    border-color: var(--green) !important;
+    color: #1b5e20 !important;
+    font-weight: 700;
+  }
+
+  .choice-btn.wrong {
+    background: #fde8e8 !important;
+    border-color: var(--pink) !important;
+    color: #b71c1c !important;
+    font-weight: 700;
+  }
+
+  /* ===== EMOJI DISPLAY ===== */
+  .emoji-display {
+    font-size: 70px;
+    margin: 20px;
+    letter-spacing: 4px;
+  }
+
+  .status {
+    margin-top: 18px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    min-height: 35px;
+    color: var(--purple);
+  }
+
+  /* ===== NEXT BUTTON ===== */
+  #next-btn {
+    background: var(--purple);
+    color: #ffffff;
+    padding: 14px 44px;
+    border-radius: 50px;
+    border: none;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    display: none;
+    font-family: inherit;
+    box-shadow: 0 5px 0 #4a2a8a;
+    transition: 0.1s;
+  }
+
+  #next-btn:hover { transform: translateY(-1px); }
+  #next-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #4a2a8a;
+  }
+
+  /* ===== AUDIO BUTTON ===== */
+  #audio-btn {
+    font-size: 70px;
+    background: #fff9e6;
+    border: 4px solid var(--yellow);
+    border-radius: 50%;
+    width: 130px;
+    height: 130px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 0 rgba(255, 179, 0, 0.4);
+    transition: 0.15s;
+  }
+
+  #audio-btn:hover {
+    transform: scale(1.05);
+    background: #fff3c4;
+  }
+
+  #audio-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(255, 179, 0, 0.4);
+  }
+
+  /* ===== FINAL SCREEN ===== */
+  .final-screen {
+    padding: 20px;
+  }
+
+  .final-screen h1 {
+    font-size: 40px;
+    color: var(--purple);
+    text-shadow: 4px 4px 0 rgba(255, 200, 100, 0.6);
+  }
+
+  .final-screen p {
+    font-size: 1.3em;
+    color: var(--text-dark);
+    margin: 16px 0 24px;
+  }
+
+  .final-screen .xp-final {
+    color: var(--pink);
+    font-size: 1.5em;
+    font-weight: 800;
+  }
+
+  .restart-btn {
+    background: var(--purple);
+    color: #ffffff;
+    padding: 16px 40px;
+    border-radius: 50px;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #4a2a8a;
+    font-family: inherit;
+    margin-top: 20px;
+  }
+
+  .restart-btn:active {
+    transform: translateY(5px);
+    box-shadow: 0 1px 0 #4a2a8a;
+  }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 500px) {
+    h1 { font-size: 20px; }
+    h2 { font-size: 18px; }
+    .box { padding: 20px 16px 22px; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .card { font-size: 12px; min-height: 90px; padding: 8px; }
+    .card.emoji { font-size: 26px; }
+    .emoji-display { font-size: 50px; }
+    .choice-btn { font-size: 15px; padding: 13px; }
+    #next-btn { font-size: 17px; padding: 12px 32px; }
+    #audio-btn { width: 100px; height: 100px; font-size: 55px; }
+    .final-screen h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🛍️ MISSION: THIS / THAT / THESE / THOSE</h1>
+<div class="score-banner">⭐ XP: <span id="xp">0</span></div>
+
+<!-- ===== LEVEL 1 ===== -->
+<div class="box" id="level1" style="display: block;">
+  <h2>🎯 Уровень 1: Поиск пар</h2>
+  <p>Соедини предложение с правильной картинкой!</p>
+  <div class="grid" id="grid1"></div>
+  <div class="status" id="status1"></div>
+</div>
+
+<!-- ===== LEVEL 2 ===== -->
+<div class="box" id="level2">
+  <h2>🧩 Уровень 2: Выбор предложения</h2>
+  <div class="emoji-display" id="emoji2"></div>
+  <div id="options2" style="display: flex; flex-direction: column; align-items: center;"></div>
+  <div class="status" id="status2"></div>
+  <button id="next-btn" onclick="nextL2()">СЛЕДУЮЩИЙ ▶</button>
+</div>
+
+<!-- ===== LEVEL 3 ===== -->
+<div class="box" id="level3">
+  <h2>🎧 Уровень 3: Слуховой радар</h2>
+  <p>Нажми на антенну, слушай и выбирай!</p>
+  <button id="audio-btn" onclick="playAudio()">📡</button>
+  <div class="grid" id="grid3"></div>
+  <div class="status" id="status3"></div>
+</div>
+
+<script>
+// ================================================================
+// CONFIGURATION & TRACKING
+// ================================================================
+const TEST_NAME = "Demonstratives & Shopping (This/That/These/Those)";
+let userMistakes = [];
+let correctAnswers = 0;
+let totalQuestions = 19; // 7 (L1) + 6 (L2) + 6 (L3)
+
+// ================================================================
+// LEVEL 1 DATA — Match sentence to emoji
+// ================================================================
+const pairData = [
+  { q: "What is this?",              e: "🎁" }, // near single
+  { q: "Look at those birds!",       e: "🦅🦅" }, // far plural
+  { q: "I like these shoes.",        e: "👟👟" }, // near plural
+  { q: "Can I have that hat?",       e: "🎩" }, // far single
+  { q: "These are my books.",        e: "📚📚" }, // near plural
+  { q: "Those are your glasses.",    e: "👓👓" }, // far plural
+  { q: "This is my bag.",            e: "👜" }  // near single
+];
+
+// ================================================================
+// LEVEL 2 DATA — Word order / Choice
+// ================================================================
+const testData = [
+  { e: "-->🐶",        c: "What's this?",                   o: ["What's this?", "What's that?", "What are these?", "What are those?"] },
+  { e: "------------>🍎🍎",      c: "Look at those apples.",          o: ["Look at these apples.", "Look at those apples.", "Look at this apple.", "Look at that apple."] },
+  { e: "------------->🚲",        c: "Can I have that bike?",          o: ["Can I have this bike?", "Can I have that bike?", "Can I have these bikes?", "Can I have those bikes?"] },
+  { e: "-->🥾🥾",      c: "Let's buy these boots.",         o: ["Let's buy these boots.", "Let's buy this boot.", "Let's buy those boots.", "Let's buy that boot."] },
+  { e: "-->🧸",        c: "I want this teddy bear.",        o: ["I want this teddy bear.", "I want that teddy bear.", "I want these teddy bears.", "I want those teddy bears."] },
+  { e: "------------->🏠🏠",      c: "Those are big houses.",          o: ["These are big houses.", "Those are big houses.", "This is a big house.", "That is a big house."] }
+];
+
+// ================================================================
+// LEVEL 3 DATA — Listening
+// ================================================================
+const audioData = [
+  { q: "I want that toy.",                 e: "🧸" },
+  { q: "Look at these balloons.",          e: "🎈🎈" },
+  { q: "What are those animals?",                  e: "🐑🐑" },
+  { q: "This is my new phone.",            e: "📱" },
+  { q: "Can I have those pencils?",        e: "✏️✏️" },
+  { q: "These are beautiful flowers.",     e: "💐" }
+];
+
+// ================================================================
+// STATE
+// ================================================================
+let xp = 0;
+let matchedCount = 0;
+let firstCard = null;
+let cur2 = 0;
+let cur3 = 0;
+
+// ================================================================
+// LEVEL 1 — MATCHING PAIRS
+// ================================================================
+function initL1() {
+  const grid = document.getElementById('grid1');
+  grid.innerHTML = "";
+  let cards = [];
+  pairData.forEach((d, i) => {
+    cards.push({ id: i, text: d.q, type: 'txt' });
+    cards.push({ id: i, text: d.e, type: 'emoji' });
+  });
+  cards.sort(() => Math.random() - 0.5);
+
+  cards.forEach(cardInfo => {
+    const el = document.createElement('div');
+    el.className = 'card' + (cardInfo.type === 'emoji' ? ' emoji' : '');
+    el.textContent = cardInfo.text;
+    el.dataset.pairId = cardInfo.id;
+
+    el.onclick = () => {
+      if (el.classList.contains('matched') || el === firstCard) return;
+      el.classList.add('selected');
+
+      if (!firstCard) {
+        firstCard = el;
+      } else {
+        const isPair = firstCard.dataset.pairId === el.dataset.pairId;
+        const isDifferent = firstCard.textContent !== el.textContent;
+
+        if (isPair && isDifferent) {
+          el.classList.replace('selected', 'matched');
+          firstCard.classList.replace('selected', 'matched');
+          matchedCount++;
+          correctAnswers++;
+          xp += 50; updateXP();
+          document.getElementById('status1').textContent = "ВЕРНО! ✅";
+
+          if (matchedCount === pairData.length) {
+            setTimeout(() => {
+              document.getElementById('level1').style.display = 'none';
+              document.getElementById('level2').style.display = 'block';
+              initL2();
+            }, 900);
+          }
+        } else {
+          document.getElementById('status1').textContent = "ОШИБКА! ❌";
+          // Track mistake
+          if (!isPair) {
+              userMistakes.push(el.textContent + " (wrong match)");
+          }
+          
+          const temp = firstCard;
+          setTimeout(() => {
+            temp.classList.remove('selected');
+            el.classList.remove('selected');
+          }, 450);
+        }
+        firstCard = null;
+      }
+    };
+    grid.appendChild(el);
+  });
+}
+
+// ================================================================
+// LEVEL 2 — MULTIPLE CHOICE
+// ================================================================
+function initL2() {
+  const d = testData[cur2];
+  document.getElementById('emoji2').textContent = d.e;
+  const box = document.getElementById('options2');
+  box.innerHTML = "";
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('status2').textContent = "";
+
+  const shuffled = [...d.o].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = opt;
+    b.onclick = () => {
+      const btns = box.querySelectorAll('button');
+      btns.forEach(btn => btn.disabled = true);
+
+      if (opt === d.c) {
+        b.classList.add('correct');
+        correctAnswers++;
+        xp += 100; updateXP();
+        document.getElementById('status2').textContent = "СУПЕР! +100 XP";
+      } else {
+        b.classList.add('wrong');
+        // Track mistake
+        userMistakes.push(opt);
+        
+        document.getElementById('status2').textContent = "НЕВЕРНО!";
+        btns.forEach(btn => { if (btn.textContent === d.c) btn.classList.add('correct'); });
+      }
+      document.getElementById('next-btn').style.display = 'block';
+    };
+    box.appendChild(b);
+  });
+}
+
+function nextL2() {
+  cur2++;
+  if (cur2 < testData.length) {
+    initL2();
+  } else {
+    document.getElementById('level2').style.display = 'none';
+    document.getElementById('level3').style.display = 'block';
+    initL3();
+  }
+}
+
+// ================================================================
+// LEVEL 3 — LISTENING
+// ================================================================
+function initL3() {
+  const grid = document.getElementById('grid3');
+  grid.innerHTML = "";
+  document.getElementById('status3').textContent = "Нажми на 📡 и слушай!";
+
+  const shuffled = [...audioData].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach((d) => {
+    const originalIndex = audioData.indexOf(d);
+    const b = document.createElement('div');
+    b.className = 'card emoji';
+    b.textContent = d.e;
+    b.onclick = () => {
+      if (originalIndex === cur3) {
+        b.classList.add('matched');
+        correctAnswers++;
+        xp += 150; updateXP();
+        cur3++;
+        if (cur3 < audioData.length) {
+          document.getElementById('status3').textContent = "ПРАВИЛЬНО! ✅";
+          setTimeout(initL3, 800);
+        } else {
+          finish();
+        }
+      } else {
+        b.classList.add('wrong');
+        // Track mistake
+        userMistakes.push(b.textContent);
+        
+        setTimeout(() => b.classList.remove('wrong'), 450);
+        document.getElementById('status3').textContent = "ПОПРОБУЙ СНОВА! ❌";
+      }
+    };
+    grid.appendChild(b);
+  });
+}
+
+function playAudio() {
+  if (!window.speechSynthesis) {
+    document.getElementById('status3').textContent = "🔇 Аудио не поддерживается";
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(audioData[cur3].q);
+  msg.lang = 'en-US';
+  msg.rate = 0.9;
+  window.speechSynthesis.speak(msg);
+  document.getElementById('status3').textContent = "🎧 Слушай внимательно...";
+}
+
+// ================================================================
+// UTILITIES & FINISH
+// ================================================================
+function updateXP() {
+  document.getElementById('xp').textContent = xp;
+}
+
+function finish() {
+  document.getElementById('level3').innerHTML = `
+    <div class="final-screen">
+      <h1>🏆 ГРАНД-МАСТЕР!</h1>
+      <p>Твой финальный счёт: <span class="xp-final">${xp} XP</span></p>
+      <p style="font-size: 1.1rem; color: #333; margin-top: -10px;">Правильных ответов: ${correctAnswers} из ${totalQuestions}</p>
+      <div id="send-status" style="font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; min-height: 20px;"></div>
+      <button class="restart-btn" onclick="location.reload()">ИГРАТЬ СНОВА 🔄</button>
+    </div>
+  `;
+  
+  sendResultsToGoogle();
+}
+
+// ================================================================
+// GOOGLE SHEETS INTEGRATION (MANDATORY)
+// ================================================================
+function sendResultsToGoogle() {
+  const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+  
+  const formData = new URLSearchParams();
+  formData.append("name", TEST_NAME);
+  formData.append("score", correctAnswers);
+  formData.append("total", totalQuestions);
+  formData.append("mistakes", userMistakes.join(', '));
+
+  const statusEl = document.getElementById('send-status');
+  statusEl.style.color = "#666";
+  statusEl.innerText = "Sending results...";
+
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formData.toString()
+  })
+  .then(() => {
+    statusEl.style.color = '#4caf50'; // Green
+    statusEl.innerText = "Results sent successfully! ✅";
+  })
+  .catch((error) => {
+    console.error("Error sending results:", error);
+    statusEl.style.color = '#e91e63'; // Red/Pink
+    statusEl.innerText = "Failed to send results ❌.";
+  });
+}
+
+// ================================================================
+// LAUNCH
+// ================================================================
+initL1();
+</script>
+</body>
+</html>

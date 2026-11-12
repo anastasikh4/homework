@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Presents · Toys & Counting</title>
+    <style>
+        :root {
+            --hero-blue: #3498db;
+            --hero-red: #e74c3c;
+            --hero-yellow: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #2ecc71;
+            --orange: #e67e22;
+            --purple: #9b59b6;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--hero-blue);
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            padding: 20px;
+        }
+        #academy-card {
+            background-color: white;
+            width: 95%;
+            max-width: 600px;
+            padding: 25px;
+            border: 6px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 12px 12px 0px var(--hero-yellow);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 4px solid var(--comic-black);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+        }
+        .lvl-badge {
+            background: var(--hero-red);
+            color: white;
+            padding: 5px 15px;
+            display: inline-block;
+            transform: rotate(-2deg);
+            font-size: 0.85rem;
+            border: 3px solid var(--comic-black);
+            letter-spacing: 1px;
+        }
+        .score-row {
+            margin: 10px 0 4px;
+            font-size: 1rem;
+        }
+        .score-row span {
+            color: var(--orange);
+            font-size: 1.2rem;
+        }
+
+        /* ═══════ CHAT WINDOW ═══════ */
+        .chat-window {
+            background: #f4f7fb;
+            border: 4px solid var(--comic-black);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 18px;
+            min-height: 160px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-bubble {
+            background: #ffffff;
+            border: 3px solid var(--comic-black);
+            border-radius: 15px;
+            padding: 12px 16px;
+            font-size: 1.05rem;
+            line-height: 2;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
+            animation: slideIn 0.35s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-bubble .speaker {
+            display: inline-block;
+            background: var(--hero-blue);
+            color: #fff;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 0.72rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-right: 6px;
+            letter-spacing: 1px;
+        }
+        .chat-bubble.book_janet .speaker { background: #e84393; } /* Pink for Janet */
+        
+        /* Emojis in the text are bigger for clarity */
+        .big-emoji {
+            font-size: 1.5rem;
+            vertical-align: middle;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 100px;
+            padding: 3px 10px;
+            margin: 0 3px;
+            background: #fff8e1;
+            border: 2px dashed var(--hero-red);
+            border-radius: 8px;
+            color: var(--hero-red);
+            font-weight: 900;
+            text-align: center;
+            vertical-align: middle;
+            font-family: 'Courier New', monospace;
+            transition: 0.3s;
+        }
+        .gap.active {
+            background: #ffeaa7;
+            color: var(--comic-black);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(241,196,15,0.4);
+            animation: pulse 1.4s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 4px rgba(241,196,15,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(241,196,15,0.15); }
+        }
+        .gap.filled {
+            background: var(--success);
+            color: white;
+            border-style: solid;
+            border-color: var(--comic-black);
+            animation: none;
+        }
+        .gap.filled-wrong {
+            background: #ffcdd2;
+            color: #c62828;
+            border-style: solid;
+            border-color: var(--hero-red);
+            animation: none;
+        }
+
+        /* ═══════ OPTIONS PANEL ═══════ */
+        .option-panel {
+            background: #fff8e1;
+            border: 3px dashed var(--hero-yellow);
+            border-radius: 15px;
+            padding: 14px 16px;
+        }
+        .option-panel .panel-title {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 0.85rem;
+            color: var(--orange);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ═══════ SHARED BUTTONS ═══════ */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .hero-btn {
+            background: var(--hero-yellow);
+            border: 3px solid var(--comic-black);
+            padding: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.2s;
+            font-family: 'Arial Black', sans-serif;
+            color: var(--comic-black);
+        }
+        .hero-btn:hover:not(:disabled) {
+            transform: scale(1.03);
+            background: #ffeaa7;
+        }
+        .hero-btn:active:not(:disabled) {
+            transform: translateY(2px);
+        }
+        .hero-btn:disabled {
+            opacity: 0.45;
+            cursor: default;
+        }
+        .hero-btn.correct-flash {
+            background: var(--success) !important;
+            color: #fff;
+        }
+        .hero-btn.wrong-flash {
+            background: var(--hero-red) !important;
+            color: #fff;
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .hidden { display: none !important; }
+
+        /* ═══════ PROGRESS ═══════ */
+        .progress-bar {
+            height: 12px;
+            background: #eee;
+            border: 2px solid #333;
+            margin-top: 20px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        #fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: 0.4s;
+        }
+        .progress-label {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #888;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* ═══════ WIN & NOTEBOOK ═══════ */
+        #win {
+            text-align: center;
+        }
+        #win h1 { font-size: 4rem; margin: 0; }
+        #win h2 { color: var(--orange); margin: 10px 0; }
+        #win p { font-size: 1rem; color: #555; }
+        
+        .notebook-box {
+            background: #e8f4f8;
+            border: 3px dashed var(--hero-blue);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .notebook-box h3 {
+            margin-top: 0;
+            color: var(--hero-blue);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .notebook-box p {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: var(--comic-black);
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .notebook-box b {
+            color: var(--hero-red);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 520px) {
+            .chat-bubble { font-size: 0.95rem; padding: 11px; line-height: 1.8; }
+            .gap { min-width: 80px; font-size: 0.9rem; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hero-btn { font-size: 0.9rem; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="academy-card">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-badge">BIRTHDAY PRESENTS: WHAT IS IT?</div>
+        <div class="score-row">⭐ POINTS: <span id="score">0</span></div>
+    </div>
+
+    <!-- ══════════ MAIN EXERCISE ══════════ -->
+    <div id="lvl0" class="screen">
+        <div class="chat-window" id="chatBox"></div>
+        <div class="option-panel" id="optionPanel">
+            <div class="panel-title" id="panelTitle">🎯 Choose the correct word</div>
+            <div class="btn-grid" id="chatBtnBox"></div>
+        </div>
+    </div>
+
+    <!-- ══════════ WIN ══════════ -->
+    <div id="win" class="hidden">
+        <h1>🎁✨</h1>
+        <h2>YOU DID IT!</h2>
+        <p>You successfully finished the test.</p>
+        <p style="margin-top:12px; font-size:1.15rem; font-weight:900; color:var(--orange);"> Final score: <span id="finalScore">0</span> points </p>
+        
+        <!-- NOTEBOOK SECTION -->
+        <div class="notebook-box">
+            <h3>📝 Write these sentences in your notebook:</h3>
+            <div id="notebook-answers"></div>
+        </div>
+
+        <div id="send-status" style="margin-top: 15px; font-weight: bold; font-size: 1.1rem; min-height: 20px;"></div>
+        
+        <button class="hero-btn" onclick="location.reload()" style="width:100%; background: var(--hero-blue); color:white; margin-top:18px; padding:15px;"> PLAY AGAIN 🔄 </button>
+    </div>
+
+    <div class="progress-bar"><div id="fill"></div></div>
+    <div class="progress-label">PROGRESS: <span id="progressTxt">0 / 13 questions</span></div>
+</div>
+
+<script>
+    // ======== TRACKING DATA ======
+    const TEST_NAME = "Birthday Presents (Janet + Look)";
+    let userMistakes = [];
+    let correctAnswers = 0;
+    let completedGaps = 0;
+    const totalQuestions = 13; // 4 (Janet) + 9 (Look pictures)
+
+    /* ══════════════════════════════════════════════ 
+       DIALOGUE AND QUESTIONS 
+       ══════════════════════════════════════════════ */
+    const steps = [
+        { 
+            speaker: "book_janet", 
+            html: "These are Janet's birthday presents 🎁: a <span class='gap' id='j1'>_____</span> <span class='big-emoji'>🧸</span>, a <span class='gap' id='j2'>_____</span> <span class='big-emoji'>🎸</span>, a <span class='gap' id='j3'>_____</span> <span class='big-emoji'>📷</span> and a <span class='gap' id='j4'>_____</span> <span class='big-emoji'>🚲</span>. Happy Birthday, Janet!", 
+            gaps: [
+                { id: "j1", options: ["teddy bear", "dog", "cat", "rabbit"], correct: "teddy bear", display: "teddy bear" },
+                { id: "j2", options: ["guitar", "piano", "drum", "violin"], correct: "guitar", display: "guitar" },
+                { id: "j3", options: ["camera", "phone", "book", "TV"], correct: "camera", display: "camera" },
+                { id: "j4", options: ["bike", "car", "bus", "train"], correct: "bike", display: "bike" }
+            ] 
+        },
+        { 
+            speaker: "book", 
+            html: "Look! These are my presents. Two <span class='gap' id='gap1'>_____</span> <span class='big-emoji'>🎸🎸</span>, a <span class='gap' id='gap2'>_____</span> <span class='big-emoji'>🚌</span> and a <span class='gap' id='gap3'>_____</span> <span class='big-emoji'>✈️</span>.", 
+            gaps: [
+                { id: "gap1", options: ["guitars", "cars", "bikes", "trains"], correct: "guitars", display: "guitars" },
+                { id: "gap2", options: ["bus", "plane", "train", "car"], correct: "bus", display: "bus" },
+                { id: "gap3", options: ["plane", "helicopter", "bike", "truck"], correct: "plane", display: "plane" }
+            ] 
+        },
+        { 
+            speaker: "book", 
+            html: "Look! These are my presents. Three <span class='gap' id='gap4'>_____</span> <span class='big-emoji'>🚗🚗🚗</span>, a <span class='gap' id='gap5'>_____</span> <span class='big-emoji'>🧸</span> and a <span class='gap' id='gap6'>_____</span> <span class='big-emoji'>📷</span>.", 
+            gaps: [
+                { id: "gap4", options: ["cars", "trucks", "teddy bears", "trains"], correct: "cars", display: "cars" },
+                { id: "gap5", options: ["dog", "cat", "teddy bear", "rabbit"], correct: "teddy bear", display: "teddy bear" },
+                { id: "gap6", options: ["phone", "book", "camera", "guitar"], correct: "camera", display: "camera" }
+            ] 
+        },
+        { 
+            speaker: "book", 
+            html: "Look! These are my presents. Two <span class='gap' id='gap7'>_____</span> <span class='big-emoji'>🚚🚚</span>, a <span class='gap' id='gap8'>_____</span> <span class='big-emoji'>🚂</span> and a <span class='gap' id='gap9'>_____</span> <span class='big-emoji'>🚁</span>.", 
+            gaps: [
+                { id: "gap7", options: ["buses", "trucks", "cars", "bikes"], correct: "trucks", display: "trucks" },
+                { id: "gap8", options: ["train", "bus", "plane", "car"], correct: "train", display: "train" },
+                { id: "gap9", options: ["plane", "helicopter", "bus", "car"], correct: "helicopter", display: "helicopter" }
+            ] 
+        }
+    ];
+
+    let currentStep = 0;
+    let gapIndex = 0;
+    let score = 0;
+    const chatBox = document.getElementById('chatBox');
+    const chatBtnBox = document.getElementById('chatBtnBox');
+    const optionPanel = document.getElementById('optionPanel');
+
+    /* ══════════════════════════════════════════════ 
+       REVEAL BUBBLES 
+       ══════════════════════════════════════════════ */
+    function revealBubble(stepIdx) {
+        const step = steps[stepIdx];
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + step.speaker;
+        
+        // Label handling
+        let label = "TEXT";
+        if (step.speaker === "book_janet") label = "JANET";
+        else if (step.speaker === "book") label = "LOOK!";
+        
+        bubble.innerHTML = `<span class="speaker">${label}</span>${step.html}`;
+        chatBox.appendChild(bubble);
+        
+        // Auto-scroll to bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (step.gaps && step.gaps.length > 0) {
+            gapIndex = 0;
+            activateGap(step.gaps[0]);
+        } else {
+            optionPanel.style.display = 'none';
+            setTimeout(() => {
+                currentStep++;
+                if (currentStep < steps.length) revealBubble(currentStep);
+                else nextLevel();
+            }, 600);
+        }
+    }
+
+    function activateGap(gapData) {
+        optionPanel.style.display = 'block';
+        document.querySelectorAll('.gap').forEach(g => g.classList.remove('active'));
+        
+        const activeEl = document.getElementById(gapData.id);
+        if (activeEl) activeEl.classList.add('active');
+
+        chatBtnBox.innerHTML = '';
+        // Shuffle the plain text options
+        const shuffled = [...gapData.options].sort(() => Math.random() - 0.5);
+        
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'hero-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkGap(gapData, opt, btn);
+            chatBtnBox.appendChild(btn);
+        });
+    }
+
+    function checkGap(gapData, chosen, btn) {
+        const allBtns = chatBtnBox.querySelectorAll('.hero-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        const gapEl = document.getElementById(gapData.id);
+        const step = steps[currentStep];
+        
+        completedGaps++;
+        document.getElementById('fill').style.width = (completedGaps / totalQuestions * 100) + '%';
+        document.getElementById('progressTxt').innerText = completedGaps + " / " + totalQuestions + " questions";
+
+        // Strict equality check for correctness
+        if (chosen === gapData.correct) {
+            // CORRECT ANSWER
+            btn.classList.add('correct-flash');
+            gapEl.innerText = gapData.display;
+            gapEl.classList.remove('active');
+            gapEl.classList.add('filled');
+            
+            score += 20;
+            correctAnswers++;
+            document.getElementById('score').innerText = score;
+
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            setTimeout(() => {
+                proceedToNext(step);
+            }, 700);
+        } else {
+            // WRONG ANSWER
+            btn.classList.add('wrong-flash');
+            userMistakes.push(chosen);
+            
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+
+            // Highlight the correct button
+            allBtns.forEach(b => {
+                if (b.innerText === gapData.correct) {
+                    b.classList.add('correct-flash');
+                }
+            });
+
+            // Show the correct answer in the gap
+            gapEl.innerText = gapData.display;
+            gapEl.classList.remove('active');
+            gapEl.classList.add('filled-wrong');
+
+            setTimeout(() => {
+                proceedToNext(step);
+            }, 2000);
+        }
+    }
+
+    function proceedToNext(step) {
+        if (step.gaps && gapIndex < step.gaps.length - 1) {
+            gapIndex++;
+            activateGap(step.gaps[gapIndex]);
+        } else {
+            currentStep++;
+            if (currentStep < steps.length) revealBubble(currentStep);
+            else nextLevel();
+        }
+    }
+
+    /* ══════════════════════════════════════════════ 
+       LEVEL SWITCHING & GOOGLE SHEETS 
+       ══════════════════════════════════════════════ */
+    function nextLevel() {
+        document.getElementById('lvl0').classList.add('hidden');
+        document.getElementById('win').classList.remove('hidden');
+        document.getElementById('lvl-tag').innerText = "FINISH!";
+        document.getElementById('finalScore').innerText = score;
+        document.getElementById('progressTxt').innerText = totalQuestions + " / " + totalQuestions + " questions";
+        document.getElementById('fill').style.width = '100%';
+        
+        generateNotebookAnswers();
+        sendResultsToGoogle();
+    }
+
+    // Generate the sentences for the kid to copy
+    function generateNotebookAnswers() {
+        const container = document.getElementById('notebook-answers');
+        container.innerHTML = '';
+        
+        // We only want to show the "Look! These are my presents..." sentences
+        let lookCounter = 1; 
+        
+        steps.forEach((step) => {
+            // Skip Janet's sentence
+            if (step.speaker === "book_janet") return; 
+            
+            let text = step.html;
+            
+            // Replace the gap span with the correct answer
+            if (step.gaps && step.gaps.length > 0) {
+                step.gaps.forEach(gap => {
+                    const gapRegex = new RegExp(`<span class='gap' id='${gap.id}'>_____</span>`, 'g');
+                    text = text.replace(gapRegex, `<b>${gap.correct}</b>`);
+                });
+            }
+            
+            container.innerHTML += `<p>${lookCounter}. ${text}</p>`;
+            lookCounter++;
+        });
+    }
+
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", correctAnswers);
+        formData.append("total", totalQuestions);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2ecc71'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    /* ══════════════════════════════════════════════ 
+       INIT 
+       ══════════════════════════════════════════════ */
+    revealBubble(0);
+</script>
+</body>
+</html>

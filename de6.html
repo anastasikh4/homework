@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRAMMAR SAFARI: MAKE SENTENCES (10 Qs)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Luckiest+Guy&display=swap');
+
+        :root {
+            --jungle: #1b5e20;
+            --leaf: #4caf50;
+            --wood: #5d4037;
+            --banana: #ffeb3b;
+            --sky: #e1f5fe;
+            --berry: #d81b60;
+        }
+
+        body {
+            background-color: var(--sky);
+            background-image: linear-gradient(rgba(255,255,255,0.3) 2px, transparent 2px),
+                              linear-gradient(90deg, rgba(255,255,255,0.3) 2px, transparent 2px);
+            background-size: 50px 50px;
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-card {
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 40px;
+            border: 10px solid var(--wood);
+            box-shadow: 0 20px 0px var(--jungle), 0 30px 50px rgba(0,0,0,0.2);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #game-card::before {
+            content: '🌿'; position: absolute; top: -10px; left: -10px; font-size: 50px; z-index: 0;
+        }
+        #game-card::after {
+            content: '🦜'; position: absolute; top: -10px; right: -10px; font-size: 50px; z-index: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--wood);
+            position: relative;
+            z-index: 1;
+        }
+
+        .xp-pill {
+            background: var(--banana);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 3px solid var(--wood);
+            font-family: 'Luckiest Guy', cursive;
+        }
+
+        .stage-tag {
+            background: var(--berry);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .display-area {
+            background: #f1f8e9;
+            min-height: 180px;
+            padding: 20px;
+            border-radius: 25px;
+            border: 5px solid var(--leaf);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            transition: 0.3s;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .emoji-main { font-size: 60px; margin: 0 0 10px 0; }
+        .prompt-text { font-size: 26px; color: var(--wood); margin: 0; font-weight: 800; line-height: 1.4;}
+
+        .question-label {
+            font-size: 20px;
+            color: var(--jungle);
+            margin-bottom: 20px;
+            min-height: 30px;
+            text-align: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-zoo {
+            background: white;
+            border: 4px solid var(--leaf);
+            border-radius: 20px;
+            padding: 18px 15px;
+            font-size: 18px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 6px 0 var(--jungle);
+            color: var(--wood);
+            text-align: left;
+        }
+
+        .btn-zoo:hover { background: #f9fff9; }
+        .btn-zoo:active { transform: translateY(4px); box-shadow: none; }
+
+        .progress-path {
+            width: 100%;
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 2px solid var(--wood);
+            position: relative;
+            z-index: 1;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--leaf);
+            border-radius: 8px;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .correct { animation: bounce 0.5s; background: var(--banana) !important; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        #win-screen {
+            display: none;
+            padding: 40px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        #win-screen h1 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 60px;
+            color: var(--berry);
+            margin: 0;
+        }
+        
+        #win-screen p {
+            font-size: 20px; 
+            font-weight: bold;
+        }
+
+        .confetti {
+            position: absolute; width: 10px; height: 10px; border-radius: 2px;
+            animation: fall 1s ease-out forwards;
+            z-index: 10;
+        }
+        @keyframes fall {
+            0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div class="stage-tag" id="stage-name">Grammar Safari</div>
+            <div class="xp-pill">🍌 <span id="xp-val">0</span></div>
+        </div>
+
+        <div class="display-area" id="main-display">
+            <p class="emoji-main" id="emoji-box"></p>
+            <p class="prompt-text" id="prompt-box"></p>
+        </div>
+
+        <div class="question-label" id="quest-text">Which sentence is correct?</div>
+
+        <div class="btn-grid" id="choices-box"></div>
+
+        <div class="progress-path">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div id="win-screen">
+        <h1>GG! 🏆</h1>
+        <p>GRAMMAR MASTER ACCOMPLISHED!</p>
+        <p id="success-msg" style="display: none; color: #27ae60; margin-top: 15px;">Results sent successfully! ✅</p>
+        <button class="btn-zoo" onclick="location.reload()" style="width: 100%; padding: 20px; margin-top: 20px; text-align: center; font-size: 20px;">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // CONFIGURATION & TRACKING
+    // ================================================================
+    const TEST_NAME = "Make Up Sentences (10 Questions A0+)";
+    let userMistakes = [];
+    let correctAnswersCount = 0;
+    let score = 0;
+    let current = 0;
+
+    // 10 Questions (5 from the photo + 5 similar ones)
+    const missions = [
+        { 
+            prompt: "I / want / bike / my birthday.", 
+            emoji: "🚲", 
+            ans: "I want a bike for my birthday.", 
+            opts: [
+                "I want a bike for my birthday.", 
+                "I want a dog for my birthday.", 
+                "I see a bike on my birthday."
+            ] 
+        },
+        { 
+            prompt: "look / these / toy cars.", 
+            emoji: "🚗", 
+            ans: "Look at these toy cars.", 
+            opts: [
+                "Look at these toy cars.", 
+                "Look at those red buses.", 
+                "Look at the toy cars."
+            ] 
+        },
+        { 
+            prompt: "warm / wishes / your birthday!", 
+            emoji: "🎂", 
+            ans: "Warm wishes for your birthday!", 
+            opts: [
+                "Warm wishes for your birthday!", 
+                "Good luck for your exam!", 
+                "Happy holiday for your summer!"
+            ] 
+        },
+        { 
+            prompt: "it / your birthday / today?", 
+            emoji: "🎉", 
+            ans: "Is it your birthday today?", 
+            opts: [
+                "Is it your birthday today?", 
+                "Is it your school today?", 
+                "Are you birthday today?"
+            ] 
+        },
+        { 
+            prompt: "those / your lorries?", 
+            emoji: "🚚", 
+            ans: "Are those your lorries?", 
+            opts: [
+                "Are those your lorries?", 
+                "Are these your cars?", 
+                "Is those your lorries?"
+            ] 
+        },
+        { 
+            prompt: "she / want / doll / her birthday.", 
+            emoji: "🪆", 
+            ans: "She wants a doll for her birthday.", 
+            opts: [
+                "She wants a doll for her birthday.", 
+                "She wants a car for her birthday.", 
+                "I want a doll for my birthday."
+            ] 
+        },
+        { 
+            prompt: "look / that / big dog.", 
+            emoji: "🐕", 
+            ans: "Look at that big dog.", 
+            opts: [
+                "Look at that big dog.", 
+                "Look at those big dogs.", 
+                "Look at this small cat."
+            ] 
+        },
+        { 
+            prompt: "happy / holiday / you!", 
+            emoji: "🏖️", 
+            ans: "Happy holiday to you!", 
+            opts: [
+                "Happy holiday to you!", 
+                "Happy birthday to me!", 
+                "Good weekend for us!"
+            ] 
+        },
+        { 
+            prompt: "this / your new phone?", 
+            emoji: "📱", 
+            ans: "Is this your new phone?", 
+            opts: [
+                "Is this your new phone?", 
+                "Is that your old phone?", 
+                "This is your new phone."
+            ] 
+        },
+        { 
+            prompt: "those / my shoes?", 
+            emoji: "👟", 
+            ans: "Are those my shoes?", 
+            opts: [
+                "Are those my shoes?", 
+                "Are these your shoes?", 
+                "Those are my shoes."
+            ] 
+        }
+    ];
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function loadMission() {
+        if(current >= missions.length) {
+            document.getElementById('play-area').style.display = 'none';
+            document.getElementById('win-screen').style.display = 'block';
+            sendResultsToGoogle();
+            return;
+        }
+
+        const m = missions[current];
+        document.getElementById('stage-name').innerText = "Grammar Safari";
+        document.getElementById('prompt-box').innerText = m.prompt;
+        document.getElementById('emoji-box').innerText = m.emoji;
+        
+        const grid = document.getElementById('choices-box');
+        grid.innerHTML = "";
+        const opts = shuffleArray([...m.opts]);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-zoo';
+            btn.innerText = opt;
+            btn.onclick = () => check(opt, btn, m.ans);
+            grid.appendChild(btn);
+        });
+
+        document.getElementById('progress-fill').style.width = (current / missions.length * 100) + "%";
+    }
+
+    function check(choice, btn, correctAns) {
+        const allBtns = document.querySelectorAll('.btn-zoo');
+        allBtns.forEach(b => b.disabled = true);
+
+        if(choice === correctAns) {
+            btn.classList.add('correct');
+            score += 100;
+            correctAnswersCount++;
+            document.getElementById('xp-val').innerText = score;
+            popConfetti();
+            current++;
+            setTimeout(loadMission, 800);
+        } else {
+            // Track mistake
+            userMistakes.push(choice);
+
+            btn.style.borderColor = "var(--berry)";
+            btn.style.color = "var(--berry)";
+            
+            // Highlight correct answer
+            allBtns.forEach(b => {
+                if(b.innerText === correctAns) {
+                    b.style.borderColor = "var(--leaf)";
+                    b.style.background = "#e8f5e9";
+                }
+            });
+
+            setTimeout(() => {
+                allBtns.forEach(b => {
+                    b.disabled = false;
+                    b.style.borderColor = "var(--leaf)";
+                    b.style.color = "var(--wood)";
+                    b.style.background = "white";
+                });
+            }, 1500);
+        }
+    }
+
+    function popConfetti() {
+        for(let i=0; i<15; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.background = ['#ff4081','#ffeb3b','#4caf50','#2196f3'][Math.floor(Math.random()*4)];
+            c.style.left = '50%'; c.style.top = '40%';
+            c.style.setProperty('--x', (Math.random()-0.5)*400 + 'px');
+            c.style.setProperty('--y', (Math.random()-0.5)*400 + 'px');
+            document.getElementById('game-card').appendChild(c);
+            setTimeout(() => c.remove(), 1000);
+        }
+    }
+
+    // ================================================================
+    // GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams();
+        params.append("name", TEST_NAME);
+        params.append("score", correctAnswersCount);
+        params.append("total", missions.length);
+        params.append("mistakes", userMistakes.join(' | '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        })
+        .then(() => {
+            // Show success message on the final screen
+            document.getElementById('success-msg').style.display = 'block';
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+        });
+    }
+
+    window.onload = () => {
+        shuffleArray(missions);
+        loadMission();
+    };
+</script>
+</body>
+</html>
