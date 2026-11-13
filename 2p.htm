@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Racing Quiz: Pit Lane Lexis</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-blue: #00f2fe;
+            --correct-green: #10b981;
+            --wrong-red: #ef4444;
+            --bg-light-grey: #e5e7eb;
+            --card-bg: #1f2937;
+            --text-main: #ffffff;
+            --text-dark: #111827;
+            --quest-gold: #fbbf24;
+            --border-color: #374151;
+        }
+
+        body {
+            background-color: var(--bg-light-grey);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .score-tracker {
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            padding: 15px;
+            border-bottom: 4px solid var(--f1-red);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 100;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            border-radius: 8px;
+        }
+
+        .mission-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 { 
+            text-transform: uppercase; 
+            text-align: center; 
+            margin: 10px 0; 
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+        
+        h1 {
+            color: var(--f1-red);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .quest-box {
+            border-bottom: 1px solid var(--border-color);
+            padding: 25px 0;
+        }
+
+        .image-box {
+            width: 100%;
+            max-width: 400px;
+            height: 200px;
+            object-fit: cover;
+            border: 2px solid #4b5563;
+            border-radius: 8px;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .variant-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .variant-btn {
+            background: #374151;
+            color: white;
+            border: 1px solid #4b5563;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .variant-btn:hover:not(:disabled) {
+            border-color: var(--f1-blue);
+            background: #4b5563;
+        }
+
+        /* Success/Fail States */
+        .variant-btn.correct { 
+            background-color: var(--correct-green) !important; 
+            border-color: var(--correct-green); 
+            color: white; 
+        }
+        .variant-btn.wrong { 
+            background-color: var(--wrong-red) !important; 
+            border-color: var(--wrong-red); 
+            color: white; 
+            opacity: 0.8;
+        }
+        .variant-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .reading-text {
+            background: #111827;
+            padding: 15px;
+            border-left: 4px solid var(--f1-blue);
+            margin: 10px 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+            color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+
+<div class="score-tracker">
+    RACE REPORT: <span id="score">0</span> / 10 LAPS | RANK: <span id="rank" style="color: var(--f1-red)">BEGINNER DRIVER</span>
+</div>
+
+<div class="mission-container">
+    <h1>Pit Lane Lexis Challenge</h1>
+
+    <!-- Q1: Traffic Signs -->
+    <div class="quest-box">
+        <h2>Lap 01: </h2>
+        <img src="https://i.pinimg.com/736x/7d/ba/65/7dba6554769db267f98c47b1462ee3a9.jpg" alt="Traffic Signs">
+        <p style="text-align:center; font-size:1.1rem;"><b>Guess the word: traffic s____</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">LINE</button>
+            <button class="variant-btn" onclick="check(this, true)">SIGNS</button>
+            <button class="variant-btn" onclick="check(this, false)">SIGNAL</button>
+        </div>
+    </div>
+
+    <!-- Q2: Seatbelt -->
+    <div class="quest-box">
+        <h2>Lap 02: Safety </h2>
+        <img src="https://upload.wikimedia.org/wikipedia/ru/8/81/Formula_Renault_1600_seat_belt.JPG" class="image-box" alt="Seatbelt">
+        <p style="text-align:center; font-size:1.1rem;"><b>When a driver in the car he has a seat... b____</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">BELT</button>
+            <button class="variant-btn" onclick="check(this, false)">STRAP</button>
+            <button class="variant-btn" onclick="check(this, false)">BLET</button>
+        </div>
+    </div>
+
+    <!-- Q3: Traffic Lights -->
+    <div class="quest-box">
+        <h2>Lap 03: </h2>
+        <img src="https://i.pinimg.com/originals/2d/ff/cf/2dffcf05cdd7a71d044e8b3413ad1ed1.jpg?nii=t" class="image-box" alt="Traffic Lights">
+        <p style="text-align:center; font-size:1.1rem;"><b>Guess the word: traffic l____</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">NIGHT</button>
+            <button class="variant-btn" onclick="check(this, false)">LAMP</button>
+            <button class="variant-btn" onclick="check(this, true)">LIGHTS</button>
+        </div>
+    </div>
+
+    <!-- Q4: Zebra Crossing -->
+    <div class="quest-box">
+        <h2>Lap 04: </h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Zebra_crossing.jpg" class="image-box" alt="Zebra Crossing">
+        <p style="text-align:center; font-size:1.1rem;"><b>Guess the word: zebra c______</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">CROSS</button>
+            <button class="variant-btn" onclick="check(this, true)">CROSSING</button>
+            <button class="variant-btn" onclick="check(this, false)">CROSSER</button>
+        </div>
+    </div>
+
+    <!-- Q5: Parking Zone -->
+    <div class="quest-box">
+        <h2>Lap 05: </h2>
+        <img src="https://i.pinimg.com/originals/53/2b/ad/532bad8ae87e34544fa045ca56315004.jpg" class="image-box" alt="Parking Zone">
+        <p style="text-align:center; font-size:1.1rem;"><b>Guess the word: parking z____</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">ZONE</button>
+            <button class="variant-btn" onclick="check(this, false)">ZON</button>
+            <button class="variant-btn" onclick="check(this, false)">PARK</button>
+        </div>
+    </div>
+
+    <!-- Q6: Yellow Line -->
+    <div class="quest-box">
+        <h2>Lap 06: Yellow Line</h2>
+        <img src="https://avatars.mds.yandex.net/i?id=d3533a9da4a3e37da968f248f4a4f200_l-5221595-images-thumbs&n=13" class="image-box" alt="Yellow Line">
+        <p style="text-align:center; font-size:1.1rem;"><b>Guess the word: yellow l____</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">LIME</button>
+            <button class="variant-btn" onclick="check(this, true)">LINES</button>
+            <button class="variant-btn" onclick="check(this, false)">LANE</button>
+        </div>
+    </div>
+
+    <!-- Q7: Preposition -->
+    <div class="quest-box">
+        <h2>Lap 07: Travel</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>He's travelling ______ the 8 o'clock train.</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">ON</button>
+            <button class="variant-btn" onclick="check(this, false)">IN</button>
+            <button class="variant-btn" onclick="check(this, false)">BY</button>
+        </div>
+    </div>
+
+    <!-- Q8: Preposition -->
+    <div class="quest-box">
+        <h2>Lap 08: School Run</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>We went to school ______ foot.</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">BY</button>
+            <button class="variant-btn" onclick="check(this, true)">ON</button>
+            <button class="variant-btn" onclick="check(this, false)">IN</button>
+        </div>
+    </div>
+
+    <!-- Q9: Preposition -->
+    <div class="quest-box">
+        <h2>Lap 09: Travel Fears</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>She is afraid of travelling ______ plane.</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">ON</button>
+            <button class="variant-btn" onclick="check(this, true)">BY</button>
+            <button class="variant-btn" onclick="check(this, false)">IN</button>
+        </div>
+    </div>
+
+    <!-- Q10: Preposition -->
+    <div class="quest-box" style="border: 2px solid var(--f1-red); padding: 20px; background: #111827; border-radius: 8px; margin-bottom: 20px;">
+        <h2 style="color: var(--quest-gold);">🏎️ FINAL LAP: Podium</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>Don't wave ______ the window.</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">OF</button>
+            <button class="variant-btn" onclick="check(this, false)">OFF</button>
+            <button class="variant-btn" onclick="check(this, true)">FROM</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let points = 0;
+    const totalQuestions = 10;
+
+    function check(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('button');
+        
+        if (isCorrect) {
+            if(!btn.classList.contains('correct')) {
+                btn.classList.add('correct');
+                points++;
+                updateScore();
+            }
+        } else {
+            btn.classList.add('wrong');
+        }
+        
+        // Disable all buttons in this question block
+        buttons.forEach(b => b.disabled = true);
+    }
+
+    function updateScore() {
+        document.getElementById('score').innerText = points;
+        let rank = "BEGINNER DRIVER";
+        
+        if (points >= 3) rank = "JUNIOR RACER";
+        if (points >= 6) rank = "SPEED CONTENDER";
+        if (points >= 8) rank = "PRO DRIVER";
+        if (points === 10) rank = "🏆 P1 CHIEF CHAMPION";
+        
+        document.getElementById('rank').innerText = rank;
+    }
+</script>
+
+</body>
+</html>

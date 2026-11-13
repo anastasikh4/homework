@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>F1 Driver Observation Worksheet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap');
+
+        :root {
+            --f1-red: #e10600;
+            --bg-light: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-dark: #1f1f27;
+            --text-gray: #4b5563;
+            --f1-yellow: #d97706; /* Darker yellow for contrast on white */
+            --border-color: #cbd5e1;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .worksheet-container {
+            background: var(--card-bg);
+            max-width: 850px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            border-top: 6px solid var(--f1-red);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Racing Stripes decoration (subtle) */
+        .worksheet-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.015) 10px,
+                rgba(0, 0, 0, 0.015) 20px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            padding: 30px 40px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-dark);
+        }
+
+        .header h1 span {
+            color: var(--f1-red);
+        }
+
+        .header .badge {
+            background: var(--f1-red);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+        }
+
+        /* Content Area */
+        .content {
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-style: italic;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h2 span {
+            background: var(--f1-red);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: skewX(-15deg);
+            font-size: 20px;
+            border-radius: 2px;
+        }
+        
+        h2 span > div {
+            transform: skewX(15deg);
+        }
+
+        /* Task 1: Text Only */
+        .task-block {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--f1-red);
+        }
+
+        .text-line {
+            font-size: 18px;
+            line-height: 2.2;
+            margin-bottom: 15px;
+            color: var(--text-gray);
+        }
+
+        /* Task 2: Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--border-color);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--f1-red);
+            box-shadow: 0 5px 15px rgba(225, 6, 0, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .card:hover::before {
+            background: var(--f1-red);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            filter: grayscale(20%) contrast(110%);
+            transition: 0.3s;
+        }
+
+        .card:hover img {
+            filter: grayscale(0%) contrast(100%);
+        }
+
+        .card p {
+            font-size: 17px;
+            line-height: 2;
+            color: var(--text-gray);
+        }
+
+        /* Task 3: Multiple Choice */
+        .mcq-block {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .mcq-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .mcq-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mcq-btn {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .mcq-btn:hover {
+            border-color: var(--f1-red);
+            background: #f1f5f9;
+        }
+
+        .mcq-btn.selected {
+            background: var(--f1-red);
+            color: #fff;
+            border-color: var(--f1-red);
+            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.2);
+        }
+
+        /* Dropdowns */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            padding: 6px 35px 6px 15px;
+            border-radius: 4px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--f1-red);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e10600%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+        }
+
+        select:focus, select:hover {
+            border-color: var(--f1-red);
+            box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.1);
+        }
+
+        /* Buttons */
+        .actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            padding: 16px 24px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+
+        .btn-check {
+            background: var(--f1-red);
+            color: #fff;
+            box-shadow: 0 4px 0 #b30500;
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+        }
+
+        .btn-check:hover {
+            background: #ff1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #b30500;
+        }
+
+        .btn-check:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #b30500;
+        }
+
+        .btn-reset {
+            background: #e2e8f0;
+            color: var(--text-dark);
+            box-shadow: 0 4px 0 #cbd5e1;
+            flex: 0.4;
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+        }
+
+        .btn-reset:hover {
+            background: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #94a3b8;
+        }
+
+        .btn-reset:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #94a3b8;
+        }
+
+        /* Status Report */
+        #status-report {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 4px;
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 5px solid;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        #score-text {
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+
+        .success-msg {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Dynamic classes for validation */
+        .correct-answer {
+            border-color: var(--success-green) !important;
+            background-color: #ecfdf5 !important;
+            color: var(--success-green) !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .wrong-answer {
+            border-color: var(--error-red) !important;
+            background-color: #fef2f2 !important;
+            color: var(--error-red) !important;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="worksheet-container">
+    
+    <div class="header">
+        <h1><span>F1</span> Driver Protocol</h1>
+        <div class="badge">Telemetry</div>
+    </div>
+
+    <div class="content">
+        
+        <!-- TASK 1 -->
+        <h2><span><div>1</div></span> Read and complete the text</h2>
+        <div class="task-block">
+            <div class="text-line">
+                Max <select class="t1-check" data-ans="a"><option value="">___</option><option value="aт">doesn't</option><option value="a">usually</option></select>  drinks water in a bottle.
+            </div>
+            <div class="text-line">
+                He always wears a <select class="t1-check" data-ans="a"><option value="">___</option><option value="a">uniform</option><option value="an">boots</option></select>  at work.
+            </div>
+            <div class="text-line">
+                He never drinks on the <select class="t1-check" data-ans="road"><option value="">___</option><option value="road">road</option><option value="car">car</option></select>.
+            </div>
+            <div class="text-line">
+                Charles always eats pasta at 12 <select class="t1-check" data-ans="o'clock"><option value="">___</option><option value="o'clock">o'clock</option><option value="time">time</option></select>.
+            </div>
+            <div class="text-line">
+                He never wears a <select class="t1-check" data-ans="helmet"><option value="">___</option><option value="hat">t-shirt</option><option value="helmet">helmet</option></select> when it's lunch time.
+            </div>
+            <div class="text-line">
+                He usually eats at the <select class="t1-check" data-ans="garage"><option value="">___</option><option value="garage">garage</option><option value="house">house</option></select>.
+            </div>
+            <div class="text-line">
+                To be safe there are red <select class="t1-check" data-ans="lines"><option value="">___</option><option value="lines">lines</option><option value="signs">signs</option></select>.
+            </div>
+            <div class="text-line">
+                You can park here in your <select class="t1-check" data-ans="car"><option value="">___</option><option value="car">car</option><option value="bike">bike</option></select>.
+            </div>
+            <div class="text-line">
+                This place is for students <select class="t1-check" data-ans="only"><option value="">___</option><option value="only">only</option><option value="always">always</option></select>.
+            </div>
+        </div>
+
+        <!-- TASK 2 -->
+        <h2><span><div>2</div></span> Look at the pictures and complete</h2>
+        <div class="cards-grid">
+            
+            <div class="card">
+                <img src="https://img.gt-shop.ru/c249d53cfeffb6173e07d5d22022fb00.JPG" alt="Seatbelt">
+                <p>
+                    It's a <select class="t2-check" data-ans="belt"><option value="">___</option><option value="belt">belt</option><option value="strap">strap</option></select>.
+                </p>
+            </div>
+
+            <div class="card">
+                <img src="https://halvamedia.sovcombank.ru/68463/shutterstock_2497269261.jpg" alt="Yellow line">
+                <p>
+                    It's a yellow <select class="t2-check" data-ans="line"><option value="">___</option><option value="line">line</option><option value="sign">sign</option></select>.
+                </p>
+            </div>
+
+            <div class="card">
+                <img src="https://i.pinimg.com/736x/77/c2/49/77c2491b10077c0bf41ad7bfb3254483.jpg" alt="Red light">
+                <p>
+                    You need to <select class="t2-check" data-ans="stop"><option value="">___</option><option value="stop">stop</option><option value="go">go</option></select>.
+                </p>
+            </div>
+
+            <div class="card">
+                <img src="https://thumbs.dreamstime.com/b/red-stop-road-sign-foreground-blurred-fast-car-background-yellow-octagonal-frame-153230870.jpg" alt="Fast car">
+                <p>
+                    It's <select class="t2-check" data-ans="dangerous"><option value="">___</option><option value="dangerous">dangerous</option><option value="safe">safe</option></select> to drive <select class="t2-check" data-ans="fast"><option value="">___</option><option value="fast">fast</option><option value="slow">slow</option></select>.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- TASK 3 -->
+        <h2 style="margin-top: 40px;"><span><div>3</div></span> Choose the correct option</h2>
+        
+        <div class="mcq-block">
+            <div class="mcq-text">When a driver in the car he has a seat...</div>
+            <div class="mcq-options" data-correct="belt">
+                <button class="mcq-btn" onclick="selectMCQ(this, 'belt')">belt</button>
+                <button class="mcq-btn" onclick="selectMCQ(this, 'blet')">blet</button>
+                <button class="mcq-btn" onclick="selectMCQ(this, 'letb')">letb</button>
+            </div>
+        </div>
+
+        <div class="mcq-block">
+            <div class="mcq-text">If you drive and see on the road a yellow...</div>
+            <div class="mcq-options" data-correct="line">
+                <button class="mcq-btn" onclick="selectMCQ(this, 'line')">line</button>
+                <button class="mcq-btn" onclick="selectMCQ(this, 'lien')">lien</button>
+                <button class="mcq-btn" onclick="selectMCQ(this, 'niel')">niel</button>
+            </div>
+        </div>
+
+        <div class="mcq-block">
+            <div class="mcq-text">Charles can ride on a... lane.</div>
+            <div class="mcq-options" data-correct="bike">
+                <button class="mcq-btn" onclick="selectMCQ(this, 'bike')">bike</button>
+                <button class="mcq-btn" onclick="selectMCQ(this, 'car')">car</button>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-check" onclick="executeProtocol()">Check Answers</button>
+            <button class="btn-reset" onclick="resetProtocol()">Reset</button>
+        </div>
+
+        <div id="status-report">
+            <div id="score-text"></div>
+            <div id="success-msg" class="success-msg"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const TEST_NAME = "F1 Driver Protocol (Light Grey)";
+    let userMistakes = [];
+
+    // Handle MCQ button selection
+    function selectMCQ(btn, value) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.mcq-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        parent.setAttribute('data-selected', value);
+    }
+
+    function executeProtocol() {
+        let score = 0;
+        let total = 0;
+        userMistakes = []; 
+
+        // 1. Check Select Dropdowns
+        const allSelects = document.querySelectorAll('.t1-check, .t2-check');
+        total += allSelects.length;
+
+        allSelects.forEach(sel => {
+            const correctAns = sel.getAttribute('data-ans');
+            const userAns = sel.value;
+
+            sel.classList.remove('correct-answer', 'wrong-answer');
+
+            if (userAns === correctAns) {
+                sel.classList.add('correct-answer');
+                score++;
+            } else {
+                sel.classList.add('wrong-answer');
+                if (userAns !== "") {
+                    userMistakes.push(userAns);
+                } else {
+                    userMistakes.push("skipped");
+                }
+            }
+        });
+
+        // 2. Check MCQ Blocks
+        const mcqBlocks = document.querySelectorAll('.mcq-options');
+        total += mcqBlocks.length;
+
+        mcqBlocks.forEach(block => {
+            const selected = block.getAttribute('data-selected');
+            const correct = block.getAttribute('data-correct');
+            const buttons = block.querySelectorAll('.mcq-btn');
+
+            buttons.forEach(b => {
+                b.classList.remove('correct-answer', 'wrong-answer');
+                b.style.borderColor = 'var(--border-color)';
+                b.style.borderWidth = '1px';
+            });
+
+            if (selected === correct) {
+                score++;
+                buttons.forEach(b => {
+                    if (b.classList.contains('selected')) {
+                        b.classList.add('correct-answer');
+                    }
+                });
+            } else {
+                buttons.forEach(b => {
+                    if (b.classList.contains('selected')) {
+                        b.classList.add('wrong-answer');
+                        userMistakes.push(b.innerText);
+                    }
+                    if (b.innerText === correct) {
+                        b.style.borderColor = 'var(--success-green)';
+                        b.style.borderWidth = '2px';
+                    }
+                });
+            }
+        });
+
+        const statusReport = document.getElementById('status-report');
+        const scoreText = document.getElementById('score-text');
+        const successMsg = document.getElementById('success-msg');
+
+        if (score === total) {
+            scoreText.innerHTML = `🏆 P1 FINISH!`;
+            statusReport.style.background = '#ecfdf5';
+            statusReport.style.color = 'var(--success-green)';
+            statusReport.style.borderColor = 'var(--success-green)';
+        } else if (score >= total * 0.6) {
+            scoreText.innerHTML = `🏎️ Podium Finish! (${score}/${total})`;
+            statusReport.style.background = '#fffbeb';
+            statusReport.style.color = 'var(--f1-yellow)';
+            statusReport.style.borderColor = 'var(--f1-yellow)';
+        } else {
+            scoreText.innerHTML = `🔧 DNF - Try Again (${score}/${total})`;
+            statusReport.style.background = '#fef2f2';
+            statusReport.style.color = 'var(--error-red)';
+            statusReport.style.borderColor = 'var(--error-red)';
+        }
+
+        statusReport.style.display = 'block';
+        sendResultsToGoogle(score, total);
+    }
+
+    function resetProtocol() {
+        document.querySelectorAll('.t1-check, .t2-check').forEach(sel => {
+            sel.value = '';
+            sel.classList.remove('correct-answer', 'wrong-answer');
+        });
+        
+        document.querySelectorAll('.mcq-options').forEach(block => {
+            block.removeAttribute('data-selected');
+            block.querySelectorAll('.mcq-btn').forEach(b => {
+                b.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                b.style.borderWidth = '1px';
+                b.style.borderColor = 'var(--border-color)';
+            });
+        });
+
+        document.getElementById('status-report').style.display = 'none';
+    }
+
+    function sendResultsToGoogle(score, total) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams();
+        params.append("name", TEST_NAME);
+        params.append("score", score);
+        params.append("total", total);
+        params.append("mistakes", userMistakes.join(', '));
+
+        const successMsg = document.getElementById('success-msg');
+        successMsg.innerText = "Sending telemetry...";
+        successMsg.style.color = "var(--text-gray)";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(() => {
+            successMsg.innerText = "Telemetry synced successfully! ✅";
+            successMsg.style.color = "var(--success-green)";
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            successMsg.innerText = "Telemetry sync failed ❌";
+            successMsg.style.color = "var(--error-red)";
+        });
+    }
+</script>
+
+</body>
+</html>
