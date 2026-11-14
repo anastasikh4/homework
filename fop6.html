@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Master</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@700;800&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Baloo 2', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(180deg, #4fc3f7 0%, #81d4fa 40%, #b3e5fc 100%);
+            background-attachment: fixed;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before {
+            width: 180px; height: 60px;
+            top: 40px; left: -30px;
+            box-shadow: 80px 20px 0 -10px rgba(255,255,255,0.7),
+                        160px -10px 0 -15px rgba(255,255,255,0.6);
+        }
+        body::after {
+            width: 220px; height: 70px;
+            bottom: 60px; right: -50px;
+            box-shadow: -100px 30px 0 -15px rgba(255,255,255,0.7),
+                        -200px 5px 0 -20px rgba(255,255,255,0.5);
+        }
+
+        .detective-card {
+            background: #fff;
+            width: 100%;
+            max-width: 560px;
+            padding: 30px 25px 25px;
+            border-radius: 30px;
+            border: 5px solid #0d47a1;
+            box-shadow: 0 12px 0 #0d47a1, 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .detective-card::before {
+            content: '⭐';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 46px;
+            filter: drop-shadow(0 3px 0 #b8860b);
+            animation: starSpin 3s ease-in-out infinite;
+        }
+
+        @keyframes starSpin {
+            0%, 100% { transform: translateX(-50%) rotate(-10deg) scale(1); }
+            50% { transform: translateX(-50%) rotate(10deg) scale(1.1); }
+        }
+
+        .level-tag {
+            display: inline-block;
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d);
+            color: #5d4037;
+            font-family: 'Fredoka One', cursive;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 3px solid #5d4037;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #5d4037;
+        }
+
+        h1 {
+            color: #0d47a1;
+            font-family: 'Fredoka One', cursive;
+            font-size: 22px;
+            margin: 0 0 18px 0;
+            padding-bottom: 12px;
+            border-bottom: 4px dashed #bbdefb;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== VERB TABLE DISPLAY ===== */
+        .verb-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 15px;
+            border: 3px solid #90caf9;
+        }
+
+        .verb-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-bottom: 1px solid #bbdefb;
+        }
+        .verb-row:last-child { border-bottom: none; }
+
+        .verb-label {
+            color: #555;
+            font-weight: 700;
+        }
+
+        .verb-value {
+            font-family: 'Fredoka One', cursive;
+            font-size: 22px;
+            color: #d32f2f;
+            letter-spacing: 1px;
+            text-transform: lowercase;
+        }
+
+        .verb-value.hidden-answer {
+            color: #ff9800;
+            border-bottom: 2px dashed #ff9800;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .translation-box {
+            display: inline-block;
+            font-size: 16px;
+            color: #fff;
+            background: #7e57c2;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 5px 0 20px;
+            border: 3px solid #4527a0;
+            box-shadow: 0 4px 0 #4527a0;
+        }
+
+        .btn-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(180deg, #42a5f5, #1976d2);
+            color: white;
+            border: 3px solid #0d47a1;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0d47a1;
+            transition: 0.12s;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(180deg, #64b5f6, #2196f3);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0d47a1;
+        }
+
+        #feedback {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 22px;
+            min-height: 30px;
+            font-family: 'Fredoka One', cursive;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-correct {
+            color: #2e7d32;
+            animation: popFeedback 0.4s ease-out;
+        }
+
+        .feedback-wrong {
+            color: #c62828;
+            animation: shakeFeedback 0.4s ease-out;
+        }
+
+        @keyframes popFeedback {
+            0% { transform: scale(0.5); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shakeFeedback {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .victory-title {
+            color: #2e7d32;
+            font-family: 'Fredoka One', cursive;
+            font-size: 30px;
+            margin: 15px 0;
+            animation: victoryPulse 1s ease-in-out infinite;
+            text-shadow: 3px 3px 0 #c8e6c9;
+        }
+
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .victory-text {
+            color: #555;
+            font-size: 17px;
+            margin: 10px 0 20px;
+            font-weight: 700;
+        }
+
+        .victory-emoji {
+            font-size: 70px;
+            display: block;
+            margin: 10px 0;
+            animation: trophyBounce 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes trophyBounce {
+            0% { transform: translateY(0) rotate(-5deg); }
+            100% { transform: translateY(-12px) rotate(5deg); }
+        }
+
+        .replay-btn {
+            background: linear-gradient(180deg, #66bb6a, #43a047);
+            color: white;
+            border: 3px solid #1b5e20;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1b5e20;
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            transition: 0.12s;
+        }
+
+        .replay-btn:hover { transform: translateY(-2px); }
+        .replay-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b5e20; }
+
+        .victory-card::before,
+        .victory-card::after {
+            content: '🎉';
+            position: absolute;
+            font-size: 40px;
+            animation: floatStar 2s ease-in-out infinite;
+        }
+        .victory-card::before { top: 20px; left: 20px; }
+        .victory-card::after { top: 20px; right: 20px; animation-delay: 0.5s; }
+
+        @keyframes floatStar {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-10px) rotate(10deg); }
+        }
+        
+        .status-msg {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .detective-card { padding: 25px 15px 20px; border-radius: 25px; }
+            .verb-value { font-size: 18px; }
+            h1 { font-size: 18px; }
+            .action-btn { font-size: 16px; padding: 12px 16px; }
+            .verb-row { font-size: 16px; flex-direction: column; gap: 5px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="detective-card" id="detective-card">
+    <div class="level-tag" id="level-label">LEVEL 1</div>
+    <h1 id="task-desc">Loading...</h1>
+    
+    <div class="verb-grid">
+        <div class="verb-row">
+            <span class="verb-label">Base Form:</span>
+            <span class="verb-value" id="v-base">...</span>
+        </div>
+        <div class="verb-row">
+            <span class="verb-label">Past Simple:</span>
+            <span class="verb-value" id="v-past">...</span>
+        </div>
+        <div class="verb-row">
+            <span class="verb-label">Past Participle:</span>
+            <span class="verb-value" id="v-pp">...</span>
+        </div>
+    </div>
+
+    <div class="translation-box" id="v-ru">Значение: Загрузка...</div>
+
+    <div id="interaction-area" class="btn-grid"></div>
+    <div id="feedback"></div>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Irregular Verbs Master (All Forms)";
+    let userMistakes = [];
+    let totalScore = 0;
+
+    // ========== VOCABULARY DATA ==========
+    const vocabulary = [
+        { base: "be", past: "was/were", pp: "been", ru: "Быть", optsP: ["was/were", "beed", "wered"], optsPP: ["been", "beed", "was"] },
+        { base: "begin", past: "began", pp: "begun", ru: "Начинать", optsP: ["began", "beginned", "beguned"], optsPP: ["begun", "began", "beginned"] },
+        { base: "bite", past: "bit", pp: "bitten", ru: "Кусать", optsP: ["bit", "bited", "bite"], optsPP: ["bitten", "bit", "bited"] },
+        { base: "blow", past: "blew", pp: "blown", ru: "Дуть", optsP: ["blew", "blowed", "blown"], optsPP: ["blown", "blew", "blowed"] },
+        { base: "break", past: "broke", pp: "broken", ru: "Ломать", optsP: ["broke", "breaked", "broken"], optsPP: ["broken", "broke", "breaked"] },
+        { base: "bring", past: "brought", pp: "brought", ru: "Приносить", optsP: ["brought", "bringed", "brang"], optsPP: ["brought", "bringed", "brang"] },
+        { base: "buy", past: "bought", pp: "bought", ru: "Покупать", optsP: ["bought", "buyed", "boughten"], optsPP: ["bought", "buyed", "boughten"] },
+        { base: "catch", past: "caught", pp: "caught", ru: "Ловить", optsP: ["caught", "catched", "caughten"], optsPP: ["caught", "catched", "caughten"] },
+        { base: "choose", past: "chose", pp: "chosen", ru: "Выбирать", optsP: ["chose", "choosed", "chosen"], optsPP: ["chosen", "chose", "choosed"] },
+        { base: "come", past: "came", pp: "come", ru: "Приходить", optsP: ["came", "comed", "come"], optsPP: ["come", "came", "comed"] },
+        { base: "do", past: "did", pp: "done", ru: "Делать", optsP: ["did", "doed", "done"], optsPP: ["done", "did", "doed"] },
+        { base: "drink", past: "drank", pp: "drunk", ru: "Пить", optsP: ["drank", "drinked", "drunk"], optsPP: ["drunk", "drank", "drinked"] },
+        { base: "drive", past: "drove", pp: "driven", ru: "Водить", optsP: ["drove", "drived", "driven"], optsPP: ["driven", "drove", "drived"] },
+        { base: "eat", past: "ate", pp: "eaten", ru: "Кушать", optsP: ["ate", "eated", "eaten"], optsPP: ["eaten", "ate", "eated"] },
+        { base: "fall", past: "fell", pp: "fallen", ru: "Падать", optsP: ["fell", "falled", "fallen"], optsPP: ["fallen", "fell", "falled"] },
+        { base: "feel", past: "felt", pp: "felt", ru: "Чувствовать", optsP: ["felt", "feeled", "fellen"], optsPP: ["felt", "feeled", "fellen"] },
+        { base: "fight", past: "fought", pp: "fought", ru: "Драться", optsP: ["fought", "fighted", "foughten"], optsPP: ["fought", "fighted", "foughten"] },
+        { base: "find", past: "found", pp: "found", ru: "Находить", optsP: ["found", "finded", "founded"], optsPP: ["found", "finded", "founded"] },
+        { base: "fly", past: "flew", pp: "flown", ru: "Летать", optsP: ["flew", "flied", "flown"], optsPP: ["flown", "flew", "flied"] },
+        { base: "forget", past: "forgot", pp: "forgotten", ru: "Забывать", optsP: ["forgot", "forgetted", "forgotten"], optsPP: ["forgotten", "forgot", "forgetted"] },
+        { base: "get", past: "got", pp: "got/gotten", ru: "Получать", optsP: ["got", "getted", "gotten"], optsPP: ["got/gotten", "got", "getted"] },
+        { base: "give", past: "gave", pp: "given", ru: "Давать", optsP: ["gave", "gived", "given"], optsPP: ["given", "gave", "gived"] },
+        { base: "go", past: "went", pp: "gone", ru: "Ехать", optsP: ["went", "goed", "gone"], optsPP: ["gone", "went", "goed"] },
+        { base: "grow", past: "grew", pp: "grown", ru: "Расти", optsP: ["grew", "growed", "grown"], optsPP: ["grown", "grew", "growed"] },
+        { base: "have", past: "had", pp: "had", ru: "Иметь", optsP: ["had", "haved", "haden"], optsPP: ["had", "haved", "haden"] },
+        { base: "hear", past: "heard", pp: "heard", ru: "Слышать", optsP: ["heard", "heared", "herd"], optsPP: ["heard", "heared", "herd"] },
+        { base: "know", past: "knew", pp: "known", ru: "Знать", optsP: ["knew", "knowed", "known"], optsPP: ["known", "knew", "knowed"] },
+        { base: "lose", past: "lost", pp: "lost", ru: "Терять", optsP: ["lost", "losed", "lossed"], optsPP: ["lost", "losed", "lossed"] },
+        { base: "make", past: "made", pp: "made", ru: "Создавать", optsP: ["made", "maked", "maden"], optsPP: ["made", "maked", "maden"] },
+        { base: "run", past: "ran", pp: "run", ru: "Бегать", optsP: ["ran", "ranned", "run"], optsPP: ["run", "ran", "ranned"] },
+        { base: "see", past: "saw", pp: "seen", ru: "Видеть", optsP: ["saw", "seed", "seen"], optsPP: ["seen", "saw", "seed"] },
+        { base: "speak", past: "spoke", pp: "spoken", ru: "Говорить", optsP: ["spoke", "speaked", "spoken"], optsPP: ["spoken", "spoke", "speaked"] },
+        { base: "take", past: "took", pp: "taken", ru: "Брать", optsP: ["took", "taked", "taken"], optsPP: ["taken", "took", "taked"] },
+        { base: "teach", past: "taught", pp: "taught", ru: "Обучать", optsP: ["taught", "teached", "teached"], optsPP: ["taught", "teached", "teached"] },
+        { base: "think", past: "thought", pp: "thought", ru: "Думать", optsP: ["thought", "thinked", "thoughten"], optsPP: ["thought", "thinked", "thoughten"] },
+        { base: "throw", past: "threw", pp: "thrown", ru: "Бросать", optsP: ["threw", "throwed", "thrown"], optsPP: ["thrown", "threw", "throwed"] },
+        { base: "understand", past: "understood", pp: "understood", ru: "Понимать", optsP: ["understood", "understanded", "understended"], optsPP: ["understood", "understanded", "understended"] },
+        { base: "win", past: "won", pp: "won", ru: "Выигрывать", optsP: ["won", "winned", "wan"], optsPP: ["won", "winned", "wan"] },
+        { base: "write", past: "wrote", pp: "written", ru: "Писать", optsP: ["wrote", "writed", "written"], optsPP: ["written", "wrote", "writed"] }
+    ];
+
+    let currentLevel = 1;
+    let currentIdx = 0;
+
+    function initTask() {
+        // --- STAGE JUMP LOGIC ---
+        if (currentIdx >= vocabulary.length) {
+            if (currentLevel < 3) {
+                currentLevel++;
+                currentIdx = 0;
+                const fb = document.getElementById('feedback');
+                fb.innerText = `🚀 ADVANCING TO LEVEL ${currentLevel}...`;
+                fb.style.color = "#1976D2";
+                fb.className = '';
+                setTimeout(initTask, 1500);
+                return;
+            } else {
+                showVictory();
+                return;
+            }
+        }
+
+        const data = vocabulary[currentIdx];
+        const area = document.getElementById('interaction-area');
+        const label = document.getElementById('level-label');
+        const desc = document.getElementById('task-desc');
+        
+        const vBase = document.getElementById('v-base');
+        const vPast = document.getElementById('v-past');
+        const vPP = document.getElementById('v-pp');
+        const vRu = document.getElementById('v-ru');
+
+        area.innerHTML = "";
+        const fb = document.getElementById('feedback');
+        fb.innerText = "";
+        fb.className = '';
+
+        /* ===== LEVEL 1: Past Simple ===== */
+        if (currentLevel === 1) {
+            label.innerText = "🎯 LEVEL 1: PAST SIMPLE";
+            desc.innerText = "Choose the correct Past Simple form:";
+            
+            vBase.innerText = data.base;
+            vBase.className = 'verb-value';
+            
+            vPast.innerText = "___";
+            vPast.className = 'verb-value hidden-answer';
+            
+            vPP.innerText = data.pp;
+            vPP.className = 'verb-value';
+            
+            vRu.innerText = `Значение: ${data.ru}`;
+
+            let choices = [...data.optsP].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.past) {
+                        vPast.innerText = data.past;
+                        vPast.className = 'verb-value';
+                        success();
+                    } else {
+                        userMistakes.push(opt);
+                        error("Try another option! 🔍");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 2: Past Participle ===== */
+        else if (currentLevel === 2) {
+            label.innerText = "🔨 LEVEL 2: PAST PARTICIPLE";
+            desc.innerText = "Choose the correct Past Participle form:";
+            
+            vBase.innerText = data.base;
+            vBase.className = 'verb-value';
+            
+            vPast.innerText = data.past;
+            vPast.className = 'verb-value';
+            
+            vPP.innerText = "___";
+            vPP.className = 'verb-value hidden-answer';
+            
+            vRu.innerText = `Значение: ${data.ru}`;
+
+            let choices = [...data.optsPP].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.pp) {
+                        vPP.innerText = data.pp;
+                        vPP.className = 'verb-value';
+                        success();
+                    } else {
+                        userMistakes.push(opt);
+                        error("Wrong form! 🔧");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 3: Translation ===== */
+        else if (currentLevel === 3) {
+            label.innerText = "🌍 LEVEL 3: TRANSLATION MATCH";
+            desc.innerText = "Pick the correct translation for:";
+            
+            vBase.innerText = data.base;
+            vBase.className = 'verb-value';
+            
+            vPast.innerText = data.past;
+            vPast.className = 'verb-value';
+            
+            vPP.innerText = data.pp;
+            vPP.className = 'verb-value';
+            
+            vRu.innerText = `Значение: ???`;
+            vRu.className = 'translation-box hidden-answer'; // We'll use a different class or just text
+
+            let options = [data.ru];
+            while (options.length < 3) {
+                let randTrans = vocabulary[Math.floor(Math.random() * vocabulary.length)].ru;
+                if (!options.includes(randTrans)) options.push(randTrans);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.ru) {
+                        vRu.innerText = `Значение: ${data.ru}`;
+                        vRu.className = 'translation-box';
+                        success();
+                    } else {
+                        userMistakes.push(opt);
+                        error("Wrong translation! 🤔");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+    }
+
+    function success() {
+        const fb = document.getElementById('feedback');
+        fb.innerText = "✅ GREAT JOB!";
+        fb.className = 'feedback-correct';
+        
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            let speakText = "";
+            if (currentLevel === 1) speakText = vocabulary[currentIdx].past;
+            else if (currentLevel === 2) speakText = vocabulary[currentIdx].pp;
+            else speakText = vocabulary[currentIdx].base;
+
+            const msg = new SpeechSynthesisUtterance(speakText);
+            msg.lang = 'en-GB';
+            msg.rate = 0.85;
+            window.speechSynthesis.speak(msg);
+        }
+
+        totalScore++;
+        currentIdx++;
+        setTimeout(initTask, 1200);
+    }
+
+    function error(msg = "Incorrect! Try again!") {
+        const fb = document.getElementById('feedback');
+        fb.innerText = `❌ ${msg}`;
+        fb.className = 'feedback-wrong';
+    }
+
+    function showVictory() {
+        const card = document.getElementById('detective-card');
+        card.classList.add('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" style="background: linear-gradient(180deg, #66bb6a, #2e7d32); color: white; border-color: #1b5e20;">MISSION COMPLETE</div>
+            <span class="victory-emoji">🏆</span>
+            <h1 class="victory-title">YOU WIN, AGENT!</h1>
+            <p class="victory-text">You mastered all the irregular verbs! 🦸‍♂️</p>
+            <p style="font-size: 1.2rem; font-weight: bold; color: #1976d2; margin-bottom: 10px;">Final Score: ${totalScore} / ${vocabulary.length * 3}</p>
+            
+            <div id="send-status" class="status-msg"></div>
+            
+            <button class="replay-btn" onclick="replayQuest()">▶️ PLAY AGAIN</button>
+        `;
+        
+        sendResultsToGoogle();
+    }
+
+    function replayQuest() {
+        currentLevel = 1;
+        currentIdx = 0;
+        totalScore = 0;
+        userMistakes = [];
+        const card = document.getElementById('detective-card');
+        card.classList.remove('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" id="level-label">LEVEL 1</div>
+            <h1 id="task-desc">Loading...</h1>
+            
+            <div class="verb-grid">
+                <div class="verb-row">
+                    <span class="verb-label">Base Form:</span>
+                    <span class="verb-value" id="v-base">...</span>
+                </div>
+                <div class="verb-row">
+                    <span class="verb-label">Past Simple:</span>
+                    <span class="verb-value" id="v-past">...</span>
+                </div>
+                <div class="verb-row">
+                    <span class="verb-label">Past Participle:</span>
+                    <span class="verb-value" id="v-pp">...</span>
+                </div>
+            </div>
+
+            <div class="translation-box" id="v-ru">Значение: Загрузка...</div>
+
+            <div id="interaction-area" class="btn-grid"></div>
+            <div id="feedback"></div>
+        `;
+        initTask();
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", totalScore);
+        formData.append("total", vocabulary.length * 3);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2e7d32';
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#c62828';
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    initTask();
+</script>
+
+</body>
+</html>

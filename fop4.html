@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Master 🎉</title>
+    <style>
+        :root {
+            --primary: #ffeb3b;
+            --secondary: #ff5722;
+            --bg: #e1f5fe;
+            --card: #fff176;
+            --success: #2ecc71;
+            --error: #e74c3c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #222;
+        }
+        h1 {
+            font-size: 28px;
+            color: #d81b60;
+            margin: 8px 0;
+            text-shadow: 2px 2px 0 white;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 680px;
+            margin: 0 auto;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .level-info {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 12px 0 20px;
+        }
+        
+        /* --- STAGE 0 MATCHING GAME --- */
+        .match-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .match-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .match-col-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .match-card {
+            padding: 15px;
+            background: #fff;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            text-align: center;
+        }
+        .match-card:hover { background: #f0f0f0; transform: translateY(-2px); }
+        .match-card.selected { border-color: #ffb300; background: #fff8e1; box-shadow: 0 4px 0 #ffb300; }
+        .match-card.matched { background: #c8e6c9; border-color: #81c784; color: #2e7d32; box-shadow: 0 4px 0 #81c784; pointer-events: none; opacity: 0.6; }
+        .match-card.wrong-match { animation: shake 0.4s; background: #ffcdd2; border-color: #e57373; }
+
+        /* --- STAGE 1-3 MISSING LETTER UI --- */
+        .russian-hint {
+            font-size: 20px;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 15px;
+            background: #f0f4c3;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+        .english-display {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1976d2;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .form-line {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-line span {
+            font-size: 18px;
+            color: #888;
+            min-width: 120px;
+            text-align: right;
+        }
+        .form-line strong {
+            font-size: 28px;
+            color: #1976d2;
+        }
+        .missing-char {
+            color: #d81b60;
+            border-bottom: 4px dashed #d81b60;
+            padding: 0 5px;
+        }
+
+        .word-pool {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .letter-btn {
+            background: #fff;
+            padding: 15px 25px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 24px;
+            color: #1976d2;
+            transition: 0.2s;
+            box-shadow: 0 5px 0 #ccc;
+            font-family: inherit;
+            min-width: 60px;
+        }
+        .letter-btn:hover { background: #f0f0f0; transform: translateY(-2px); }
+        .letter-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #ccc; }
+        .letter-btn:disabled { opacity: 0.4; pointer-events: none; }
+        
+        .letter-btn.correct { background: #c8e6c9; border-color: #81c784; color: #2e7d32; box-shadow: 0 5px 0 #81c784; }
+        .letter-btn.wrong { background: #ffcdd2; border-color: #e57373; color: #c62828; box-shadow: 0 5px 0 #e57373; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .feedback { margin-top: 15px; font-weight: bold; min-height: 30px; font-size: 1.2rem; }
+        .correct-text { color: var(--success); }
+        .wrong-text { color: var(--error); }
+        
+        /* Final Screen */
+        .final-screen {
+            display: none;
+            text-align: center;
+        }
+        .final-screen h2 { color: #1976d2; font-size: 32px; }
+        
+        .status-msg {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Irregular Verbs Master 🧠</h1>
+    <div id="level-indicator" class="level-info">Stage 0 — Warm-up Match</div>
+
+    <!-- STAGE 0: MATCHING -->
+    <div id="stage0-ui">
+        <div class="match-board">
+            <div class="match-col" id="match-left">
+                <div class="match-col-title">Base Form</div>
+            </div>
+            <div class="match-col" id="match-right">
+                <div class="match-col-title">Past / Participle</div>
+            </div>
+        </div>
+        <div class="feedback" id="feedback-0"></div>
+    </div>
+
+    <!-- STAGE 1-3: MISSING LETTER -->
+    <div id="game-ui" class="hidden">
+        <div class="russian-hint" id="russian-hint">Loading...</div>
+        
+        <div class="english-display">
+            <div class="form-line"><span>Base:</span> <strong id="en-base">...</strong></div>
+            <div class="form-line"><span>Past Simple:</span> <strong id="en-past">...</strong></div>
+            <div class="form-line"><span>Past Participle:</span> <strong id="en-pp">...</strong></div>
+        </div>
+
+        <div class="word-pool" id="options-pool"></div>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="final-screen" class="final-screen">
+        <h2>Mission Accomplished! 👑</h2>
+        <p style="font-size: 1.2rem; margin: 10px 0;">You've masterfully finished all assessment modules.</p>
+        <p id="final-score" style="font-size: 1.5rem; font-weight: bold; color: #d81b60;">Final Score: 0 / 49</p>
+        
+        <!-- Status Message for Google Sheets Sync -->
+        <div id="send-status" class="status-msg"></div>
+    </div>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Irregular Verbs Master (All Forms)";
+    let userMistakes = [];
+    let totalScore = 0;
+    const totalQuestions = 49; // 4 (Stage 0) + 15 (Stage 1) + 15 (Stage 2) + 15 (Stage 3)
+
+    // ========== DATA SETS ==========
+    // Stage 0: Matching Base Form to Past Simple
+    const stage0Data = [
+        { id: 1, left: "fight", right: "fought" },
+        { id: 2, left: "teach", right: "taught" },
+        { id: 3, left: "think", right: "thought" },
+        { id: 4, left: "have", right: "had" }
+    ];
+
+    // Full Data List
+    const fullVerbList = [
+        { ru: "слышать", base: "hear", past: "heard", pp: "heard" },
+        { ru: "терять", base: "lose", past: "lost", pp: "lost" },
+        { ru: "создавать", base: "make", past: "made", pp: "made" },
+        { ru: "выигрывать", base: "win", past: "won", pp: "won" },
+        { ru: "дуть", base: "blow", past: "blew", pp: "blown" },
+        { ru: "рисовать", base: "draw", past: "drew", pp: "drawn" },
+        { ru: "летать", base: "fly", past: "flew", pp: "flown" },
+        { ru: "расти", base: "grow", past: "grew", pp: "grown" },
+        { ru: "знать", base: "know", past: "knew", pp: "known" },
+        { ru: "бросать", base: "throw", past: "threw", pp: "thrown" },
+        { ru: "кусать", base: "bite", past: "bit", pp: "bitten" },
+        { ru: "ломать", base: "break", past: "broke", pp: "broken" },
+        { ru: "выбирать", base: "choose", past: "chose", pp: "chosen" },
+        { ru: "кушать", base: "eat", past: "ate", pp: "eaten" },
+        { ru: "замораживать", base: "freeze", past: "froze", pp: "frozen" },
+        { ru: "прятать", base: "hide", past: "hid", pp: "hidden" },
+        { ru: "говорить", base: "speak", past: "spoke", pp: "spoken" },
+        { ru: "воровать", base: "steal", past: "stole", pp: "stolen" },
+        { ru: "начинать", base: "begin", past: "began", pp: "begun" },
+        { ru: "пить", base: "drink", past: "drank", pp: "drunk" },
+        { ru: "звонить", base: "ring", past: "rang", pp: "rung" },
+        { ru: "петь", base: "sing", past: "sang", pp: "sung" },
+        { ru: "плавать", base: "swim", past: "swam", pp: "swum" },
+        { ru: "приходить", base: "come", past: "came", pp: "come" },
+        { ru: "становиться", base: "become", past: "became", pp: "become" },
+        { ru: "получать", base: "get", past: "got", pp: "got, gotten" },
+        { ru: "забывать", base: "forget", past: "forgot", pp: "forgotten" },
+        { ru: "давать", base: "give", past: "gave", pp: "given" },
+        { ru: "прощать", base: "forgive", past: "forgave", pp: "forgiven" },
+        { ru: "стоять", base: "stand", past: "stood", pp: "stood" },
+        { ru: "понимать", base: "understand", past: "understood", pp: "understood" },
+        { ru: "трясти", base: "shake", past: "shook", pp: "shaken" },
+        { ru: "брать", base: "take", past: "took", pp: "taken" },
+        { ru: "водить", base: "drive", past: "drove", pp: "driven" },
+        { ru: "кататься", base: "ride", past: "rode", pp: "ridden" },
+        { ru: "подниматься", base: "rise", past: "rose", pp: "risen" },
+        { ru: "писать", base: "write", past: "wrote", pp: "written" }
+    ];
+
+    // Shuffle helper
+    function shuffleArray(arr) {
+        let array = [...arr];
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    let currentStage = 0;
+    let currentIndex = 0;
+    let currentData = [];
+    let isAnswered = false;
+
+    // Stage 0 specific vars
+    let selectedLeftCard = null;
+    let selectedRightCard = null;
+    let matchesFoundStage0 = 0;
+
+    // ========== GAME LOGIC ==========
+    function initGame() {
+        currentStage = 0;
+        currentIndex = 0;
+        totalScore = 0;
+        userMistakes = [];
+        
+        document.getElementById('stage0-ui').classList.remove('hidden');
+        document.getElementById('game-ui').classList.add('hidden');
+        document.getElementById('final-screen').style.display = 'none';
+        
+        const statusEl = document.getElementById('send-status');
+        if(statusEl) statusEl.innerText = "";
+
+        startStage0();
+    }
+
+    // --- STAGE 0 LOGIC (MATCHING) ---
+    function startStage0() {
+        document.getElementById('level-indicator').innerText = "Stage 0 — Warm-up Match";
+        document.getElementById('feedback-0').innerText = "";
+        
+        const leftCol = document.getElementById('match-left');
+        const rightCol = document.getElementById('match-right');
+        
+        leftCol.innerHTML = '<div class="match-col-title">Base Form</div>';
+        rightCol.innerHTML = '<div class="match-col-title">Past Simple</div>';
+        
+        matchesFoundStage0 = 0;
+        selectedLeftCard = null;
+        selectedRightCard = null;
+
+        // Render Left Cards (in original order)
+        stage0Data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'match-card';
+            card.innerText = item.left;
+            card.dataset.id = item.id;
+            card.onclick = () => handleMatchClick(card, 'left');
+            leftCol.appendChild(card);
+        });
+
+        // Render Right Cards (shuffled)
+        const shuffledRight = shuffleArray(stage0Data);
+        shuffledRight.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'match-card';
+            card.innerText = item.right;
+            card.dataset.id = item.id;
+            card.onclick = () => handleMatchClick(card, 'right');
+            rightCol.appendChild(card);
+        });
+    }
+
+    function handleMatchClick(card, side) {
+        if (card.classList.contains('matched')) return;
+
+        if (side === 'left') {
+            if (selectedLeftCard) selectedLeftCard.classList.remove('selected');
+            selectedLeftCard = card;
+        } else {
+            if (selectedRightCard) selectedRightCard.classList.remove('selected');
+            selectedRightCard = card;
+        }
+        
+        card.classList.add('selected');
+
+        if (selectedLeftCard && selectedRightCard) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        const leftId = selectedLeftCard.dataset.id;
+        const rightId = selectedRightCard.dataset.id;
+        const feedback = document.getElementById('feedback-0');
+
+        if (leftId === rightId) {
+            // Match
+            totalScore++;
+            matchesFoundStage0++;
+            
+            selectedLeftCard.classList.remove('selected');
+            selectedRightCard.classList.remove('selected');
+            selectedLeftCard.classList.add('matched');
+            selectedRightCard.classList.add('matched');
+            
+            feedback.innerHTML = "<span class='correct-text'>Match found! ✅</span>";
+            
+            selectedLeftCard = null;
+            selectedRightCard = null;
+
+            if (matchesFoundStage0 === stage0Data.length) {
+                currentStage = 1;
+                setTimeout(startStage1, 1000);
+            }
+        } else {
+            // No match
+            userMistakes.push(selectedLeftCard.innerText + " -> " + selectedRightCard.innerText);
+            feedback.innerHTML = "<span class='wrong-text'>Try again! ❌</span>";
+            
+            const l = selectedLeftCard;
+            const r = selectedRightCard;
+            l.classList.add('wrong-match');
+            r.classList.add('wrong-match');
+            
+            setTimeout(() => {
+                l.classList.remove('wrong-match', 'selected');
+                r.classList.remove('wrong-match', 'selected');
+                selectedLeftCard = null;
+                selectedRightCard = null;
+                feedback.innerText = "";
+            }, 800);
+        }
+    }
+
+    // --- STAGE 1-3 LOGIC (MISSING LETTER) ---
+    function startStage1() {
+        document.getElementById('stage0-ui').classList.add('hidden');
+        document.getElementById('game-ui').classList.remove('hidden');
+        
+        // Split the full list into 3 chunks of 12 for the 3 stages
+        const shuffledList = shuffleArray(fullVerbList);
+        currentData = shuffledList.slice(0, 15);
+        currentIndex = 0;
+        document.getElementById('level-indicator').innerText = "Stage 1 — Verbal Workout (Part 1)";
+        loadQuestion();
+    }
+
+    function startStage2() {
+        const shuffledList = shuffleArray(fullVerbList);
+        currentData = shuffledList.slice(15, 30);
+        currentIndex = 0;
+        document.getElementById('level-indicator').innerText = "Stage 2 — Verbal Workout (Part 2)";
+        loadQuestion();
+    }
+
+    function startStage3() {
+        const shuffledList = shuffleArray(fullVerbList);
+        currentData = shuffledList.slice(30, 45);
+        currentIndex = 0;
+        document.getElementById('level-indicator').innerText = "Stage 3 — Verbal Workout (Part 3)";
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        const data = currentData[currentIndex];
+        
+        document.getElementById('russian-hint').innerText = data.ru;
+        
+        // Randomly hide a letter in the Base, Past, or PP form
+        const forms = ['base', 'past', 'pp'];
+        const hideForm = forms[Math.floor(Math.random() * forms.length)];
+        
+        let baseText = data.base;
+        let pastText = data.past;
+        let ppText = data.pp;
+        let correctLetter = "";
+        
+        // Apply hiding logic
+        if (hideForm === 'base') {
+            const idx = Math.floor(Math.random() * baseText.length);
+            correctLetter = baseText[idx];
+            baseText = baseText.substring(0, idx) + `<span class="missing-char">_</span>` + baseText.substring(idx + 1);
+        } else if (hideForm === 'past') {
+            const idx = Math.floor(Math.random() * pastText.length);
+            correctLetter = pastText[idx];
+            pastText = pastText.substring(0, idx) + `<span class="missing-char">_</span>` + pastText.substring(idx + 1);
+        } else {
+            const idx = Math.floor(Math.random() * ppText.length);
+            correctLetter = ppText[idx];
+            ppText = ppText.substring(0, idx) + `<span class="missing-char">_</span>` + ppText.substring(idx + 1);
+        }
+
+        document.getElementById('en-base').innerHTML = baseText;
+        document.getElementById('en-past').innerHTML = pastText;
+        document.getElementById('en-pp').innerHTML = ppText;
+        
+        document.getElementById('feedback').innerText = "";
+
+        const pool = document.getElementById('options-pool');
+        pool.innerHTML = "";
+        
+        // Generate distractor options (random letters)
+        const alphabet = "abcdefghijklmnopqrstuvwxyz".split('');
+        let options = [correctLetter];
+        
+        while (options.length < 4) {
+            const randLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+            if (!options.includes(randLetter)) {
+                options.push(randLetter);
+            }
+        }
+        
+        const shuffledOptions = shuffleArray(options);
+        
+        shuffledOptions.forEach(letter => {
+            const btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = letter;
+            btn.onclick = () => checkAnswer(letter, btn, correctLetter);
+            pool.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedLetter, btn, correctLetter) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const poolBtns = document.querySelectorAll('.letter-btn');
+        poolBtns.forEach(b => b.disabled = true);
+
+        if (selectedLetter === correctLetter) {
+            btn.classList.add('correct');
+            document.getElementById('feedback').innerHTML = "<span class='correct-text'>Correct! 🎉</span>";
+            totalScore++;
+        } else {
+            btn.classList.add('wrong');
+            userMistakes.push(selectedLetter);
+            document.getElementById('feedback').innerHTML = `<span class='wrong-text'>Oops! The correct letter was '${correctLetter}'. ❌</span>`;
+            
+            poolBtns.forEach(b => {
+                if (b.innerText === correctLetter) {
+                    b.classList.add('correct');
+                }
+            });
+        }
+
+        setTimeout(() => {
+            currentIndex++;
+            if (currentIndex < currentData.length) {
+                loadQuestion();
+            } else {
+                nextStage();
+            }
+        }, 1500);
+    }
+
+    function nextStage() {
+        currentStage++;
+        if (currentStage === 2) {
+            startStage2();
+        } else if (currentStage === 3) {
+            startStage3();
+        } else {
+            showGlobalGameOver();
+        }
+    }
+
+    function showGlobalGameOver() {
+        document.getElementById('stage0-ui').classList.add('hidden');
+        document.getElementById('game-ui').classList.add('hidden');
+        document.getElementById('final-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = `Final Score: ${totalScore} / ${totalQuestions}`;
+        
+        sendResultsToGoogle();
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", totalScore);
+        formData.append("total", totalQuestions);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending telemetry data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2ecc71';
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c';
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    window.onload = initGame;
+</script>
+
+</body>
+</html>

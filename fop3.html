@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Style Quiz: Starlight 8 Module 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-red: #ff4b4b;
+            --duo-red-dark: #ea2b2b;
+            --duo-bg: #ffffff;
+            --duo-light-green: #d7ffb1;
+            --duo-light-red: #ffdfe0;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--duo-bg);
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header & Progress */
+        .header {
+            padding: 20px 20px 10px;
+            max-width: 650px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 16px;
+            background-color: var(--duo-gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--duo-green);
+            border-radius: 10px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 650px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .question-prompt {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--duo-text);
+            margin-bottom: 30px;
+            line-height: 1.4;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-prompt .blank {
+            color: var(--duo-blue);
+            border-bottom: 3px solid var(--duo-blue);
+            padding: 0 10px;
+            margin: 0 4px;
+            display: inline-block;
+        }
+
+        /* Options Grid */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* 3D Buttons */
+        .option-btn {
+            background-color: var(--duo-bg);
+            border: 2px solid var(--duo-gray);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--duo-text);
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--duo-gray);
+            transition: all 0.1s ease;
+        }
+
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 var(--duo-gray);
+        }
+
+        .option-btn:hover {
+            background-color: #f7f7f7;
+        }
+
+        /* Correct & Wrong States */
+        .option-btn.correct {
+            background-color: var(--duo-light-green) !important;
+            border-color: var(--duo-green) !important;
+            color: var(--duo-green-dark) !important;
+            box-shadow: 0 4px 0 var(--duo-green) !important;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--duo-light-red) !important;
+            border-color: var(--duo-red) !important;
+            color: var(--duo-red-dark) !important;
+            box-shadow: 0 4px 0 var(--duo-red) !important;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .options-container.disabled .option-btn {
+            pointer-events: none;
+        }
+        
+        .options-container.disabled .option-btn:not(.correct):not(.wrong) {
+            opacity: 0.5;
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* Footer area */
+        .footer {
+            border-top: 2px solid var(--duo-gray);
+            padding: 20px;
+            background-color: var(--duo-bg);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .footer-inner {
+            max-width: 650px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .next-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--duo-green-dark);
+            transition: all 0.1s ease;
+            width: 100%;
+            max-width: 350px;
+            display: none;
+        }
+
+        .next-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 var(--duo-green-dark);
+        }
+
+        /* Final Screen */
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100vh;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .final-screen h1 {
+            font-size: 32px;
+            color: var(--duo-green);
+            margin-bottom: 10px;
+        }
+
+        .final-screen p {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background-color: var(--duo-blue);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1899d6;
+            transition: all 0.1s ease;
+        }
+
+        .restart-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #1899d6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .question-prompt { font-size: 20px; min-height: 80px; }
+            .option-btn { font-size: 16px; padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- QUIZ INTERFACE -->
+    <div id="quiz-container">
+        <div class="header">
+            <div class="progress-container">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="question-prompt" id="questionText">Loading...</div>
+            <div class="options-container" id="optionsContainer">
+                <!-- Buttons injected by JS -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-inner">
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="final-screen" id="finalScreen">
+        <div style="font-size: 80px; margin-bottom: 20px;">🏆</div>
+        <h1 id="finalTitle">Lesson Complete!</h1>
+        <p id="finalScore">25 / 25</p>
+        <button class="restart-btn" onclick="location.reload()">Restart Quiz</button>
+    </div>
+
+    <script>
+        // --- QUIZ DATA (25 Questions) ---
+        const quizData = [
+            // 1. Future Simple
+            {
+                q: "I think it ______ rain tomorrow, so bring an umbrella.",
+                options: ["will", "is going to", "is raining", "rains"],
+                correct: "will"
+            },
+            // 2. Be going to
+            {
+                q: "Look at those clouds! It ______ rain.",
+                options: ["will", "is going to", "is raining", "rains"],
+                correct: "is going to"
+            },
+            // 3. Present Continuous for future
+            {
+                q: "We ______ dinner with my grandparents on Sunday.",
+                options: ["will have", "are having", "have", "will be having"],
+                correct: "are having"
+            },
+            // 4. Future Continuous
+            {
+                q: "At 8 PM tonight, I ______ my favourite TV show.",
+                options: ["will watch", "am watching", "will be watching", "watch"],
+                correct: "will be watching"
+            },
+            // 5. Future Perfect
+            {
+                q: "By the time you arrive, I ______ cooking dinner.",
+                options: ["will finish", "will have finished", "finish", "am finishing"],
+                correct: "will have finished"
+            },
+            // 6. Future Perfect Continuous
+            {
+                q: "Next month, she ______ at this company for ten years.",
+                options: ["will work", "will be working", "will have been working", "has worked"],
+                correct: "will have been working"
+            },
+            // 7. Comparisons
+            {
+                q: "This supermarket is ______ than the one near my house.",
+                options: ["cheap", "cheaper", "cheapest", "the cheapest"],
+                correct: "cheaper"
+            },
+            // 8. Comparisons
+            {
+                q: "It's ______ restaurant in the city.",
+                options: ["the most expensive", "more expensive", "expensive", "most expensive"],
+                correct: "the most expensive"
+            },
+            // 9. as... as
+            {
+                q: "The bookshop isn't ______ it used to be.",
+                options: ["as big as", "bigger than", "the biggest", "so big than"],
+                correct: "as big as"
+            },
+            // 10. the..., the...
+            {
+                q: "______ you buy, ______ you save.",
+                options: ["The more, the more", "More, more", "The most, the most", "Much, much"],
+                correct: "The more, the more"
+            },
+            // 11. Gerund vs Infinitive
+            {
+                q: "I forgot ______ the milk on my way home.",
+                options: ["buying", "to buy", "buy", "bought"],
+                correct: "to buy"
+            },
+            // 12. Gerund vs Infinitive
+            {
+                q: "I'll never forget ______ that beautiful sunset in Italy.",
+                options: ["seeing", "to see", "see", "saw"],
+                correct: "seeing"
+            },
+            // 13. stop + gerund
+            {
+                q: "He stopped ______ chocolate because he wanted to lose weight.",
+                options: ["to eat", "eating", "eat", "eaten"],
+                correct: "eating"
+            },
+            // 14. stop + infinitive
+            {
+                q: "We stopped ______ a coffee on our way to work.",
+                options: ["having", "to have", "have", "had"],
+                correct: "to have"
+            },
+            // 15. although
+            {
+                q: "______ it was raining, we decided to go shopping.",
+                options: ["Despite", "Although", "Because", "So"],
+                correct: "Although"
+            },
+            // 16. despite
+            {
+                q: "She went to the party ______ feeling tired.",
+                options: ["although", "despite", "because", "so"],
+                correct: "despite"
+            },
+            // 17. Vocabulary - Shops
+            {
+                q: "You can buy medicine at the ______.",
+                options: ["bakery", "chemist's", "butcher's", "bookshop"],
+                correct: "chemist's"
+            },
+            // 18. Vocabulary - Food
+            {
+                q: "We need to buy some fresh vegetables at the ______.",
+                options: ["supermarket", "post office", "bank", "library"],
+                correct: "supermarket"
+            },
+            // 19. Vocabulary - Shopping terms
+            {
+                q: "A ______ is a card that gives you money off when you shop at a store.",
+                options: ["credit card", "loyalty card", "ID card", "business card"],
+                correct: "loyalty card"
+            },
+            // 20. Phrasal verbs
+            {
+                q: "I need to ______ out the price of the shoes before I buy them.",
+                options: ["check", "look", "turn", "find"],
+                correct: "check"
+            },
+            // 21. Phrasal verbs
+            {
+                q: "She tried to ______ across her idea about healthy food.",
+                options: ["get", "come", "throw", "check"],
+                correct: "get"
+            },
+            // 22. Word formation (Adjectives)
+            {
+                q: "The soup had a very ______ taste, so I didn't eat it.",
+                options: ["delicious", "disgusting", "wonderful", "enjoyable"],
+                correct: "disgusting"
+            },
+            // 23. Word formation (-less)
+            {
+                q: "It was very ______ of him to leave his wallet on the table.",
+                options: ["careful", "careless", "caring", "care"],
+                correct: "careless"
+            },
+            // 24. Adjective order
+            {
+                q: "She bought a ______ dress for the party.",
+                options: ["beautiful long red", "red long beautiful", "long beautiful red", "beautiful red long"],
+                correct: "beautiful long red"
+            },
+            // 25. Vocabulary - Food descriptions
+            {
+                q: "I don't like buying ______ vegetables because they don't taste fresh.",
+                options: ["frozen", "organic", "local", "natural"],
+                correct: "frozen"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let canClick = true;
+
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+
+        function initQuiz() {
+            // Shuffle questions on load
+            quizData.sort(() => Math.random() - 0.5);
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= quizData.length) {
+                showEndScreen();
+                return;
+            }
+
+            canClick = true;
+            const q = quizData[currentQuestion];
+            questionText.innerHTML = q.q;
+            progressBar.style.width = `${(currentQuestion / quizData.length) * 100}%`;
+            nextBtn.style.display = 'none';
+            optionsContainer.classList.remove('disabled');
+            optionsContainer.innerHTML = '';
+
+            // Shuffle options
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(optionText => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = optionText;
+                btn.onclick = () => checkAnswer(optionText, q.correct, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btn) {
+            if (!canClick) return;
+            canClick = false;
+            optionsContainer.classList.add('disabled');
+
+            if (selected === correct) {
+                score++;
+                btn.classList.add('correct');
+                if (navigator.vibrate) navigator.vibrate(50);
+            } else {
+                btn.classList.add('wrong');
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                
+                // Highlight correct answer
+                Array.from(optionsContainer.children).forEach(b => {
+                    if (b.innerText === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            nextBtn.style.display = 'block';
+            progressBar.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            showQuestion();
+        }
+
+        function showEndScreen() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('finalScreen').style.display = 'flex';
+            document.getElementById('finalScore').innerText = `${score} / ${quizData.length}`;
+            
+            if (score === quizData.length) {
+                document.getElementById('finalTitle').innerText = "Perfect! 🎉";
+            } else if (score >= quizData.length * 0.7) {
+                document.getElementById('finalTitle').innerText = "Great Job! 🌟";
+            } else {
+                document.getElementById('finalTitle').innerText = "Keep Practicing! 💪";
+            }
+        }
+
+        // Start
+        initQuiz();
+    </script>
+</body>
+</html>

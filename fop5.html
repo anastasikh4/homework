@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-red: #ff4b4b;
+            --duo-light-green: #d7ffb1;
+            --duo-light-red: #ffdfe0;
+            --duo-purple: #ce82ff;
+            --duo-light-purple: #f3e5ff;
+            --duo-orange: #ff9f43;
+            --duo-light-orange: #ffeaa7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff;
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            font-size: 13px;
+            padding-bottom: 120px;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            height: 12px;
+            background-color: var(--duo-gray);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--duo-green);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            padding: 15px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--duo-text);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: var(--duo-text);
+        }
+
+        .vocab-box {
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            box-shadow: 0 3px 0;
+        }
+
+        .purple-box {
+            background-color: var(--duo-light-purple);
+            border: 2px solid var(--duo-purple);
+            box-shadow: 0 3px 0 var(--duo-purple);
+        }
+        .purple-box strong { color: #9b59b6; font-weight: 800; }
+
+        .orange-box {
+            background-color: var(--duo-light-orange);
+            border: 2px solid var(--duo-orange);
+            box-shadow: 0 3px 0 var(--duo-orange);
+        }
+        .orange-box strong { color: #d35400; font-weight: 800; }
+
+        .vocab-box ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 8px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+        }
+
+        .vocab-box li {
+            background: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--duo-blue);
+        }
+
+        .letter-box {
+            border: 2px solid var(--duo-gray);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 2.2;
+            font-size: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 0 var(--duo-gray);
+            background: #fafafa;
+        }
+
+        .letter-box p { margin: 8px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;}
+
+        select {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            padding: 4px 10px;
+            border: 2px solid var(--duo-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+            color: var(--duo-blue);
+            font-size: 13px;
+            transition: all 0.2s;
+            background: white;
+            min-width: 130px;
+        }
+
+        select:focus { border-color: var(--duo-blue); }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-top: 2px solid var(--duo-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 100;
+        }
+
+        #check-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 3px solid var(--duo-green-dark);
+            padding: 10px 45px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        #check-btn:active { border-bottom-width: 1px; transform: translateY(2px); }
+
+        .feedback-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            padding: 0 10%;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 101;
+        }
+
+        .feedback-text {
+            font-size: 18px;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .status-msg {
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .continue-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 3px solid var(--duo-green-dark);
+            padding: 10px 30px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .feedback-bar.correct-ui { display: flex; background-color: var(--duo-light-green); color: var(--duo-green-dark); }
+        .feedback-bar.incorrect-ui { display: flex; background-color: var(--duo-light-red); color: var(--duo-red); }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="card">
+        <h1>Irregular Verbs: Past Forms</h1>
+
+        <div class="vocab-box purple-box">
+            <strong>Complete the sentences with the correct past form.</strong>
+            <ul>
+                <li>fight</li><li>teach</li><li>think</li><li>blow</li><li>draw</li>
+                <li>fly</li><li>grow</li><li>know</li><li>throw</li><li>bite</li>
+            </ul>
+        </div>
+
+        <div class="letter-box">
+            <p><strong>1.</strong> Yesterday, the two drivers <select id="q1" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="fought">fought</option>
+                <option value="fighted">fighted</option>
+                <option value="fight">fight</option>
+            </select> for the first place.</p>
+
+            <p><strong>2.</strong> My grandfather <select id="q2" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="teached">teached</option>
+                <option value="taught">taught</option>
+                <option value="teach">teach</option>
+            </select> me how to ride a bike.</p>
+
+            <p><strong>3.</strong> I <select id="q3" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="think">think</option>
+                <option value="thought">thought</option>
+                <option value="thinked">thinked</option>
+            </select> about it all night.</p>
+
+            <p><strong>4.</strong> The wind <select id="q4" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="blowed">blowed</option>
+                <option value="blew">blew</option>
+                <option value="blown">blown</option>
+            </select> strongly during the storm.</p>
+
+            <p><strong>5.</strong> The artist <select id="q5" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="drew">drew</option>
+                <option value="drawn">drawn</option>
+                <option value="drawed">drawed</option>
+            </select> a beautiful picture on the wall.</p>
+
+            <p><strong>6.</strong> The mechanic <select id="q6" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="flied">flied</option>
+                <option value="flown">flown</option>
+                <option value="flew">flew</option>
+            </select> to London last week.</p>
+
+            <p><strong>7.</strong> The tomatoes <select id="q7" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="growed">growed</option>
+                <option value="grew">grew</option>
+                <option value="grown">grown</option>
+            </select> very fast in the garden.</p>
+
+            <p><strong>8.</strong> He <select id="q8" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="knowed">knowed</option>
+                <option value="known">known</option>
+                <option value="knew">knew</option>
+            </select> the answer to the question.</p>
+
+            <p><strong>9.</strong> The boy <select id="q9" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="threw">threw</option>
+                <option value="thrown">thrown</option>
+                <option value="throwed">throwed</option>
+            </select> the ball to his dog.</p>
+
+            <p><strong>10.</strong> The dog <select id="q10" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="bited">bited</option>
+                <option value="bitten">bitten</option>
+                <option value="bit">bit</option>
+            </select> the postman yesterday.</p>
+        </div>
+    </div>
+
+    <div id="feedback-bar" class="feedback-bar">
+        <div class="feedback-text">
+            <span id="feedback-message">Correct!</span>
+            <span id="send-status" class="status-msg"></span>
+        </div>
+        <button class="continue-btn" onclick="resetUI()">TRY AGAIN</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="check-btn" onclick="checkAnswers()">Check</button>
+    </div>
+
+    <script>
+        // ========== TRACKING DATA ==========
+        const TEST_NAME = "Irregular Verbs - Past Simple";
+        let userMistakes = [];
+
+        const answers = { 
+            q1: "fought", 
+            q2: "taught", 
+            q3: "thought", 
+            q4: "blew", 
+            q5: "drew",
+            q6: "flew", 
+            q7: "grew", 
+            q8: "knew", 
+            q9: "threw", 
+            q10: "bit"
+        };
+        const totalQuestions = Object.keys(answers).length;
+
+        function updateProgress() {
+            const selects = document.querySelectorAll('select');
+            let filled = 0;
+            selects.forEach(s => { if(s.value !== "") filled++; });
+            document.getElementById('progress-bar').style.width = (filled / totalQuestions) * 100 + '%';
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const selects = document.querySelectorAll('select');
+            let allFilled = Array.from(selects).every(s => s.value !== "");
+
+            if(!allFilled) return alert("Пожалуйста, заполните все пропуски!");
+
+            for (let id in answers) {
+                const select = document.getElementById(id);
+                if (select.value === answers[id]) {
+                    correctCount++;
+                    select.style.borderColor = "var(--duo-green)";
+                    select.style.backgroundColor = "#f0ffe8";
+                } else {
+                    userMistakes.push(select.value); 
+                    select.style.borderColor = "var(--duo-red)";
+                    select.style.backgroundColor = "#fff0f0";
+                }
+            }
+
+            const bar = document.getElementById('feedback-bar');
+            const msg = document.getElementById('feedback-message');
+            const footer = document.getElementById('footer');
+            
+            if (correctCount === totalQuestions) {
+                bar.className = "feedback-bar correct-ui";
+                msg.innerHTML = "✔️ Perfect! All correct!";
+            } else {
+                bar.className = "feedback-bar incorrect-ui";
+                msg.innerHTML = `❌ ${correctCount}/${totalQuestions} Correct`;
+            }
+            
+            footer.style.display = 'none';
+            sendResultsToGoogle(correctCount, totalQuestions);
+        }
+
+        function resetUI() { 
+            document.getElementById('feedback-bar').className = "feedback-bar"; 
+            document.getElementById('footer').style.display = 'flex';
+            
+            document.querySelectorAll('select').forEach(s => {
+                s.style.borderColor = "var(--duo-gray)";
+                s.style.backgroundColor = "white";
+            });
+            
+            const statusEl = document.getElementById('send-status');
+            statusEl.innerText = "";
+        }
+
+        // ========== GOOGLE SHEETS INTEGRATION (MANDATORY) ==========
+        function sendResultsToGoogle(score, total) {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const formData = new URLSearchParams();
+            formData.append("name", TEST_NAME);
+            formData.append("score", score);
+            formData.append("total", total);
+            formData.append("mistakes", userMistakes.join(', '));
+
+            const statusEl = document.getElementById('send-status');
+            statusEl.style.color = "#666";
+            statusEl.innerText = "Sending results...";
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            })
+            .then(() => {
+                statusEl.style.color = '#2ecc71';
+                statusEl.innerText = "Results sent successfully! ✅";
+            })
+            .catch((error) => {
+                console.error("Error sending results:", error);
+                statusEl.style.color = '#e74c3c';
+                statusEl.innerText = "Failed to send results ❌.";
+            });
+        }
+    </script>
+</body>
+</html>
