@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordwall Style: Past Perfect Match</title>
+    <style>
+        :root {
+            --ww-blue: #0071ba;
+            --ww-light-blue: #e8f4fd;
+            --ww-dark: #2d3e50;
+            --ww-correct: #46a049;
+            --ww-wrong: #e91e63;
+            --ww-yellow: #ffcc00;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background-color: var(--ww-light-blue); 
+            color: var(--ww-dark); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .game-container { 
+            max-width: 850px; 
+            width: 100%; 
+            background: white; 
+            border: 3px solid var(--ww-blue); 
+            border-radius: 15px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: var(--ww-blue); 
+            text-align: center; 
+            text-transform: uppercase; 
+            margin-top: 0; 
+            font-size: 1.8rem;
+        }
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .option-card {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+        .option-card:hover:not(.matched) {
+            border-color: var(--ww-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .option-card.selected {
+            border-color: var(--ww-yellow);
+            background: #fffde7;
+            box-shadow: 0 0 0 3px var(--ww-yellow);
+        }
+        .opt-letter {
+            background: var(--ww-blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Sentences List */
+        .sentences-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sentence-item {
+            display: flex;
+            align-items: center;
+            background: #f0f7ff;
+            border: 2px solid #cce5ff;
+            border-radius: 10px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .sentence-item:hover:not(.matched) {
+            border-color: var(--ww-blue);
+            background: #e1f0fa;
+        }
+        .sentence-item.selected {
+            border-color: var(--ww-yellow);
+            background: #fffde7;
+            box-shadow: 0 0 0 3px var(--ww-yellow);
+        }
+        .sentence-num {
+            font-weight: bold;
+            color: var(--ww-blue);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        .drop-zone { 
+            display: inline-block; 
+            width: 40px; 
+            height: 30px;
+            background: white;
+            border: 2px solid var(--ww-blue); 
+            border-radius: 6px;
+            text-align: center; 
+            color: var(--ww-blue); 
+            font-weight: bold; 
+            line-height: 26px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+        .sentence-text {
+            font-size: 1.05rem;
+            flex-grow: 1;
+            font-weight: 600;
+        }
+
+        /* Instant Feedback States */
+        .matched {
+            background: #e8f5e9 !important;
+            border-color: var(--ww-correct) !important;
+            color: #2e7d32;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        .matched .drop-zone {
+            border-color: var(--ww-correct);
+            color: var(--ww-correct);
+        }
+        .matched .opt-letter {
+            background: var(--ww-correct);
+        }
+
+        .wrong-match {
+            animation: shake 0.4s ease-in-out;
+            border-color: var(--ww-wrong) !important;
+            background: #fce4ec !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* Final Screen */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+        .final-screen h2 { color: var(--ww-blue); font-size: 2.2rem; }
+        .final-score-text { font-size: 1.5rem; font-weight: bold; margin: 20px 0; }
+        .success-msg {
+            color: var(--ww-correct);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: none;
+        }
+        .btn-restart {
+            background: var(--ww-blue); 
+            color: white; 
+            border: none; 
+            padding: 15px 40px; 
+            border-radius: 50px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #005a96; 
+            margin-top: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .sentence-text { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="gameContainer">
+    <h1>⏳ Past Perfect Match</h1>
+    <p class="instruction">Click a sentence and an ending to match them instantly!</p>
+
+    <!-- Options Grid (A-F) -->
+    <div class="options-grid" id="optionsGrid">
+        <div class="option-card" onclick="selectOption(this)" data-id="A">
+            <div class="opt-letter">A</div>
+            the film had already started.
+        </div>
+        <div class="option-card" onclick="selectOption(this)" data-id="B">
+            <div class="opt-letter">B</div>
+            I had forgotten my wallet.
+        </div>
+        <div class="option-card" onclick="selectOption(this)" data-id="C">
+            <div class="opt-letter">C</div>
+            he had lost his keys.
+        </div>
+        <div class="option-card" onclick="selectOption(this)" data-id="D">
+            <div class="opt-letter">D</div>
+            she had been working all day.
+        </div>
+        <div class="option-card" onclick="selectOption(this)" data-id="E">
+            <div class="opt-letter">E</div>
+            they had been studying for weeks.
+        </div>
+        <div class="option-card" onclick="selectOption(this)" data-id="F">
+            <div class="opt-letter">F</div>
+            it had been raining.
+        </div>
+    </div>
+
+    <!-- Sentences List (1-6) -->
+    <div class="sentences-list" id="sentencesList">
+        <div class="sentence-item" onclick="selectSentence(this)" data-ans="A">
+            <span class="sentence-num">1</span>
+            <span class="drop-zone"></span>
+            <span class="sentence-text">When I arrived at the cinema, ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)" data-ans="D">
+            <span class="sentence-num">2</span>
+            <span class="drop-zone"></span>
+            <span class="sentence-text">She was very tired because ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)" data-ans="B">
+            <span class="sentence-num">3</span>
+            <span class="drop-zone"></span>
+            <span class="sentence-text">I couldn't buy lunch because ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)" data-ans="F">
+            <span class="sentence-num">4</span>
+            <span class="drop-zone"></span>
+            <span class="sentence-text">The road was wet because ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)" data-ans="C">
+            <span class="sentence-num">5</span>
+            <span class="drop-zone"></span>
+            <span class="sentence-text">He couldn't open the door because ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)" data-ans="E">
+            <span class="sentence-num">6</span>
+            <span class="drop-zone"></span>
+            <span class="sentence-text">They finally passed the exam after ...</span>
+        </div>
+    </div>
+</div>
+
+<!-- FINAL SCREEN -->
+<div class="game-container final-screen" id="finalScreen">
+    <h2>🎉 Great Job!</h2>
+    <div class="final-score-text">Score: 6 / 6</div>
+    <div class="success-msg" id="successMsg">Results sent successfully! ✅</div>
+    <button class="btn-restart" onclick="location.reload()">TRY AGAIN</button>
+</div>
+
+<script>
+    // Mandatory Configuration
+    const TEST_NAME = "Past Perfect & Continuous Match (Instant Feedback)";
+    let userMistakes = [];
+    let totalMatches = 6;
+    let matchesFound = 0;
+
+    let selectedSentence = null;
+    let selectedOption = null;
+    let isProcessing = false; // Prevents rapid clicking during animations
+
+    // Highlight the clicked sentence
+    function selectSentence(el) {
+        if (isProcessing || el.classList.contains('matched')) return;
+
+        // Deselect if clicked again
+        if (selectedSentence === el) {
+            el.classList.remove('selected');
+            selectedSentence = null;
+            return;
+        }
+
+        // Remove highlight from previous sentence
+        if (selectedSentence) selectedSentence.classList.remove('selected');
+        
+        selectedSentence = el;
+        el.classList.add('selected');
+
+        // If an option is already selected, evaluate immediately
+        if (selectedOption) {
+            evaluateMatch();
+        }
+    }
+
+    // Highlight the clicked option
+    function selectOption(el) {
+        if (isProcessing || el.classList.contains('matched')) return;
+
+        // Deselect if clicked again
+        if (selectedOption === el) {
+            el.classList.remove('selected');
+            selectedOption = null;
+            return;
+        }
+
+        // Remove highlight from previous option
+        if (selectedOption) selectedOption.classList.remove('selected');
+
+        selectedOption = el;
+        el.classList.add('selected');
+
+        // If a sentence is already selected, evaluate immediately
+        if (selectedSentence) {
+            evaluateMatch();
+        }
+    }
+
+    // Instant feedback logic
+    function evaluateMatch() {
+        isProcessing = true;
+        
+        const sentenceAns = selectedSentence.getAttribute('data-ans');
+        const optionId = selectedOption.getAttribute('data-id');
+
+        if (sentenceAns === optionId) {
+            // --- CORRECT MATCH ---
+            selectedSentence.classList.remove('selected');
+            selectedOption.classList.remove('selected');
+            
+            selectedSentence.classList.add('matched');
+            selectedOption.classList.add('matched');
+            
+            // Fill in the drop zone with the letter
+            selectedSentence.querySelector('.drop-zone').innerText = optionId;
+
+            matchesFound++;
+            
+            selectedSentence = null;
+            selectedOption = null;
+            isProcessing = false;
+
+            // Check for game over
+            if (matchesFound === totalMatches) {
+                setTimeout(showFinalScreen, 500);
+            }
+
+        } else {
+            // --- WRONG MATCH ---
+            const wrongSentence = selectedSentence;
+            const wrongOption = selectedOption;
+
+            // Track mistake
+            userMistakes.push(`Tried to link "${wrongSentence.querySelector('.sentence-text').innerText}" with "${wrongOption.innerText.trim()}"`);
+
+            // Add shake animation
+            wrongSentence.classList.add('wrong-match');
+            wrongOption.classList.add('wrong-match');
+
+            // Reset after animation
+            setTimeout(() => {
+                wrongSentence.classList.remove('selected', 'wrong-match');
+                wrongOption.classList.remove('selected', 'wrong-match');
+                
+                selectedSentence = null;
+                selectedOption = null;
+                isProcessing = false;
+            }, 600);
+        }
+    }
+
+    function showFinalScreen() {
+        document.getElementById('gameContainer').style.display = 'none';
+        document.getElementById('finalScreen').style.display = 'block';
+        
+        // Trigger Google Sheets API (Score is always 6/6 since they must match all to finish)
+        sendResultsToGoogle(6, 6);
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle(score, total) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", total);
+        formData.append("mistakes", userMistakes.join(' | '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            // Show success message on the final screen
+            const msgEl = document.getElementById('successMsg');
+            if(msgEl) msgEl.style.display = 'block';
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+        });
+    }
+</script>
+
+</body>
+</html>
