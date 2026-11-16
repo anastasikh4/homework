@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Too vs Not Enough Quiz</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --chip-bg: #f1f2f6;
+            --chip-border: #dfe4ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 100%;
+            max-width: 650px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 70%;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .instruction {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .scrambled-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #dfe4ea;
+            min-height: 80px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .word-chip {
+            background: var(--chip-bg);
+            border: 2px solid var(--chip-border);
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            user-select: none;
+            font-size: 1.05rem;
+        }
+
+        .word-chip:hover {
+            background: var(--quiz-light-purple);
+            color: white;
+            border-color: var(--quiz-light-purple);
+            transform: scale(1.05);
+        }
+
+        .answer-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #bce6eb;
+            min-height: 80px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .answer-chip {
+            background: #fff;
+            border: 2px solid #bce6eb;
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            user-select: none;
+            font-size: 1.05rem;
+        }
+
+        .answer-chip:hover {
+            background: var(--quiz-red);
+            color: white;
+            border-color: var(--quiz-red);
+            transform: scale(0.95);
+        }
+
+        .reply-section {
+            display: none;
+            margin-top: 20px;
+            background: #fff9c4;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #f1c40f;
+            text-align: center;
+        }
+
+        .reply-section label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: bold;
+            color: #d35400;
+            font-size: 1.1rem;
+        }
+
+        .reply-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-reply-option {
+            padding: 12px 24px;
+            border: 2px solid #f1c40f;
+            border-radius: 12px;
+            background: white;
+            color: #333;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 90%;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn-reply-option:hover {
+            background: #fff3cd;
+            border-color: #e67e22;
+        }
+
+        .btn-reply-option.correct {
+            background: #d4edda;
+            border-color: #2ecc71;
+            color: #155724;
+        }
+
+        .btn-reply-option.wrong {
+            background: #f8d7da;
+            border-color: #e74c3c;
+            color: #721c24;
+        }
+
+        .btn-reply-option:disabled {
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        #reply-feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 24px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+        }
+
+        .btn-check {
+            background: var(--quiz-light-purple);
+            color: white;
+        }
+
+        .btn-check:hover {
+            background: #6c44a3;
+        }
+
+        .btn-reset {
+            background: #bdc3c7;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #95a5a6;
+        }
+
+        .btn-next {
+            background: var(--quiz-green);
+            color: white;
+            display: none;
+        }
+
+        .btn-next:hover {
+            background: #20bf6b;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #feedback {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.1rem;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-msg {
+            color: var(--quiz-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    <div class="header">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">Grammar</div>
+    </div>
+
+    <div id="content">
+        <div class="instruction">1. Click the chunks to make a complaint with 'too'.</div>
+        
+        <div class="scrambled-area" id="scrambled-words"></div>
+        
+        <div class="instruction" style="margin-top:15px;">2. Your complaint:</div>
+        <div class="answer-area" id="answer-area"></div>
+
+        <!-- Reply section with two options -->
+        <div class="reply-section" id="reply-section">
+            <label>Choose the correct agreement with 'not ... enough':</label>
+            <div class="reply-options" id="reply-options"></div>
+            <div id="reply-feedback"></div>
+        </div>
+    </div>
+
+    <div id="feedback"></div>
+    
+    <div class="action-buttons">
+        <button class="btn btn-reset" onclick="resetQuestion()">Reset</button>
+        <button class="btn btn-check" id="check-btn" onclick="checkSentence()">Check</button>
+        <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question</button>
+    </div>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Too vs Not Enough Grammar Quiz (2-Word Chunks)";
+    let userMistakes = [];
+
+    const questions = [
+        {
+            chunks: ["This bag", "is", "too heavy", "!"],
+            correct: "This bag is too heavy !",
+            replies: ["You're right. It's not light enough.", "You're right. It's not heavy enough."],
+            correctReplyIndex: 0
+        },
+        {
+            chunks: ["The room", "is", "too dark", "!"],
+            correct: "The room is too dark !",
+            replies: ["I agree. It's not dark enough.", "I agree. It's not bright enough."],
+            correctReplyIndex: 1
+        },
+        {
+            chunks: ["The music", "is", "too loud", "!"],
+            correct: "The music is too loud !",
+            replies: ["Yes, it's not quiet enough.", "Yes, it's not loud enough."],
+            correctReplyIndex: 0
+        },
+        {
+            chunks: ["This coffee", "is", "too sweet", "!"],
+            correct: "This coffee is too sweet !",
+            replies: ["Yes, it's not strong enough.", "Yes, it's not sweet enough."],
+            correctReplyIndex: 0
+        },
+        {
+            chunks: ["This bed", "is", "too soft", "!"],
+            correct: "This bed is too soft !",
+            replies: ["I agree. It's not firm enough.", "I agree. It's not soft enough."],
+            correctReplyIndex: 0
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let availableChunks = [];
+    let userChunks = [];
+    let isSentenceCorrect = false;
+    let replyOptionsShuffled = [];
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('progress-bar').style.width = (currentQ / questions.length) * 100 + "%";
+        document.getElementById('category').innerText = "Question " + (currentQ + 1) + " of " + questions.length;
+        
+        availableChunks = shuffleArray([...q.chunks]);
+        userChunks = [];
+        isSentenceCorrect = false;
+        
+        const replyPairs = q.replies.map((text, idx) => ({ text, isCorrect: idx === q.correctReplyIndex }));
+        replyOptionsShuffled = shuffleArray(replyPairs);
+        
+        document.getElementById('reply-section').style.display = 'none';
+        document.getElementById('reply-feedback').innerText = '';
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('check-btn').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').disabled = false;
+        
+        renderUI();
+    }
+
+    function renderUI() {
+        const scrambledArea = document.getElementById('scrambled-words');
+        const answerArea = document.getElementById('answer-area');
+        
+        scrambledArea.innerHTML = '';
+        answerArea.innerHTML = '';
+        
+        availableChunks.forEach((chunk, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'word-chip';
+            btn.innerText = chunk;
+            btn.onclick = () => moveChunkToAnswer(index);
+            scrambledArea.appendChild(btn);
+        });
+        
+        userChunks.forEach((chunk, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'answer-chip';
+            btn.innerText = chunk;
+            btn.onclick = () => moveChunkToScrambled(index);
+            answerArea.appendChild(btn);
+        });
+    }
+
+    function moveChunkToAnswer(index) {
+        if (isSentenceCorrect) return;
+        const chunk = availableChunks.splice(index, 1)[0];
+        userChunks.push(chunk);
+        renderUI();
+    }
+
+    function moveChunkToScrambled(index) {
+        if (isSentenceCorrect) return;
+        const chunk = userChunks.splice(index, 1)[0];
+        availableChunks.push(chunk);
+        renderUI();
+    }
+
+    function resetQuestion() {
+        if (isSentenceCorrect) return;
+        const q = questions[currentQ];
+        availableChunks = shuffleArray([...q.chunks]);
+        userChunks = [];
+        renderUI();
+        document.getElementById('feedback').innerText = '';
+    }
+
+    function checkSentence() {
+        if (userChunks.length === 0) {
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--quiz-red)'>Please form a sentence first!</span>";
+            return;
+        }
+
+        const userSentence = userChunks.join(" ");
+        const correctSentence = questions[currentQ].correct;
+
+        if (userSentence.trim() === correctSentence.trim()) {
+            isSentenceCorrect = true;
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--quiz-green)'>Correct! ✅ Now choose the correct agreement.</span>";
+            document.getElementById('check-btn').style.display = 'none';
+            document.getElementById('reply-section').style.display = 'block';
+            renderReplyOptions();
+        } else {
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--quiz-red)'>Not quite. Try again! ❌</span>";
+        }
+    }
+
+    function renderReplyOptions() {
+        const container = document.getElementById('reply-options');
+        container.innerHTML = '';
+        
+        replyOptionsShuffled.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-reply-option';
+            btn.innerText = option.text;
+            btn.onclick = () => checkReply(option, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkReply(selectedOption, btn) {
+        const feedback = document.getElementById('reply-feedback');
+        const allBtns = document.querySelectorAll('.btn-reply-option');
+        
+        if (selectedOption.isCorrect) {
+            btn.classList.add('correct');
+            feedback.innerHTML = "<span style='color:var(--quiz-green)'>Perfect! That's the correct grammar. 🎉</span>";
+            allBtns.forEach(b => b.disabled = true);
+            score++;
+            document.getElementById('next-btn').style.display = 'block';
+        } else {
+            btn.classList.add('wrong');
+            userMistakes.push(selectedOption.text);
+            feedback.innerHTML = "<span style='color:var(--quiz-red)'>Not the correct response. Try again!</span>";
+        }
+    }
+
+    function handleNext() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('progress-bar').style.width = "100%";
+        sendResultsToGoogle();
+
+        document.getElementById('quiz-box').innerHTML = `
+            <div class="final-screen">
+                <h1 style="font-size: 3rem;">🏆</h1>
+                <h2>Quiz Complete!</h2>
+                <p style="font-size: 1.2rem;">You scored: <strong>${score} / ${questions.length}</strong></p>
+                <div id="success-msg" class="success-msg">Results sent successfully! ✅</div>
+                <button class="btn btn-check" style="width: auto; padding: 15px 40px; margin-top: 20px;" onclick="location.reload()">TRY AGAIN</button>
+            </div>
+        `;
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", questions.length);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            const msgEl = document.getElementById('success-msg');
+            if(msgEl) msgEl.style.display = 'block';
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+        });
+    }
+
+    // Initialize
+    loadQuestion();
+</script>
+
+</body>
+</html>

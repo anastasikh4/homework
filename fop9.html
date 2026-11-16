@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Quest: Shops & Things</title>
+    <style>
+        :root { --main-bg: #1a1a2e; --card-bg: #ffffff; --gold: #f1c40f; --text: #2c3e50; --correct: #2ecc71; --wrong: #e74c3c; }
+        body { font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif; background: var(--main-bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .game-ui { background: #16213e; color: white; padding: 15px 30px; border-radius: 50px; border: 3px solid var(--gold); margin-bottom: 20px; font-size: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .card { background: var(--card-bg); width: 100%; max-width: 600px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 0 #bdc3c7; }
+        .image-container { width: 100%; height: 100px; background: #f0f4f8; border-radius: 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; }
+        
+        .sentence { font-size: 20px; font-weight: bold; margin: 15px 0; min-height: 60px; line-height: 1.4; color: #555; }
+        .sentence strong { color: var(--text); font-size: 22px; }
+        
+        .scrambled-box { 
+            background: #fff9c4; 
+            border: 2px dashed #f1c40f; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin: 15px 0; 
+            font-size: 22px; 
+            font-weight: bold; 
+            letter-spacing: 3px; 
+            color: #d35400;
+            text-transform: uppercase;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+        
+        .hint-text { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; font-style: italic; }
+        
+        .input-area { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .input-box { padding: 15px; font-size: 20px; border: 2px solid #bdc3c7; border-radius: 12px; width: 65%; outline: none; text-align: center; text-transform: lowercase; }
+        .input-box:focus { border-color: var(--gold); }
+        .input-box:disabled { background-color: #f9f9f9; color: #777; }
+        
+        .btn { padding: 15px 25px; font-size: 18px; border: none; border-radius: 12px; cursor: pointer; color: white; transition: 0.2s; font-weight: bold; }
+        .btn-check { background: #3498db; box-shadow: 0 5px 0 #2980b9; }
+        .btn-check:active { transform: translateY(4px); box-shadow: none; }
+        .btn-next { background: #e67e22; box-shadow: 0 5px 0 #d35400; display: none; }
+        .btn-next:active { transform: translateY(4px); box-shadow: none; }
+        
+        .feedback { margin-top: 15px; font-size: 20px; font-weight: bold; min-height: 30px; }
+        .feedback.correct { color: var(--correct); }
+        .feedback.wrong { color: var(--wrong); }
+        
+        .hidden { display: none; }
+        .win-screen { font-size: 30px; color: var(--gold); }
+        
+        .success-msg {
+            color: var(--correct);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-ui">
+    💎 <span id="score">0</span> | Quest: <span id="current">1</span>/9
+</div>
+
+<div class="card" id="game-card">
+    <div class="image-container" id="img-box">🛒</div>
+    <div class="sentence" id="task-text">Loading...</div>
+    
+    <!-- Scrambled letters block -->
+    <div class="scrambled-box" id="scrambled-letters">...</div>
+    
+    <div class="hint-text" id="hint-text"></div>
+    
+    <div class="input-area">
+        <input type="text" id="user-answer" class="input-box" placeholder="Type the shop..." autocomplete="off">
+        <button class="btn btn-check" id="check-btn" onclick="checkAnswer()">Check</button>
+        <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">Next ➡️</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+</div>
+
+<div id="finish" class="hidden">
+    <div class="card">
+        <h1 class="win-screen">🏆 VICTORY!</h1>
+        <p>You found all the shops!</p>
+        <div style="font-size: 80px;">🛍️🏪🎉</div>
+        <div id="success-msg" class="success-msg">Results sent successfully! ✅</div>
+        <button class="btn btn-check" onclick="location.reload()" style="margin-top:20px;">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // Mandatory Configuration
+    const TEST_NAME = "Shops & Things Vocabulary Quiz (Exact Words)";
+    let userMistakes = [];
+    let score = 0;
+    let step = 0;
+
+    // Data using EXACT words from the image
+    const data = [
+        { 
+            items: "bread and cakes", 
+            answer: "baker's", 
+            emoji: "🍞", 
+            hint: "Where you buy fresh bread." 
+        },
+        { 
+            items: "school books and comic books", 
+            answer: "bookshop", 
+            emoji: "📚", 
+            hint: "Where you buy books to read." 
+        },
+        { 
+            items: "vitamins and thermometer", 
+            answer: "chemist's", 
+            emoji: "💊", 
+            hint: "Where you buy medicine." 
+        },
+        { 
+            items: "jeans and dresses", 
+            answer: "clothes shop", 
+            emoji: "👖", 
+            hint: "Where you buy things to wear." 
+        },
+        { 
+            items: "a sofa, a skirt and a cup", 
+            answer: "department store", 
+            emoji: "🛍️", 
+            hint: "A large shop that sells many different types of goods." 
+        },
+        { 
+            items: "fruit and vegetables", 
+            answer: "greengrocer's", 
+            emoji: "🍎", 
+            hint: "Where you buy fresh fruit and vegetables." 
+        },
+        { 
+            items: "newspapers and magazines", 
+            answer: "newsagent's", 
+            emoji: "📰", 
+            hint: "Where you buy the daily news." 
+        },
+        { 
+            items: "boots and shoes", 
+            answer: "shoe shop", 
+            emoji: "👢", 
+            hint: "Where you buy footwear." 
+        },
+        { 
+            items: "tennis balls and trainers", 
+            answer: "sports shop", 
+            emoji: "🎾", 
+            hint: "Where you buy things for playing games." 
+        }
+    ];
+
+    // Function to scramble letters in a word or phrase
+    function scrambleWord(str) {
+        const words = str.split(' ');
+        return words.map(word => {
+            if (word.length < 2) return word;
+            const letters = word.split('');
+            // Fisher-Yates shuffle
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            let scrambled = letters.join('');
+            // If it accidentally unscrambles to the same word, swap two letters
+            if (scrambled === word && word.length > 1) {
+                scrambled = word.substring(1, 2) + word.substring(0, 1) + word.substring(2);
+            }
+            return scrambled;
+        }).join(' ');
+    }
+
+    function update() {
+        if (step < data.length) {
+            document.getElementById('current').innerText = step + 1;
+            document.getElementById('task-text').innerHTML = `Where can you buy <br><strong>${data[step].items}</strong>?`;
+            document.getElementById('hint-text').innerText = "💡 " + data[step].hint;
+            document.getElementById('img-box').innerText = data[step].emoji;
+            
+            // Generate and display scrambled letters
+            const scrambled = scrambleWord(data[step].answer);
+            document.getElementById('scrambled-letters').innerText = scrambled.toUpperCase();
+            
+            // Reset UI
+            const input = document.getElementById('user-answer');
+            input.value = '';
+            input.disabled = false;
+            input.style.borderColor = '#bdc3c7';
+            
+            document.getElementById('check-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback').innerText = '';
+            
+            input.focus();
+        } else {
+            document.getElementById('game-card').classList.add('hidden');
+            document.getElementById('finish').classList.remove('hidden');
+            
+            // Send to Google Sheets
+            sendResultsToGoogle();
+        }
+    }
+
+    // Normalize strings for comparison (removes punctuation like apostrophes and spaces)
+    function normalize(str) {
+        return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function checkAnswer() {
+        const input = document.getElementById('user-answer');
+        const userAnswer = input.value.trim();
+        const correctAnswer = data[step].answer;
+        const feedback = document.getElementById('feedback');
+
+        // Check answer
+        const isCorrect = normalize(userAnswer) === normalize(correctAnswer);
+
+        if (isCorrect) {
+            score += 10;
+            document.getElementById('score').innerText = score;
+            feedback.innerText = "✅ Correct!";
+            feedback.className = "feedback correct";
+            
+            input.disabled = true;
+            input.style.borderColor = 'var(--correct)';
+            document.getElementById('check-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            // SHOW CORRECT ANSWER AND NEXT BUTTON ON WRONG ANSWER
+            feedback.innerHTML = `❌ Incorrect. The answer is: <span style="color:var(--correct); text-transform:capitalize;">${correctAnswer}</span>`;
+            feedback.className = "feedback wrong";
+            
+            input.disabled = true;
+            input.style.borderColor = 'var(--wrong)';
+            
+            document.getElementById('check-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+            
+            // Track mistake
+            userMistakes.push(userAnswer);
+        }
+    }
+
+    function nextQuestion() {
+        step++;
+        update();
+    }
+
+    // Handle Enter key
+    document.getElementById('user-answer').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            if (document.getElementById('next-btn').style.display === 'inline-block') {
+                nextQuestion();
+            } else {
+                checkAnswer();
+            }
+        }
+    });
+
+    // ============================================================
+    // GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ============================================================
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams();
+        params.append("name", TEST_NAME);
+        params.append("score", score / 10); // Convert points back to number of correct answers
+        params.append("total", data.length);
+        params.append("mistakes", userMistakes.join(', '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(() => {
+            // Show success message on final screen
+            document.getElementById('success-msg').style.display = 'block';
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+        });
+    }
+
+    // Start game
+    update();
+</script>
+
+</body>
+</html>

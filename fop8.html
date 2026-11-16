@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordwall Style: As... As Comparisons</title>
+    <style>
+        :root {
+            --ww-blue: #0071ba;
+            --ww-light-blue: #e8f4fd;
+            --ww-dark: #2d3e50;
+            --ww-correct: #46a049;
+            --ww-wrong: #e91e63;
+            --ww-yellow: #ffcc00;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background-color: var(--ww-light-blue); 
+            color: var(--ww-dark); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .game-container { 
+            max-width: 800px; 
+            width: 100%; 
+            background: white; 
+            border: 3px solid var(--ww-blue); 
+            border-radius: 15px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: var(--ww-blue); 
+            text-align: center; 
+            text-transform: uppercase; 
+            margin-top: 0; 
+            font-size: 1.8rem;
+        }
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .option-card {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+        .option-card:hover {
+            border-color: var(--ww-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .option-card.selected {
+            border-color: var(--ww-yellow);
+            background: #fffde7;
+            box-shadow: 0 0 0 3px var(--ww-yellow);
+        }
+        .opt-letter {
+            background: var(--ww-blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Sentences List */
+        .sentences-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sentence-item {
+            display: flex;
+            align-items: center;
+            background: #f0f7ff;
+            border: 2px solid #cce5ff;
+            border-radius: 10px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sentence-item:hover {
+            border-color: var(--ww-blue);
+            background: #e1f0fa;
+        }
+        .sentence-item.selected {
+            border-color: var(--ww-yellow);
+            background: #fffde7;
+            box-shadow: 0 0 0 3px var(--ww-yellow);
+        }
+        .sentence-num {
+            font-weight: bold;
+            color: var(--ww-blue);
+            margin-right: 10px;
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+        .drop-zone { 
+            display: inline-block; 
+            width: 40px; 
+            height: 30px;
+            background: white;
+            border: 2px solid var(--ww-blue); 
+            border-radius: 6px;
+            text-align: center; 
+            color: var(--ww-blue); 
+            font-weight: bold; 
+            line-height: 26px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .sentence-text {
+            font-size: 1.05rem;
+            flex-grow: 1;
+            font-weight: 600;
+        }
+
+        /* Controls */
+        .controls { 
+            margin-top: 30px; 
+            text-align: center; 
+        }
+        .btn-check { 
+            background: var(--ww-blue); 
+            color: white; 
+            border: none; 
+            padding: 15px 40px; 
+            border-radius: 50px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #005a96; 
+            transition: 0.1s;
+        }
+        .btn-check:active { 
+            transform: translateY(4px); 
+            box-shadow: none; 
+        }
+
+        .feedback { 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-size: 1.3rem; 
+            text-align: center; 
+            min-height: 30px;
+        }
+        
+        .correct-anim { color: var(--ww-correct) !important; border-color: var(--ww-correct) !important; }
+        .wrong-anim { color: var(--ww-wrong) !important; border-color: var(--ww-wrong) !important; }
+
+        /* Final Screen */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+        .final-screen h2 { color: var(--ww-blue); font-size: 2rem; }
+        .final-score-text { font-size: 1.5rem; font-weight: bold; margin: 20px 0; }
+        .success-msg {
+            color: var(--ww-correct);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: none;
+        }
+        .btn-restart {
+            background: var(--ww-blue); 
+            color: white; 
+            border: none; 
+            padding: 15px 40px; 
+            border-radius: 50px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #005a96; 
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .sentence-text { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="gameContainer">
+    <h1>Jack & Emma: Comparisons</h1>
+    <p class="instruction">Click a sentence, then click the correct ending from the grid above.</p>
+
+    <!-- Options Grid (A-F) -->
+    <div class="options-grid">
+        <div class="option-card" onclick="selectOption(this, 'A')">
+            <div class="opt-letter">A</div>
+            is as hardworking as Jack.
+        </div>
+        <div class="option-card" onclick="selectOption(this, 'B')">
+            <div class="opt-letter">B</div>
+            isn't as old as Emma.
+        </div>
+        <div class="option-card" onclick="selectOption(this, 'C')">
+            <div class="opt-letter">C</div>
+            isn't as funny as Jack.
+        </div>
+        <div class="option-card" onclick="selectOption(this, 'D')">
+            <div class="opt-letter">D</div>
+            is as smart as Emma.
+        </div>
+        <div class="option-card" onclick="selectOption(this, 'E')">
+            <div class="opt-letter">E</div>
+            isn't as tall as Jack.
+        </div>
+        <div class="option-card" onclick="selectOption(this, 'F')">
+            <div class="opt-letter">F</div>
+            is as old as Emma.
+        </div>
+    </div>
+
+    <!-- Sentences List (1-6) -->
+    <div class="sentences-list" id="sentencesList">
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">1</span>
+            <span class="drop-zone" data-ans="E"></span>
+            <span class="sentence-text">Jack is taller than Emma. Emma ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">2</span>
+            <span class="drop-zone" data-ans="A"></span>
+            <span class="sentence-text">Jack and Emma are hardworking. Emma ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">3</span>
+            <span class="drop-zone" data-ans="B"></span>
+            <span class="sentence-text">Emma is older than Jack. Jack ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">4</span>
+            <span class="drop-zone" data-ans="C"></span>
+            <span class="sentence-text">Jack is funnier than Emma. Emma ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">5</span>
+            <span class="drop-zone" data-ans="D"></span>
+            <span class="sentence-text">Jack and Emma are smart. Jack ...</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">6</span>
+            <span class="drop-zone" data-ans="F"></span>
+            <span class="sentence-text">Jack and Emma are 14 years old. Jack ...</span>
+        </div>
+    </div>
+
+    <div class="controls" id="controls">
+        <button class="btn-check" onclick="checkAnswers()">CHECK ANSWERS</button>
+        <div id="result" class="feedback"></div>
+    </div>
+</div>
+
+<!-- FINAL SCREEN -->
+<div class="game-container final-screen" id="finalScreen">
+    <h2>🎉 Great Job!</h2>
+    <div class="final-score-text" id="finalScoreText">Score: 6 / 6</div>
+    <div class="success-msg" id="successMsg">Results sent successfully! ✅</div>
+    <button class="btn-restart" onclick="location.reload()">TRY AGAIN</button>
+</div>
+
+<script>
+    const TEST_NAME = "As...As Comparisons (Jack & Emma)";
+    let userMistakes = [];
+    let score = 0;
+
+    let selectedSentence = null;
+    let selectedOptionLetter = null;
+
+    // Highlight the clicked sentence
+    function selectSentence(el) {
+        if (selectedSentence) {
+            selectedSentence.classList.remove('selected');
+        }
+        
+        selectedSentence = el;
+        el.classList.add('selected');
+        
+        // If an option was already selected, fill it in immediately
+        if (selectedOptionLetter) {
+            const dropZone = el.querySelector('.drop-zone');
+            dropZone.innerText = selectedOptionLetter;
+            
+            // Reset selections after matching
+            el.classList.remove('selected');
+            selectedSentence = null;
+            selectedOptionLetter = null;
+        }
+    }
+
+    // Handle option click
+    function selectOption(el, letter) {
+        // If a sentence is selected, link them
+        if (selectedSentence) {
+            const dropZone = selectedSentence.querySelector('.drop-zone');
+            dropZone.innerText = letter;
+            
+            // Clear selections
+            selectedSentence.classList.remove('selected');
+            selectedSentence = null;
+            selectedOptionLetter = null;
+        } else {
+            // If no sentence is selected, just highlight the option
+            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedOptionLetter = letter;
+            
+            // Remove highlight after a brief moment if not used
+            setTimeout(() => {
+                el.classList.remove('selected');
+                if (selectedOptionLetter === letter) selectedOptionLetter = null;
+            }, 1500);
+        }
+    }
+
+    // Check all answers
+    function checkAnswers() {
+        let correctCount = 0;
+        const zones = document.querySelectorAll('.drop-zone');
+        const resultDiv = document.getElementById('result');
+        
+        // Reset previous colors and arrays
+        userMistakes = [];
+        zones.forEach(zone => {
+            zone.classList.remove('correct-anim', 'wrong-anim');
+            const parent = zone.closest('.sentence-item');
+            parent.style.borderColor = '#cce5ff'; // reset border
+        });
+
+        let allFilled = Array.from(zones).every(z => z.innerText.trim() !== "");
+
+        if(!allFilled) {
+            resultDiv.innerText = "Please fill in all the blanks first!";
+            resultDiv.style.color = "var(--ww-wrong)";
+            return;
+        }
+
+        zones.forEach(zone => {
+            const userAns = zone.innerText.trim().toUpperCase();
+            const correctAns = zone.getAttribute('data-ans').toUpperCase();
+            const parentItem = zone.closest('.sentence-item');
+
+            if (userAns === correctAns) {
+                zone.classList.add('correct-anim');
+                parentItem.style.borderColor = 'var(--ww-correct)';
+                correctCount++;
+            } else {
+                zone.classList.add('wrong-anim');
+                parentItem.style.borderColor = 'var(--ww-wrong)';
+                
+                // Track mistake (push the sentence text)
+                userMistakes.push(parentItem.querySelector('.sentence-text').innerText);
+            }
+        });
+
+        if (correctCount === zones.length) {
+            resultDiv.innerText = "";
+            score = correctCount;
+            showFinalScreen();
+        } else {
+            resultDiv.innerText = `Score: ${correctCount} / ${zones.length}. Try again!`;
+            resultDiv.style.color = "var(--ww-wrong)";
+        }
+    }
+
+    function showFinalScreen() {
+        document.getElementById('gameContainer').style.display = 'none';
+        document.getElementById('finalScreen').style.display = 'block';
+        document.getElementById('finalScoreText').innerText = `Score: ${score} / 6`;
+        
+        // Trigger Google Sheets API
+        sendResultsToGoogle();
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", 6);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            // Show success message on the final screen
+            const msgEl = document.getElementById('successMsg');
+            if(msgEl) msgEl.style.display = 'block';
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+        });
+    }
+</script>
+
+</body>
+</html>
