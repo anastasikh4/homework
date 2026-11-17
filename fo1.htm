@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starlight 3 · Module 2 · Easy Practice</title>
+<style>
+:root {
+    --ink: #20364d;
+    --purple: #70399b;
+    --brown: #754214;
+    --green: #176534;
+    --green-bg: #dcfce7;
+    --red: #a12232;
+    --red-bg: #ffe0e6;
+    --yellow: #ffe58a;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 20px 12px;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+        radial-gradient(circle, #ffffff88 2px, transparent 3px) 0 0 / 25px 25px,
+        #c8e9fb;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+button { font: inherit; }
+button:focus-visible, summary:focus-visible {
+    outline: 4px solid #176d9f;
+    outline-offset: 4px;
+}
+.app {
+    max-width: 720px;
+    margin: auto;
+    padding: 25px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 24px;
+    box-shadow: 8px 8px 0 var(--yellow);
+}
+header { text-align: center; }
+.badge {
+    display: inline-block;
+    padding: 5px 17px;
+    background: #eee3ff;
+    color: var(--purple);
+    border-radius: 20px;
+    font-weight: 800;
+}
+h1 {
+    color: var(--purple);
+    font-size: clamp(26px, 6vw, 37px);
+    line-height: 1.2;
+    margin: 14px 0;
+}
+h2 { color: var(--purple); font-size: 28px; }
+.subtitle { color: #506479; margin: 8px 0; }
+.small { color: #506479; font-size: 14px; }
+.score-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 22px;
+    margin: 18px 0;
+    font-weight: 800;
+}
+.tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+.tab {
+    padding: 6px 12px;
+    border: 2px solid #c8d8e5;
+    border-radius: 20px;
+    background: #f1f6fa;
+    color: #506479;
+    font-weight: 700;
+    font-size: 14px;
+}
+.tab.active {
+    background: #fff2be;
+    border-color: #caa440;
+    color: var(--brown);
+}
+.tab.done {
+    background: var(--green-bg);
+    border-color: #88b997;
+    color: var(--green);
+}
+.question-card {
+    background: #f1f8ff;
+    border: 3px solid #a9c8de;
+    border-radius: 20px;
+    padding: 24px 18px;
+    text-align: center;
+}
+.counter { color: #506479; font-size: 14px; font-weight: 800; }
+.instruction { font-size: 22px; font-weight: 800; margin: 12px 0 0; }
+.translation { color: #506479; font-size: 16px; margin: 0 0 15px; }
+.visual {
+    font-size: 66px;
+    font-weight: 900;
+    line-height: 1.3;
+    margin: 16px 0;
+}
+.emoji-font { font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
+.prompt {
+    font-size: clamp(22px, 4.5vw, 29px);
+    font-weight: 800;
+    margin: 18px 0;
+    overflow-wrap: anywhere;
+}
+.answer-line { display: block; margin-top: 12px; }
+.blank {
+    display: inline-block;
+    padding: 0 8px;
+    min-width: 64px;
+    border-bottom: 3px dashed #9a701c;
+    color: var(--brown);
+}
+.blank.focus {
+    background: #fff1b7;
+    border-radius: 7px 7px 0 0;
+}
+.blank.filled {
+    color: var(--green);
+    background: var(--green-bg);
+    border-bottom-style: solid;
+    border-bottom-color: #71a986;
+}
+.hint {
+    display: inline-block;
+    padding: 9px 14px;
+    color: var(--brown);
+    background: #fff3ce;
+    border-radius: 12px;
+    font-size: 16px;
+}
+.options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 22px;
+}
+.answer, .next, .restart {
+    min-height: 68px;
+    padding: 15px 12px;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    color: var(--ink);
+    font-size: 23px;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--yellow);
+    box-shadow: 0 5px 0 #b99b3b;
+}
+.answer:hover:not(:disabled) { background: #fff0b5; }
+.answer:active:not(:disabled), .next:active, .restart:active {
+    transform: translateY(3px);
+    box-shadow: none;
+}
+.answer:disabled { cursor: default; opacity: .65; }
+.answer.correct {
+    color: var(--green);
+    background: var(--green-bg);
+    border-color: var(--green);
+    box-shadow: 0 5px 0 #85b896;
+    opacity: 1;
+}
+.answer.wrong {
+    color: var(--red);
+    background: var(--red-bg);
+    border-color: var(--red);
+    box-shadow: 0 5px 0 #c7838c;
+    opacity: 1;
+    animation: shake .3s ease;
+}
+.feedback {
+    min-height: 82px;
+    margin-top: 20px;
+    padding: 13px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+.feedback.good { color: var(--green); background: var(--green-bg); }
+.feedback.bad { color: var(--red); background: var(--red-bg); }
+.feedback small { display: block; font-size: 15px; font-weight: 400; margin-top: 4px; }
+.next, .restart {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    background: #d9edff;
+    box-shadow: 0 5px 0 #8cabc5;
+    font-size: 21px;
+}
+.hidden { display: none !important; }
+.progress-track {
+    height: 16px;
+    margin-top: 25px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e6edf3;
+}
+.progress-fill { width: 0; height: 100%; background: #8bd476; transition: width .3s; }
+.progress-label { margin-top: 8px; text-align: center; color: #506479; font-size: 14px; }
+
+/* Visual distance cue for this / that / these / those. */
+.scene {
+    position: relative;
+    height: 155px;
+    border: 2px solid #b4d1e3;
+    border-radius: 16px;
+    background: linear-gradient(#e0f2ff 70%, #e3f3d8 70%);
+    margin: 18px 0;
+    overflow: hidden;
+}
+.observer {
+    position: absolute;
+    left: 10px;
+    bottom: 15px;
+    font-size: 44px;
+    line-height: 1;
+}
+.scene-label {
+    position: absolute;
+    top: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 8px;
+}
+.near-label { left: 10px; background: #fff0b9; color: var(--brown); }
+.far-label { right: 10px; background: #e9e0ff; color: var(--purple); }
+.scene-object {
+    position: absolute;
+    bottom: 16px;
+    font-size: 43px;
+    line-height: 1.2;
+}
+.scene-object.near { left: 72px; }
+.scene-object.far { right: 12px; bottom: 45px; font-size: 35px; }
+.distance-note {
+    font-size: 16px;
+    font-weight: 800;
+    color: #285977;
+    margin-top: 8px;
+}
+#finish { text-align: center; }
+.trophy { font-size: 70px; margin: 10px 0; }
+.final-score { font-size: 32px; font-weight: 900; color: var(--green); }
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+.result-box {
+    padding: 13px 6px;
+    border: 2px solid #c3d9e9;
+    border-radius: 12px;
+    background: #e3f3ff;
+    font-size: 15px;
+}
+.result-box strong { display: block; font-size: 24px; }
+details {
+    padding: 15px;
+    background: #f0f8ff;
+    border: 2px solid #bed7e9;
+    border-radius: 13px;
+    text-align: left;
+    margin: 20px 0;
+}
+summary { cursor: pointer; font-weight: 800; color: #285977; }
+.review-list { padding-left: 26px; }
+.review-list li { padding: 8px 0; }
+#send-status { font-weight: 800; margin-top: 20px; }
+@keyframes shake {
+    25%, 75% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+}
+@media (max-width: 460px) {
+    .app { padding: 20px 13px; }
+    .question-card { padding: 20px 12px; }
+    .answer { font-size: 20px; padding: 13px 8px; }
+    .results-grid { grid-template-columns: 1fr; }
+    .scene-object.near { left: 62px; font-size: 35px; }
+    .scene-object.far { font-size: 29px; }
+    .observer { font-size: 37px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main class="app">
+    <header>
+        <span class="badge">STARLIGHT 3 · MODULE 2 · A0+</span>
+        <h1>My Easy English Quiz</h1>
+        <p class="subtitle">Is / Are · This / That · Numbers</p>
+        <p class="small" lang="ru">Простые вопросы, картинки и два варианта ответа.</p>
+        <div class="score-row">
+            <span>Points: <strong id="points">0</strong></span>
+            <span>Correct: <strong id="correctCount">0 / 19</strong></span>
+        </div>
+    </header>
+
+    <section id="quiz">
+        <div class="tabs" aria-label="Quiz sections">
+            <span class="tab active" id="tabD">D. Is / Are</span>
+            <span class="tab" id="tabE">E. This / That</span>
+            <span class="tab" id="tabA">A. Numbers</span>
+        </div>
+
+        <div class="question-card">
+            <div class="counter" id="counter"></div>
+            <p class="instruction" id="instruction"></p>
+            <p class="translation" id="translation" lang="ru"></p>
+            <div class="visual" id="visual" aria-hidden="true"></div>
+
+            <div class="scene hidden" id="scene" aria-hidden="true">
+                <span class="scene-label near-label">NEAR · близко</span>
+                <span class="scene-label far-label">FAR · далеко</span>
+                <span class="observer emoji-font">🧒</span>
+                <span class="scene-object emoji-font" id="sceneObject"></span>
+            </div>
+
+            <div class="distance-note hidden" id="distanceNote"></div>
+            <div class="prompt" id="prompt"></div>
+            <div class="hint" id="hint"></div>
+        </div>
+
+        <div class="options" id="options"></div>
+
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+
+        <button type="button" class="next hidden" id="nextButton">
+            Next / Дальше →
+        </button>
+
+        <p class="small" style="text-align:center;" lang="ru">
+            Без таймера. Каждый пропуск — один маленький шаг.
+        </p>
+        <p class="small" style="text-align:center;">
+            Your score and wrong choices are sent automatically when you finish.
+            No name is needed.
+        </p>
+    </section>
+
+    <section id="finish" class="hidden">
+        <div class="trophy" aria-hidden="true">🏆</div>
+        <h2>Well done!</h2>
+        <p lang="ru">Молодец! Ты закончил тест.</p>
+        <div class="final-score" id="finalScore"></div>
+        <p id="finalPoints"></p>
+
+        <div class="results-grid">
+            <div class="result-box">Is / Are<strong id="resultD"></strong></div>
+            <div class="result-box">This / That<strong id="resultE"></strong></div>
+            <div class="result-box">Numbers<strong id="resultA"></strong></div>
+        </div>
+
+        <details>
+            <summary>Correct answers / Правильные ответы</summary>
+            <div id="answerReview"></div>
+        </details>
+
+        <details>
+            <summary>My mistakes / Мои ошибки</summary>
+            <div id="mistakeReview"></div>
+        </details>
+
+        <div id="send-status" role="status" aria-live="polite"></div>
+        <p class="small" id="send-note"></p>
+
+        <button type="button" class="restart" id="restartButton">
+            Play again / Ещё раз ↻
+        </button>
+    </section>
+
+    <div class="progress-track"
+         id="progressBar"
+         role="progressbar"
+         aria-label="Quiz progress"
+         aria-valuemin="0"
+         aria-valuemax="19"
+         aria-valuenow="0">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressText">0 / 19</div>
+</main>
+
+<script>
+"use strict";
+
+const TEST_NAME = "Starlight 3 — Module 2 — Is Are, Demonstratives and Numbers — A0+";
+const GOOGLE_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+let userMistakes = [];
+let mistakeDetails = [];
+let correctAnswers = 0;
+let completedQuestions = 0;
+let currentIndex = 0;
+let score = 0;
+let locked = false;
+let resultsSubmitted = false;
+
+const sectionOrder = ["D", "E", "A"];
+const sectionScores = { D: 0, E: 0, A: 0 };
+
+/*
+    D: Each of the five supplied sentences is split into two easy steps:
+       1. Choose Is / Are.
+       2. Choose the short answer.
+    E: Four original picture-supported questions, because no individual
+       this / that / these / those items were supplied.
+    A: The five numbers from Variant 2.
+*/
+const dialogueItems = [
+    {
+        subject: "Peter",
+        rest: "sad",
+        verb: "Is",
+        answerStart: "No,",
+        answer: "he isn't",
+        wrongAnswer: "she isn't",
+        emoji: "👦",
+        verbHint: "Peter → he → is",
+        answerHint: "Peter → he",
+        explanation: "Peter — мальчик: he. Короткий ответ: No, he isn't."
+    },
+    {
+        subject: "these",
+        rest: "my presents",
+        verb: "Are",
+        answerStart: "Yes,",
+        answer: "they are",
+        wrongAnswer: "it is",
+        emoji: "🎁 🎁",
+        verbHint: "these → are",
+        answerHint: "presents → they",
+        explanation: "Несколько подарков: they. Короткий ответ: Yes, they are."
+    },
+    {
+        subject: "Jane",
+        rest: "a good friend",
+        verb: "Is",
+        answerStart: "Yes,",
+        answer: "she is",
+        wrongAnswer: "he is",
+        emoji: "👧",
+        verbHint: "Jane → she → is",
+        answerHint: "Jane → she",
+        explanation: "Jane — девочка: she. Короткий ответ: Yes, she is."
+    },
+    {
+        subject: "your roller-skates",
+        rest: "cool",
+        verb: "Are",
+        answerStart: "Yes,",
+        answer: "they are",
+        wrongAnswer: "it is",
+        emoji: "🛼 🛼",
+        verbHint: "roller-skates → they → are",
+        answerHint: "roller-skates → they",
+        explanation: "Roller-skates — множественное число: Yes, they are."
+    },
+    {
+        subject: "you",
+        rest: "happy",
+        verb: "Are",
+        answerStart: "Yes,",
+        answer: "I am",
+        wrongAnswer: "I are",
+        emoji: "😊",
+        verbHint: "you → are",
+        answerHint: "Are you…? → Yes, I am.",
+        explanation: "Тебя спрашивают: Are you…? Ты отвечаешь о себе: Yes, I am."
+    }
+];
+
+const questions = [];
+
+dialogueItems.forEach(item => {
+    const fullQuestion = item.verb + " " + item.subject + " " + item.rest + "?";
+    const fullAnswer = item.answerStart + " " + item.answer + ".";
+
+    questions.push({
+        section: "D",
+        kind: "questionVerb",
+        visual: item.emoji,
+        subject: item.subject,
+        rest: item.rest,
+        options: ["Is", "Are"],
+        correct: item.verb,
+        hint: item.verbHint,
+        explanation: fullQuestion + " — " + item.verbHint,
+        review: fullQuestion,
+        reviewGroup: fullQuestion + " " + fullAnswer
+    });
+
+    questions.push({
+        section: "D",
+        kind: "shortAnswer",
+        visual: item.emoji,
+        fullQuestion,
+        answerStart: item.answerStart,
+        options: [item.answer, item.wrongAnswer],
+        correct: item.answer,
+        hint: item.answerHint,
+        explanation: item.explanation,
+        review: fullQuestion + " " + fullAnswer
+    });
+});
+
+questions.push(
+    {
+        section: "E",
+        kind: "demonstrative",
+        visual: "🧸",
+        distance: "near",
+        nounPhrase: "is a teddy bear.",
+        options: ["This", "That"],
+        correct: "This",
+        hint: "Один предмет: this — близко, that — далеко.",
+        explanation: "Один мишка рядом: This is a teddy bear.",
+        review: "This is a teddy bear. — Один предмет близко."
+    },
+    {
+        section: "E",
+        kind: "demonstrative",
+        visual: "🚲",
+        distance: "far",
+        nounPhrase: "is a bike.",
+        options: ["This", "That"],
+        correct: "That",
+        hint: "Один предмет: this — близко, that — далеко.",
+        explanation: "Один велосипед далеко: That is a bike.",
+        review: "That is a bike. — Один предмет далеко."
+    },
+    {
+        section: "E",
+        kind: "demonstrative",
+        visual: "🎁 🎁",
+        distance: "near",
+        nounPhrase: "are presents.",
+        options: ["These", "Those"],
+        correct: "These",
+        hint: "Несколько предметов: these — близко, those — далеко.",
+        explanation: "Несколько подарков рядом: These are presents.",
+        review: "These are presents. — Несколько предметов близко."
+    },
+    {
+        section: "E",
+        kind: "demonstrative",
+        visual: "⚽ ⚽",
+        distance: "far",
+        nounPhrase: "are balls.",
+        options: ["These", "Those"],
+        correct: "Those",
+        hint: "Несколько предметов: these — близко, those — далеко.",
+        explanation: "Несколько мячей далеко: Those are balls.",
+        review: "Those are balls. — Несколько предметов далеко."
+    }
+);
+
+[
+    { number: "70", correct: "seventy", wrong: "twenty", hint: "7 → seven" },
+    { number: "50", correct: "fifty", wrong: "ninety", hint: "5 → five" },
+    { number: "20", correct: "twenty", wrong: "seventy", hint: "2 → two" },
+    { number: "100", correct: "one hundred", wrong: "ten", hint: "10 → ten" },
+    { number: "90", correct: "ninety", wrong: "fifty", hint: "9 → nine" }
+].forEach(item => {
+    questions.push({
+        section: "A",
+        kind: "number",
+        visual: item.number,
+        number: item.number,
+        options: [item.correct, item.wrong],
+        correct: item.correct,
+        hint: item.hint,
+        explanation: item.number + " — " + item.correct,
+        review: item.number + " — " + item.correct
+    });
+});
+
+const totalQuestions = questions.length;
+const $ = id => document.getElementById(id);
+
+function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function makeBlank() {
+    const blank = document.createElement("span");
+    blank.className = "blank focus";
+    blank.id = "activeBlank";
+    blank.textContent = "___";
+    return blank;
+}
+
+function setFeedback(message, explanation, type = "") {
+    const box = $("feedback");
+    box.className = "feedback" + (type ? " " + type : "");
+    box.replaceChildren(document.createTextNode(message));
+
+    if (explanation) {
+        const small = document.createElement("small");
+        small.lang = "ru";
+        small.textContent = explanation;
+        box.append(small);
+    }
+}
+
+function updateProgress() {
+    $("points").textContent = score;
+    $("correctCount").textContent = correctAnswers + " / " + totalQuestions;
+    $("progressFill").style.width =
+        (completedQuestions / totalQuestions * 100) + "%";
+    $("progressText").textContent =
+        completedQuestions + " / " + totalQuestions;
+    $("progressBar").setAttribute("aria-valuemax", totalQuestions);
+    $("progressBar").setAttribute("aria-valuenow", completedQuestions);
+}
+
+function updateTabs(section) {
+    const activeIndex = sectionOrder.indexOf(section);
+    sectionOrder.forEach((letter, index) => {
+        $("tab" + letter).className =
+            "tab" +
+            (index < activeIndex ? " done" : index === activeIndex ? " active" : "");
+    });
+}
+
+function renderPrompt(question) {
+    const prompt = $("prompt");
+    prompt.replaceChildren();
+    const blank = makeBlank();
+
+    if (question.kind === "questionVerb") {
+        prompt.append(
+            blank,
+            document.createTextNode(" " + question.subject + " " + question.rest + "?")
+        );
+    } else if (question.kind === "shortAnswer") {
+        prompt.append(document.createTextNode(question.fullQuestion));
+
+        const answerLine = document.createElement("span");
+        answerLine.className = "answer-line";
+        answerLine.append(
+            document.createTextNode(question.answerStart + " "),
+            blank,
+            document.createTextNode(".")
+        );
+        prompt.append(answerLine);
+    } else if (question.kind === "demonstrative") {
+        prompt.append(blank, document.createTextNode(" " + question.nounPhrase));
+    } else {
+        prompt.append(
+            document.createTextNode(question.number + " = "),
+            blank
+        );
+    }
+}
+
+function loadQuestion() {
+    locked = false;
+    const question = questions[currentIndex];
+
+    const headings = {
+        questionVerb: ["Is or Are?", "Выбери Is или Are."],
+        shortAnswer: ["Choose the answer.", "Выбери короткий ответ."],
+        demonstrative: ["Look and choose.", "Посмотри: близко или далеко?"],
+        number: ["Choose the number.", "Выбери число словами."]
+    };
+
+    $("counter").textContent = (currentIndex + 1) + " / " + totalQuestions;
+    $("instruction").textContent = headings[question.kind][0];
+    $("translation").textContent = headings[question.kind][1];
+    $("hint").textContent = question.hint;
+
+    const isScene = question.kind === "demonstrative";
+    $("scene").classList.toggle("hidden", !isScene);
+    $("distanceNote").classList.toggle("hidden", !isScene);
+    $("visual").classList.toggle("hidden", isScene);
+
+    if (isScene) {
+        $("sceneObject").textContent = question.visual;
+        $("sceneObject").className =
+            "scene-object emoji-font " + question.distance;
+        $("distanceNote").textContent = question.distance === "near"
+            ? "NEAR — близко к ребёнку"
+            : "FAR — далеко от ребёнка";
+    } else {
+        $("visual").textContent = question.visual;
+        $("visual").classList.toggle("emoji-font", question.kind !== "number");
+    }
+
+    renderPrompt(question);
+    updateTabs(question.section);
+
+    $("nextButton").classList.add("hidden");
+    setFeedback("Choose one answer.", "Выбери один ответ.");
+
+    $("options").replaceChildren();
+    shuffle(question.options).forEach(option => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.textContent = option;
+        button.addEventListener("click", () => checkAnswer(option, button));
+        $("options").append(button);
+    });
+}
+
+function checkAnswer(chosen, clickedButton) {
+    if (locked) return;
+    locked = true;
+
+    const question = questions[currentIndex];
+    const correct = chosen === question.correct;
+
+    $("options").querySelectorAll("button").forEach(button => {
+        button.disabled = true;
+        if (button.textContent === question.correct) {
+            button.classList.add("correct");
+        }
+    });
+
+    const blank = $("activeBlank");
+    blank.textContent = question.correct;
+    blank.className = "blank filled";
+
+    if (correct) {
+        correctAnswers++;
+        score += 10;
+        sectionScores[question.section]++;
+        setFeedback("Yes! Well done!", question.explanation, "good");
+    } else {
+        userMistakes.push(chosen);
+        mistakeDetails.push({
+            number: currentIndex + 1,
+            chosen,
+            correct: question.correct,
+            sentence: question.review
+        });
+
+        clickedButton.classList.add("wrong");
+        setFeedback(
+            "Answer: " + question.correct,
+            question.explanation,
+            "bad"
+        );
+    }
+
+    completedQuestions++;
+    updateProgress();
+
+    $("nextButton").textContent =
+        currentIndex === totalQuestions - 1
+            ? "Finish / Закончить →"
+            : "Next / Дальше →";
+    $("nextButton").classList.remove("hidden");
+}
+
+function nextQuestion() {
+    if (!locked) return;
+    currentIndex++;
+
+    if (currentIndex < totalQuestions) {
+        loadQuestion();
+    } else {
+        finishQuiz();
+    }
+}
+
+function buildReviews() {
+    const container = $("answerReview");
+    container.replaceChildren();
+
+    const titles = {
+        D: "D. Questions and answers / Вопросы и ответы",
+        E: "E. This, that, these, those",
+        A: "A. Numbers / Числа"
+    };
+
+    sectionOrder.forEach(section => {
+        const heading = document.createElement("h3");
+        heading.textContent = titles[section];
+
+        const list = document.createElement("ol");
+        list.className = "review-list";
+
+        const sectionQuestions = questions.filter(question =>
+            question.section === section &&
+            question.kind !== "questionVerb"
+        );
+
+        sectionQuestions.forEach(question => {
+            const item = document.createElement("li");
+            item.textContent = question.review;
+            list.append(item);
+        });
+
+        container.append(heading, list);
+    });
+
+    const mistakes = $("mistakeReview");
+    mistakes.replaceChildren();
+
+    if (mistakeDetails.length === 0) {
+        const text = document.createElement("p");
+        text.textContent = "No mistakes! / Без ошибок!";
+        mistakes.append(text);
+        return;
+    }
+
+    const list = document.createElement("ol");
+    list.className = "review-list";
+
+    mistakeDetails.forEach(mistake => {
+        const item = document.createElement("li");
+        item.textContent =
+            "№ " + mistake.number +
+            ". Твой ответ: " + mistake.chosen +
+            ". Правильно: " + mistake.correct +
+            ". " + mistake.sentence;
+        list.append(item);
+    });
+
+    mistakes.append(list);
+}
+
+function finishQuiz() {
+    $("quiz").classList.add("hidden");
+    $("finish").classList.remove("hidden");
+
+    $("finalScore").textContent = correctAnswers + " / " + totalQuestions;
+    $("finalPoints").textContent = score + " / " + (totalQuestions * 10) + " points";
+
+    sectionOrder.forEach(section => {
+        const count = questions.filter(question => question.section === section).length;
+        $("result" + section).textContent = sectionScores[section] + " / " + count;
+    });
+
+    buildReviews();
+    updateProgress();
+    sendResultsToGoogle();
+}
+
+function sendResultsToGoogle() {
+    if (resultsSubmitted) return;
+    resultsSubmitted = true;
+
+    const formData = new URLSearchParams();
+    formData.append("name", TEST_NAME);
+    formData.append("score", String(correctAnswers));
+    formData.append("total", String(totalQuestions));
+    formData.append("mistakes", userMistakes.join(", "));
+
+    const statusEl = $("send-status");
+    const noteEl = $("send-note");
+
+    statusEl.style.color = "#506479";
+    statusEl.textContent = "Sending results...";
+    noteEl.textContent = "";
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData.toString(),
+        keepalive: true
+    })
+    .then(() => {
+        statusEl.style.color = "#176534";
+        statusEl.textContent = "Results sent successfully! ✅";
+
+        // A no-cors response is opaque: spreadsheet storage cannot be verified.
+        noteEl.textContent =
+            "Request sent. This browser cannot confirm that the spreadsheet saved it.";
+    })
+    .catch(error => {
+        console.error("Submission failed:", error);
+        statusEl.style.color = "#a12232";
+        statusEl.textContent = "Could not send results.";
+        noteEl.textContent =
+            "Your score is shown above. / Твой результат показан выше.";
+    });
+}
+
+$("nextButton").addEventListener("click", nextQuestion);
+$("restartButton").addEventListener("click", () => location.reload());
+
+updateProgress();
+loadQuestion();
+</script>
+</body>
+</html>

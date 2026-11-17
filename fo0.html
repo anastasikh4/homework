@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant 1 · Easy English · A0+</title>
+<!-- Подключаем шрифт Raleway -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --ink: #20364d;       /* Dark Navy */
+    --purple: #70399b;    /* Deep Purple */
+    --brown: #754214;     /* Dark Brown */
+    --green: #176534;     /* Dark Green */
+    --green-bg: #dcfce7;
+    --red: #a12232;       /* Dark Red */
+    --red-bg: #ffe0e6;
+    --blue-bg: #e3f3ff;
+    --yellow: #ffe58a;    /* Soft Yellow */
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 20px 12px;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+        radial-gradient(circle, #ffffff88 2px, transparent 3px) 0 0 / 25px 25px,
+        #c8e9fb;
+    font-family: 'Raleway', sans-serif; /* Используем Raleway */
+    line-height: 1.6;
+}
+button { font: inherit; }
+button:focus-visible, summary:focus-visible {
+    outline: 4px solid #176d9f;
+    outline-offset: 4px;
+}
+.app {
+    max-width: 680px;
+    margin: auto;
+    padding: 25px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 24px;
+    box-shadow: 8px 8px 0 var(--yellow);
+}
+header { text-align: center; }
+.badge {
+    display: inline-block;
+    padding: 5px 17px;
+    background: #eee3ff;
+    color: var(--purple);
+    border-radius: 20px;
+    font-weight: 800;
+}
+h1 {
+    color: var(--purple);
+    font-size: clamp(27px, 6vw, 38px);
+    line-height: 1.2;
+    margin: 14px 0;
+}
+h2 { color: var(--purple); font-size: 28px; margin: 12px 0; }
+.subtitle { color: #506479; margin: 8px 0; }
+.small { color: #506479; font-size: 14px; }
+.score-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 18px 0;
+    font-size: 17px;
+    font-weight: 800;
+}
+.tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+.tab {
+    padding: 6px 13px;
+    border: 2px solid #c8d8e5;
+    border-radius: 20px;
+    background: #f1f6fa;
+    color: #506479;
+    font-weight: 700;
+    font-size: 14px;
+}
+.tab.active { background: #fff2be; border-color: #caa440; color: var(--brown); }
+.tab.done { background: var(--green-bg); border-color: #88b997; color: var(--green); }
+.question-card {
+    background: #f1f8ff;
+    border: 3px solid #a9c8de;
+    border-radius: 20px;
+    padding: 24px 18px;
+    text-align: center;
+}
+.counter { color: #506479; font-size: 14px; font-weight: 800; }
+.instruction { font-size: 21px; font-weight: 800; margin: 12px 0 0; }
+.translation { color: #506479; font-size: 16px; margin: 0 0 15px; }
+.visual {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1.3;
+    margin: 15px 0;
+    overflow-wrap: anywhere;
+}
+.visual.emojis {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+    font-size: 60px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.prompt { font-size: 26px; font-weight: 800; margin: 15px 0; }
+.hint {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 9px 14px;
+    color: var(--brown);
+    background: #fff3ce;
+    border-radius: 12px;
+    font-size: 16px;
+}
+.options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 22px;
+}
+.answer, .next, .restart {
+    min-height: 68px;
+    padding: 15px 12px;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--yellow);
+    box-shadow: 0 5px 0 #b99b3b;
+}
+.answer:hover:not(:disabled) { background: #fff0b5; }
+.answer:active:not(:disabled), .next:active, .restart:active {
+    transform: translateY(3px);
+    box-shadow: none;
+}
+.answer:disabled { cursor: default; opacity: .65; }
+.answer.correct {
+    color: var(--green);
+    background: var(--green-bg);
+    border-color: var(--green);
+    box-shadow: 0 5px 0 #85b896;
+    opacity: 1;
+}
+.answer.wrong {
+    color: var(--red);
+    background: var(--red-bg);
+    border-color: var(--red);
+    box-shadow: 0 5px 0 #c7838c;
+    opacity: 1;
+    animation: shake .3s ease;
+}
+.feedback {
+    min-height: 78px;
+    margin-top: 20px;
+    padding: 13px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+.feedback.good { color: var(--green); background: var(--green-bg); }
+.feedback.bad { color: var(--red); background: var(--red-bg); }
+.feedback small { display: block; font-size: 15px; font-weight: 400; margin-top: 4px; }
+.next, .restart {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    background: #d9edff;
+    box-shadow: 0 5px 0 #8cabc5;
+    font-size: 21px;
+}
+.hidden { display: none !important; }
+.progress-track {
+    height: 16px;
+    margin-top: 25px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e6edf3;
+}
+.progress-fill { width: 0; height: 100%; background: #8bd476; transition: width .3s; }
+.progress-label { margin-top: 8px; text-align: center; color: #506479; font-size: 14px; }
+#finish { text-align: center; }
+.trophy { font-size: 70px; margin: 10px 0; }
+.final-score { font-size: 32px; font-weight: 900; color: var(--green); }
+.results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+.result-box {
+    padding: 13px 6px;
+    border: 2px solid #c3d9e9;
+    border-radius: 12px;
+    background: var(--blue-bg);
+    font-size: 15px;
+}
+.result-box strong { display: block; font-size: 24px; }
+details {
+    padding: 15px;
+    background: #f0f8ff;
+    border: 2px solid #bed7e9;
+    border-radius: 13px;
+    text-align: left;
+    margin: 20px 0;
+}
+summary { cursor: pointer; font-weight: 800; color: #285977; }
+.review-list { padding-left: 26px; }
+.review-list li { padding: 6px 0; }
+#send-status { font-weight: 800; margin-top: 20px; }
+@keyframes shake {
+    25%, 75% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+}
+@media (max-width: 460px) {
+    .app { padding: 20px 13px; }
+    .question-card { padding: 20px 12px; }
+    .answer { font-size: 21px; padding: 13px 8px; }
+    .visual.emojis { font-size: 49px; }
+    .prompt { font-size: 23px; }
+    .results-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main class="app">
+    <header>
+        <span class="badge">VARIANT 1 · A0+</span>
+        <h1>My Easy English Quiz</h1>
+        <p class="subtitle">Look. Read. Choose.</p>
+        <p class="small" lang="ru">Посмотри. Прочитай. Выбери.</p>
+        <div class="score-row">
+            <span>Points: <strong id="points">0</strong></span>
+            <span>Correct: <strong id="correctCount">0 / 15</strong></span>
+        </div>
+    </header>
+
+    <section id="quiz">
+        <div class="tabs" aria-label="Quiz sections">
+            <span class="tab active" id="tabA">A. Numbers</span>
+            <span class="tab" id="tabB">B. Plurals</span>
+            <span class="tab" id="tabC">C. Toys</span>
+        </div>
+
+        <div class="question-card">
+            <div class="counter" id="counter">1 / 15</div>
+            <p class="instruction" id="instruction"></p>
+            <p class="translation" id="translation" lang="ru"></p>
+            <div class="visual" id="visual" aria-hidden="true"></div>
+            <div class="prompt" id="prompt"></div>
+            <div class="hint" id="hint"></div>
+        </div>
+
+        <div class="options" id="options"></div>
+
+        <div class="feedback" id="feedback" role="status" aria-live="polite">
+            Choose one answer.
+            <small lang="ru">Выбери один ответ.</small>
+        </div>
+
+        <button type="button" class="next hidden" id="nextButton">
+            Next →
+        </button>
+
+        <p class="small" style="text-align:center;" lang="ru">
+            Только два варианта ответа. Без таймера. Не спеши!
+        </p>
+        <p class="small" style="text-align:center;">
+            Your test score and wrong choices are sent automatically when you finish.
+            No name is needed.
+        </p>
+    </section>
+
+    <section id="finish" class="hidden">
+        <div class="trophy" aria-hidden="true">🏆</div>
+        <h2>Well done!</h2>
+        <p lang="ru">Молодец! Ты закончил тест.</p>
+        <div class="final-score" id="finalScore"></div>
+        <p id="finalPoints"></p>
+
+        <div class="results-grid">
+            <div class="result-box">Numbers<strong id="resultA"></strong></div>
+            <div class="result-box">Plurals<strong id="resultB"></strong></div>
+            <div class="result-box">Toys<strong id="resultC"></strong></div>
+        </div>
+
+        <details>
+            <summary>Correct answers / Правильные ответы</summary>
+            <div id="answerReview"></div>
+        </details>
+
+        <details>
+            <summary>My mistakes / Мои ошибки</summary>
+            <div id="mistakeReview"></div>
+        </details>
+
+        <div id="send-status" role="status" aria-live="polite"></div>
+        <p class="small" id="send-note"></p>
+
+        <button type="button" class="restart" id="restartButton">
+            Play again ↻
+        </button>
+    </section>
+
+    <div class="progress-track"
+         id="progressBar"
+         role="progressbar"
+         aria-label="Quiz progress"
+         aria-valuemin="0"
+         aria-valuemax="15"
+         aria-valuenow="0">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressText">0 / 15</div>
+</main>
+
+<script>
+"use strict";
+
+const TEST_NAME = "Variant 1 — Easy English A0+ — Numbers, Plurals and Toys";
+const GOOGLE_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+let userMistakes = [];
+let mistakeDetails = [];
+let correctAnswers = 0;
+let completedQuestions = 0;
+let currentIndex = 0;
+let score = 0;
+let locked = false;
+let resultsSubmitted = false;
+
+const sectionScores = { A: 0, B: 0, C: 0 };
+
+const questions = [
+    {
+        section: "A",
+        visual: "80",
+        prompt: "80 = ___",
+        options: ["eighty", "forty"],
+        correct: "eighty",
+        hint: "8 → eight",
+        explanation: "80 — eighty",
+        review: "80 — eighty"
+    },
+    {
+        section: "A",
+        visual: "40",
+        prompt: "40 = ___",
+        options: ["forty", "sixty"],
+        correct: "forty",
+        hint: "4 → four",
+        explanation: "40 — forty. Пишем без буквы u.",
+        review: "40 — forty"
+    },
+    {
+        section: "A",
+        visual: "30",
+        prompt: "30 = ___",
+        options: ["thirty", "eighty"],
+        correct: "thirty",
+        hint: "3 → three",
+        explanation: "30 — thirty",
+        review: "30 — thirty"
+    },
+    {
+        section: "A",
+        visual: "100",
+        prompt: "100 = ___",
+        options: ["one hundred", "ten"],
+        correct: "one hundred",
+        hint: "10 → ten",
+        explanation: "100 — one hundred",
+        review: "100 — one hundred"
+    },
+    {
+        section: "A",
+        visual: "60",
+        prompt: "60 = ___",
+        options: ["sixty", "thirty"],
+        correct: "sixty",
+        hint: "6 → six",
+        explanation: "60 — sixty",
+        review: "60 — sixty"
+    },
+
+    {
+        section: "B",
+        visual: "🚌 🚌",
+        prompt: "one bus → two ___",
+        options: ["buses", "bus"],
+        correct: "buses",
+        hint: "bus + es",
+        explanation: "Один — bus. Два — buses.",
+        review: "one bus → two buses"
+    },
+    {
+        section: "B",
+        visual: "🚂 🚂",
+        prompt: "one train → two ___",
+        options: ["trains", "train"],
+        correct: "trains",
+        hint: "train + s",
+        explanation: "Один — train. Два — trains.",
+        review: "one train → two trains"
+    },
+    {
+        section: "B",
+        visual: "📖 📖",
+        prompt: "one story → two ___",
+        options: ["stories", "story"],
+        correct: "stories",
+        hint: "story: y → ies",
+        explanation: "Одна история — story. Две истории — stories.",
+        review: "one story → two stories"
+    },
+    {
+        section: "B",
+        visual: "🏠 🏠",
+        prompt: "one house → two ___",
+        options: ["houses", "house"],
+        correct: "houses",
+        hint: "house + s",
+        explanation: "Один дом — house. Два дома — houses.",
+        review: "one house → two houses"
+    },
+    {
+        section: "B",
+        visual: "⚽ ⚽",
+        prompt: "one ball → two ___",
+        options: ["balls", "ball"],
+        correct: "balls",
+        hint: "ball + s",
+        explanation: "Один мяч — ball. Два мяча — balls.",
+        review: "one ball → two balls"
+    },
+
+    {
+        section: "C",
+        visual: "🧸",
+        prompt: "плюшевый мишка",
+        options: ["teddy bear", "car"],
+        correct: "teddy bear",
+        hint: "Look at the picture. / Посмотри на картинку.",
+        explanation: "Плюшевый мишка — teddy bear.",
+        review: "плюшевый мишка — teddy bear"
+    },
+    {
+        section: "C",
+        visual: "🚲",
+        prompt: "велосипед",
+        options: ["bike", "camera"],
+        correct: "bike",
+        hint: "Look at the picture. / Посмотри на картинку.",
+        explanation: "Велосипед — bike.",
+        review: "велосипед — bike"
+    },
+    {
+        section: "C",
+        visual: "🚚",
+        prompt: "грузовик",
+        options: ["truck", "teddy bear"],
+        correct: "truck",
+        hint: "Look at the picture. / Посмотри на картинку.",
+        explanation: "Грузовик — truck.",
+        review: "грузовик — truck"
+    },
+    {
+        section: "C",
+        visual: "📷",
+        prompt: "фотоаппарат",
+        options: ["camera", "bike"],
+        correct: "camera",
+        hint: "Look at the picture. / Посмотри на картинку.",
+        explanation: "Фотоаппарат — camera.",
+        review: "фотоаппарат — camera"
+    },
+    {
+        section: "C",
+        visual: "🚗",
+        prompt: "машина",
+        options: ["car", "truck"],
+        correct: "car",
+        hint: "Look at the picture. / Посмотри на картинку.",
+        explanation: "Машина — car.",
+        review: "машина — car"
+    }
+];
+
+const totalQuestions = questions.length;
+const $ = id => document.getElementById(id);
+
+function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function setFeedback(message, explanation, type) {
+    const box = $("feedback");
+    box.className = "feedback" + (type ? " " + type : "");
+    box.replaceChildren(document.createTextNode(message));
+
+    if (explanation) {
+        const small = document.createElement("small");
+        small.lang = "ru";
+        small.textContent = explanation;
+        box.append(small);
+    }
+}
+
+function updateProgress() {
+    $("points").textContent = score;
+    $("correctCount").textContent = correctAnswers + " / " + totalQuestions;
+    $("progressFill").style.width =
+        (completedQuestions / totalQuestions * 100) + "%";
+    $("progressText").textContent =
+        completedQuestions + " / " + totalQuestions;
+    $("progressBar").setAttribute("aria-valuenow", completedQuestions);
+}
+
+function updateTabs(section) {
+    const sections = ["A", "B", "C"];
+    const activeIndex = sections.indexOf(section);
+
+    sections.forEach((letter, index) => {
+        $("tab" + letter).className =
+            "tab" +
+            (index < activeIndex ? " done" : index === activeIndex ? " active" : "");
+    });
+}
+
+function loadQuestion() {
+    locked = false;
+    const question = questions[currentIndex];
+
+    const headings = {
+        A: ["Choose the number.", "Выбери число словами."],
+        B: ["One or two?", "Один предмет или два?"],
+        C: ["What is it?", "Что это?"]
+    };
+
+    $("counter").textContent = (currentIndex + 1) + " / " + totalQuestions;
+    $("instruction").textContent = headings[question.section][0];
+    
+    // ИСПРАВЛЕНИЕ ЗДЕСЬ:
+    $("translation").textContent = headings[question.section][1];
+    
+    $("visual").textContent = question.visual;
+    $("visual").className =
+        question.section === "A" ? "visual" : "visual emojis";
+    $("prompt").textContent = question.prompt;
+    $("prompt").lang = question.section === "C" ? "ru" : "en";
+    $("hint").textContent = question.hint;
+
+    $("nextButton").classList.add("hidden");
+    setFeedback("Choose one answer.", "Выбери один ответ.", "");
+    updateTabs(question.section);
+
+    $("options").replaceChildren();
+
+    shuffle(question.options).forEach(option => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.textContent = option;
+        button.addEventListener("click", () => checkAnswer(option, button));
+        $("options").append(button);
+    });
+}
+
+function checkAnswer(chosen, clickedButton) {
+    if (locked) return;
+    locked = true;
+
+    const question = questions[currentIndex];
+    const isCorrect = chosen === question.correct;
+
+    $("options").querySelectorAll("button").forEach(button => {
+        button.disabled = true;
+        if (button.textContent === question.correct) {
+            button.classList.add("correct");
+        }
+    });
+
+    if (isCorrect) {
+        correctAnswers++;
+        score += 10;
+        sectionScores[question.section]++;
+        setFeedback("Yes! Well done!", question.explanation, "good");
+    } else {
+        userMistakes.push(chosen);
+        mistakeDetails.push({
+            number: currentIndex + 1,
+            prompt: question.prompt,
+            chosen,
+            correct: question.correct
+        });
+
+        clickedButton.classList.add("wrong");
+        setFeedback(
+            "Answer: " + question.correct,
+            question.explanation,
+            "bad"
+        );
+    }
+
+    completedQuestions++;
+    updateProgress();
+
+    $("nextButton").textContent =
+        currentIndex === totalQuestions - 1
+            ? "Finish / Закончить →"
+            : "Next / Дальше →";
+    $("nextButton").classList.remove("hidden");
+}
+
+function nextQuestion() {
+    if (!locked) return;
+
+    currentIndex++;
+    if (currentIndex < totalQuestions) {
+        loadQuestion();
+    } else {
+        finishQuiz();
+    }
+}
+
+function buildReviews() {
+    const answerContainer = $("answerReview");
+    answerContainer.replaceChildren();
+
+    const names = {
+        A: "A. Numbers / Числа",
+        B: "B. Plurals / Множественное число",
+        C: "C. Toys / Игрушки"
+    };
+
+    ["A", "B", "C"].forEach(section => {
+        const heading = document.createElement("h3");
+        heading.textContent = names[section];
+
+        const list = document.createElement("ol");
+        list.className = "review-list";
+
+        questions
+            .filter(question => question.section === section)
+            .forEach(question => {
+                const item = document.createElement("li");
+                item.textContent = question.review;
+                list.append(item);
+            });
+
+        answerContainer.append(heading, list);
+    });
+
+    const mistakeContainer = $("mistakeReview");
+    mistakeContainer.replaceChildren();
+
+    if (mistakeDetails.length === 0) {
+        const text = document.createElement("p");
+        text.textContent = "No mistakes! / Без ошибок!";
+        mistakeContainer.append(text);
+        return;
+    }
+
+    const list = document.createElement("ol");
+    list.className = "review-list";
+
+    mistakeDetails.forEach(mistake => {
+        const item = document.createElement("li");
+        item.textContent =
+            "№ " + mistake.number + ": " + mistake.prompt +
+            " — Твой ответ: " + mistake.chosen +
+            ". Правильно: " + mistake.correct + ".";
+        list.append(item);
+    });
+
+    mistakeContainer.append(list);
+}
+
+function finishQuiz() {
+    $("quiz").classList.add("hidden");
+    $("finish").classList.remove("hidden");
+    $("finalScore").textContent = correctAnswers + " / " + totalQuestions;
+    $("finalPoints").textContent = score + " / 150 points";
+
+    ["A", "B", "C"].forEach(section => {
+        $("result" + section).textContent = sectionScores[section] + " / 5";
+    });
+
+    buildReviews();
+    updateProgress();
+    sendResultsToGoogle();
+}
+
+function sendResultsToGoogle() {
+    if (resultsSubmitted) return;
+    resultsSubmitted = true;
+
+    const formData = new URLSearchParams();
+    formData.append("name", TEST_NAME);
+    formData.append("score", String(correctAnswers));
+    formData.append("total", String(totalQuestions));
+    formData.append("mistakes", userMistakes.join(", "));
+
+    const statusEl = $("send-status");
+    const noteEl = $("send-note");
+
+    statusEl.style.color = "#506479";
+    statusEl.textContent = "Sending results...";
+    noteEl.textContent = "";
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData.toString(),
+        keepalive: true
+    })
+    .then(() => {
+        statusEl.style.color = "#176534";
+        statusEl.textContent = "Results sent successfully! ✅";
+
+        noteEl.textContent =
+            "Request sent. Spreadsheet storage cannot be verified in this browser.";
+    })
+    .catch(error => {
+        console.error("Submission failed:", error);
+        statusEl.style.color = "#a12232";
+        statusEl.textContent = "Could not send results.";
+        noteEl.textContent =
+            "Your score is still shown above. / Твой результат показан выше.";
+    });
+}
+
+$("nextButton").addEventListener("click", nextQuestion);
+$("restartButton").addEventListener("click", () => location.reload());
+
+updateProgress();
+loadQuestion();
+</script>
+</body>
+</html>
