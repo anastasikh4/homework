@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super English Hero: Too & Enough Quest 🦸‍♂️</title>
+    <style>
+        :root {
+            --primary: #FFD93D;
+            --secondary: #6BCB77;
+            --accent: #FF6B6B;
+            --blue: #4D96FF;
+            --purple: #9B7BFF;
+            --orange: #FF9F45;
+            --text-soft: #FFF3C4;
+            --text-mint: #C8F7DC;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Montserrat', 'Comic Sans MS', sans-serif;
+            background: #1a1a2e;
+            color: var(--text-soft);
+            margin: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px 14px;
+            overflow-x: hidden;
+        }
+        .container {
+            background: #16213e;
+            border: 8px solid var(--blue);
+            border-radius: 40px;
+            padding: 30px 24px 26px;
+            width: 100%; max-width: 540px;
+            text-align: center;
+            box-shadow: 0 20px 0 #0f3460;
+            position: relative;
+        }
+
+        .level-badge {
+            position: absolute; top: -20px; right: 20px;
+            background: var(--accent);
+            color: #1a1a2e;
+            padding: 8px 18px; border-radius: 20px;
+            font-weight: 900; font-size: 18px;
+            box-shadow: 0 4px 0 #b33939;
+        }
+        .topic-badge {
+            display: inline-block;
+            background: var(--purple);
+            color: #1a1a2e;
+            padding: 6px 16px; border-radius: 20px;
+            font-weight: 800; font-size: 12px;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+        }
+        .topic-badge.comp { background: var(--orange); color: #1a1a2e; }
+        .topic-badge.super { background: var(--blue); color: #1a1a2e; }
+
+        h1 {
+            font-size: 24px; margin: 0 0 8px 0;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+
+        .emoji-card {
+            font-size: 70px;
+            background: #fff;
+            border-radius: 28px;
+            margin: 10px auto 15px;
+            width: 120px; height: 120px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 -8px 0 #ddd;
+            animation: pop 0.35s ease-out;
+        }
+        @keyframes pop {
+            0%   { transform: scale(0.85); }
+            60%  { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+
+        .phrase {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--primary);
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .btn-grid {
+            display: grid;
+            gap: 12px;
+        }
+        .btn-grid.two   { grid-template-columns: 1fr; }
+        .btn-grid.four  { grid-template-columns: 1fr 1fr; }
+
+        .hero-btn {
+            padding: 16px 18px;
+            font-size: 16px;
+            font-weight: 800;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #1a1a2e;
+            font-family: inherit;
+            line-height: 1.4;
+            word-wrap: break-word;
+            min-height: 60px;
+            text-align: left;
+        }
+        .hero-btn.big { font-size: 18px; letter-spacing: 0.5px; }
+
+        .hero-btn.c1 { background: var(--accent);   box-shadow: 0 7px 0 #b33939; color: #2b0a0a; }
+        .hero-btn.c2 { background: var(--secondary);box-shadow: 0 7px 0 #3b7a44; color: #0f2e17; }
+        .hero-btn.c3 { background: var(--blue);     box-shadow: 0 7px 0 #2b5bb3; color: #0b1d3d; }
+        .hero-btn.c4 { background: var(--purple);   box-shadow: 0 7px 0 #5a47a8; color: #1e1345; }
+
+        .hero-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+        }
+        .hero-btn:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+        .hero-btn.reveal {
+            background: var(--secondary) !important;
+            box-shadow: 0 7px 0 #3b7a44 !important;
+            color: #0f2e17 !important;
+            opacity: 1 !important;
+        }
+        .hero-btn.wrongPick {
+            background: #3a1a1a !important;
+            box-shadow: 0 7px 0 #1a0505 !important;
+            color: #ff9c9c !important;
+            opacity: 1 !important;
+        }
+
+        #msg {
+            height: 36px;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-soft);
+            transition: color 0.2s;
+        }
+        .score-board {
+            margin-top: 10px;
+            font-size: 16px;
+            color: var(--text-mint);
+            opacity: 0.9;
+            font-weight: 700;
+        }
+        .score-board #xp { color: var(--primary); }
+
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-10px); }
+            40%      { transform: translateX(10px); }
+            60%      { transform: translateX(-8px); }
+            80%      { transform: translateX(8px); }
+        }
+
+        .win-screen { text-align: center; padding: 20px 0; }
+        .win-screen .trophy { font-size: 90px; display: inline-block; animation: bob 2s infinite; }
+        @keyframes bob {
+            0%,100% { transform: translateY(0) rotate(-4deg); }
+            50%     { transform: translateY(-10px) rotate(4deg); }
+        }
+        .win-screen h1 { color: var(--secondary); font-size: 28px; margin: 10px 0; }
+        .win-screen .final-score { font-size: 44px; color: var(--primary); font-weight: 900; margin: 12px 0; }
+        .win-screen p { font-size: 15px; color: var(--text-mint); margin-bottom: 20px; }
+        
+        .success-msg {
+            color: var(--secondary);
+            font-weight: 900;
+            font-size: 16px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .restart-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--secondary);
+            color: #0f2e17;
+            border: none;
+            border-radius: 16px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 17px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            cursor: pointer;
+            box-shadow: 0 7px 0 #3b7a44;
+            transition: 0.1s;
+        }
+        .restart-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #3b7a44;
+        }
+
+        .confetti {
+            position: fixed; top: -12px;
+            width: 10px; height: 14px;
+            pointer-events: none; z-index: 999;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            0%   { transform: translateY(-10px) rotate(0); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg); opacity: 0.4; }
+        }
+
+        @media (max-width: 420px) {
+            .container { padding: 26px 16px 22px; border-width: 6px; }
+            .emoji-card { width: 100px; height: 100px; font-size: 50px; }
+            .phrase { font-size: 16px; }
+            .hero-btn { font-size: 15px; padding: 14px 12px; }
+            .hero-btn.big { font-size: 16px; }
+            h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainBox">
+    <div class="level-badge">LVL: <span id="lvl">1</span></div>
+    <div id="content"></div>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Too and Enough Word Order Quest";
+    let userMistakes = [];
+
+    /* =========================================================
+       DATA - Adapted from the photo to test EXACT same rules
+       ========================================================= */
+    const DATA = [
+        {
+            type: 'comp',
+            topic: 'Word Order',
+            emoji: '☕',
+            display: 'Put the words in the correct order:',
+            options: [
+                'The coffee is too hot for my little brother.',
+                'The coffee is hot too for my little brother.',
+                'The coffee too is hot for my little brother.'
+            ],
+            correct: 'The coffee is too hot for my little brother.'
+        },
+        {
+            type: 'comp',
+            topic: 'Word Order',
+            emoji: '🧥',
+            display: 'Put the words in the correct order:',
+            options: [
+                'The jacket is warm enough for this weather.',
+                'The jacket is enough warm for this weather.',
+                'The jacket is warm for enough this weather.'
+            ],
+            correct: 'The jacket is warm enough for this weather.'
+        },
+        {
+            type: 'comp',
+            topic: 'Word Order',
+            emoji: '🎬',
+            display: 'Put the words in the correct order:',
+            options: [
+                'The movie isn\'t scary enough for us.',
+                'The movie isn\'t enough scary for us.',
+                'The movie isn\'t scary for us enough.'
+            ],
+            correct: 'The movie isn\'t scary enough for us.'
+        },
+        {
+            type: 'comp',
+            topic: 'Word Order',
+            emoji: '📝',
+            display: 'Put the words in the correct order:',
+            options: [
+                'The math test wasn\'t too difficult for the students.',
+                'The math test wasn\'t difficult too for the students.',
+                'The math test wasn\'t too difficult the students for.'
+            ],
+            correct: 'The math test wasn\'t too difficult for the students.'
+        },
+        {
+            type: 'comp',
+            topic: 'Word Order',
+            emoji: '👟',
+            display: 'Put the words in the correct order:',
+            options: [
+                'These shoes are too small for me.',
+                'These shoes are small too for me.',
+                'These shoes are too small me for.'
+            ],
+            correct: 'These shoes are too small for me.'
+        },
+        {
+            type: 'comp',
+            topic: 'Word Order',
+            emoji: '🛏️',
+            display: 'Put the words in the correct order:',
+            options: [
+                'This bed is comfortable enough for two people.',
+                'This bed is enough comfortable for two people.',
+                'This bed is comfortable for enough two people.'
+            ],
+            correct: 'This bed is comfortable enough for two people.'
+        },
+        {
+            type: 'super',
+            topic: 'Meaning',
+            emoji: '👍👎',
+            display: '"The soup is too salty for me." Is this a positive or negative situation?',
+            options: [
+                'Positive (Good thing) 😊',
+                'Negative (Bad thing) 😞'
+            ],
+            correct: 'Negative (Bad thing) 😞'
+        },
+        {
+            type: 'super',
+            topic: 'Meaning',
+            emoji: '👍👎',
+            display: '"The room is quiet enough for studying." Is this a positive or negative situation?',
+            options: [
+                'Positive (Good thing) 😊',
+                'Negative (Bad thing) 😞'
+            ],
+            correct: 'Positive (Good thing) 😊'
+        }
+    ];
+
+    /* =========================================================
+       STATE
+       ========================================================= */
+    let xp = 0;
+    let level = 1;
+    let score = 0;
+    let current;
+    let currentQueue = [];
+    let queueIndex = 0;
+    let answered = false;
+
+    const container = document.getElementById('mainBox');
+    const content   = document.getElementById('content');
+
+    /* =========================================================
+       UTILITIES
+       ========================================================= */
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function buildQueue() {
+        currentQueue = shuffle(DATA);
+        queueIndex = 0;
+    }
+
+    /* =========================================================
+       RENDER QUESTION
+       ========================================================= */
+    function spawn() {
+        if (queueIndex >= currentQueue.length) return showWin();
+
+        current = currentQueue[queueIndex];
+        answered = false;
+
+        const topicClass = current.type;
+        const isBig = current.options.length === 2;
+        const gridClass = isBig ? 'two' : 'four';
+
+        // SHUFFLE THE OPTIONS SO THEY MIX UP EVERY TIME
+        const shuffledOptions = shuffle(current.options);
+
+        const btnsHtml = shuffledOptions.map((opt, i) => {
+            const colorClass = isBig ? '' : `c${(i % 4) + 1}`;
+            const bigClass   = isBig ? 'big' : '';
+            return `<button class="hero-btn ${colorClass} ${bigClass}" data-idx="${i}" onclick="check(this)">${opt}</button>`;
+        }).join('');
+
+        content.innerHTML = `
+            <div class="topic-badge ${topicClass}">${current.topic}</div>
+            <h1>Grammar Quest! 🦸</h1>
+            <div class="emoji-card">${current.emoji}</div>
+            <div class="phrase">
+                ${current.display}
+            </div>
+            <div class="btn-grid ${gridClass}" id="btnGrid">
+                ${btnsHtml}
+            </div>
+            <div id="msg">Pick the right answer! ⚡</div>
+            <div class="score-board">Experience: <span id="xp">${xp}</span> / 10 &nbsp;·&nbsp; Card ${queueIndex + 1}/${currentQueue.length}</div>
+        `;
+    }
+
+    /* =========================================================
+       CHECK ANSWER & TRACK MISTAKES
+       ========================================================= */
+    function check(btn) {
+        if (answered) return;
+
+        const chosen = btn.innerText.trim();
+        const isCorrect = chosen.toLowerCase() === current.correct.toLowerCase();
+
+        const msg = document.getElementById('msg');
+        const allBtns = document.querySelectorAll('.hero-btn');
+
+        if (isCorrect) {
+            answered = true;
+            score++;
+
+            btn.classList.add('reveal');
+            allBtns.forEach(b => b.disabled = true);
+
+            msg.textContent = 'AMAZING! 🌟';
+            msg.style.color = 'var(--secondary)';
+
+            xp++;
+            document.getElementById('xp').textContent = xp;
+
+            if (xp >= 10) {
+                level++;
+                xp = 0;
+                document.getElementById('lvl').textContent = level;
+                msg.textContent = 'LEVEL UP! 🚀';
+            }
+
+            if (navigator.vibrate) navigator.vibrate(35);
+
+            queueIndex++;
+            setTimeout(spawn, 1200);
+
+        } else {
+            btn.classList.add('wrongPick');
+            btn.disabled = true;
+            
+            // MANDATORY: Push wrong option to userMistakes array
+            userMistakes.push(chosen);
+
+            msg.textContent = 'Ouch! Try again! ⚡';
+            msg.style.color = 'var(--accent)';
+
+            container.classList.add('shake');
+            setTimeout(() => container.classList.remove('shake'), 500);
+
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+        }
+    }
+
+    /* =========================================================
+       WIN SCREEN
+       ========================================================= */
+    function showWin() {
+        const totalLevel = level;
+        content.innerHTML = `
+            <div class="win-screen">
+                <div class="trophy">🏆</div>
+                <h1>YOU ARE A HERO!</h1>
+                <p>You completed all grammar quests!</p>
+                <div class="final-score">LVL ${totalLevel}</div>
+                <p id="successMsg" class="success-msg" style="color: var(--secondary); font-weight: 900;">Results sent successfully! ✅</p>
+                <button class="restart-btn" onclick="location.reload()">Play Again 🚀</button>
+            </div>
+        `;
+        launchConfetti();
+        sendResultsToGoogle();
+    }
+
+    /* =========================================================
+       CONFETTI
+       ========================================================= */
+    function launchConfetti() {
+        const colors = ['#FFD93D', '#6BCB77', '#FF6B6B', '#4D96FF', '#9B7BFF', '#FF9F45'];
+        for (let i = 0; i < 70; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            c.style.animationDelay = (Math.random() * 0.8) + 's';
+            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 5000);
+        }
+    }
+
+    /* =========================================================
+       GOOGLE SHEETS INTEGRATION (MANDATORY)
+       ========================================================= */
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: currentQueue.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    /* =========================================================
+       START
+       ========================================================= */
+    buildQueue();
+    spawn();
+</script>
+
+</body>
+</html>
