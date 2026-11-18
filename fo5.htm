@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 2 · Work & Routines | Reading & Unscramble</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:#58cc02; --green-dark:#58a700; --green-light:#d7ffb8;
+    --red:#ff4b4b; --red-dark:#ea2b2b; --red-light:#ffdfe0;
+    --blue:#1cb0f6; --blue-dark:#1899d6; --blue-light:#ddf4ff;
+    --yellow:#ffc800; --orange:#ff9600;
+    --gray:#e5e5e5; --gray-dark:#afafaf; --ink:#3c3c3c; --text:#4b4b4b; --muted:#777777;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { min-height:100vh; background:#fff; color:var(--text); font-family:'Nunito',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  button { font:inherit; }
+  [hidden] { display:none !important; }
+  :focus-visible { outline:3px solid var(--blue); outline-offset:3px; }
+
+  .screen { display:none; width:100%; min-height:100vh; flex-direction:column; }
+  .screen.active { display:flex; }
+  .screen-center { align-items:center; justify-content:center; padding:40px 20px; }
+
+  /* header */
+  .lesson-header { width:100%; max-width:820px; margin:0 auto; padding:24px 20px 12px; display:flex; align-items:center; gap:16px; }
+  .icon-btn { width:42px; height:42px; flex:none; display:grid; place-items:center; border:0; border-radius:12px; background:none; color:var(--gray-dark); cursor:pointer; }
+  .icon-btn:hover { background:#f7f7f7; }
+  .icon-btn svg { width:24px; height:24px; }
+  .progress-wrap { flex:1; }
+  .progress { height:16px; border-radius:999px; background:var(--gray); overflow:hidden; }
+  .progress-fill { height:100%; width:0; border-radius:999px; background:var(--green); transition:width .5s cubic-bezier(.22,1,.36,1); }
+  .score-chip { display:flex; align-items:center; gap:6px; flex:none; font-size:18px; font-weight:900; color:var(--orange); }
+  .score-chip svg { width:24px; height:24px; }
+
+  /* main */
+  .lesson-main { flex:1; width:100%; display:flex; justify-content:center; padding:10px 20px 40px; }
+  .lesson-inner { width:100%; max-width:640px; text-align:center; }
+  .q-meta { font-size:13px; font-weight:900; color:var(--gray-dark); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
+
+  /* reading passage */
+  .passage { text-align:left; margin:0 0 22px; padding:18px 20px; border:2px solid var(--gray); border-radius:18px; background:#fff; box-shadow:0 3px 0 var(--gray); }
+  .passage-label { font-size:12px; font-weight:900; letter-spacing:1.4px; color:var(--blue); margin-bottom:8px; text-transform:uppercase; }
+  .passage p { font-size:19px; font-weight:700; line-height:1.7; color:var(--ink); }
+
+  .task-title { font-size:22px; font-weight:900; color:var(--ink); margin-bottom:6px; }
+  .task-sub { font-size:15px; font-weight:700; color:var(--muted); margin-bottom:18px; }
+
+  /* unscramble areas */
+  .target-area { min-height:74px; border:2px dashed var(--gray-dark); border-radius:16px; padding:12px; margin-bottom:22px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; background:#fafafa; transition:border-color .2s, background .2s; }
+  .target-area.has-words { border-style:solid; border-color:var(--blue); background:#fff; }
+  .word-bank { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .word-chip { padding:10px 18px; background:#fff; border:2px solid var(--gray); border-bottom-width:4px; border-radius:12px; font-size:18px; font-weight:700; color:var(--ink); cursor:pointer; transition:all .1s; user-select:none; }
+  .word-chip:hover { background:#f7f7f7; transform:translateY(-1px); }
+  .word-chip:active { transform:translateY(2px); border-bottom-width:2px; }
+  .word-chip.in-target { background:var(--blue-light); border-color:var(--blue); color:var(--blue-dark); }
+
+  /* footer */
+  .lesson-footer { position:sticky; bottom:0; z-index:10; border-top:2px solid var(--gray); background:#fff; transition:background .2s, border-color .2s; }
+  .lesson-footer[data-state="correct"] { background:var(--green-light); border-top-color:var(--green-light); }
+  .lesson-footer[data-state="wrong"] { background:var(--red-light); border-top-color:var(--red-light); }
+  .footer-inner { max-width:820px; margin:0 auto; padding:20px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .fb-left { display:flex; align-items:center; gap:16px; flex:1; }
+  .fb-icon { width:50px; height:50px; flex:none; display:none; place-items:center; border-radius:50%; background:#fff; }
+  .fb-icon svg { width:28px; height:28px; }
+  .lesson-footer[data-state="correct"] .fb-icon, .lesson-footer[data-state="wrong"] .fb-icon { display:grid; }
+  .lesson-footer[data-state="correct"] .fb-icon { color:var(--green); }
+  .lesson-footer[data-state="wrong"] .fb-icon { color:var(--red-dark); }
+  .fb-text { flex:1; text-align:left; }
+  .fb-title { font-size:20px; font-weight:900; color:var(--muted); }
+  .lesson-footer[data-state="correct"] .fb-title { color:var(--green-dark); }
+  .lesson-footer[data-state="wrong"] .fb-title { color:var(--red-dark); }
+  .fb-detail { font-size:16px; font-weight:700; color:var(--muted); margin-top:4px; }
+  .lesson-footer[data-state="wrong"] .fb-detail { color:var(--red-dark); }
+  .btn-check { flex:none; height:50px; padding:0 32px; border:0; border-radius:16px; font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:.8px; cursor:pointer; transition:all .1s; background:var(--green); color:#fff; box-shadow:0 4px 0 var(--green-dark); }
+  .btn-check:disabled { background:var(--gray); color:var(--gray-dark); box-shadow:0 4px 0 var(--gray-dark); cursor:not-allowed; }
+  .btn-check:active:not(:disabled) { transform:translateY(4px); box-shadow:none; }
+  .lesson-footer[data-state="wrong"] .btn-check { background:var(--red); box-shadow:0 4px 0 var(--red-dark); }
+
+  /* results */
+  .result-card { width:100%; max-width:520px; text-align:center; animation:fadeIn .5s ease; }
+  .trophy { width:120px; margin:0 auto 16px; }
+  .result-title { font-size:32px; font-weight:900; color:var(--orange); }
+  .result-msg { margin:8px auto 16px; max-width:420px; font-size:17px; font-weight:700; color:var(--muted); }
+  .result-score { font-size:56px; font-weight:900; color:var(--green); margin:10px 0; }
+  .result-score .of { font-size:24px; color:var(--gray-dark); }
+  .review { margin:22px 0 8px; padding:16px 18px 6px; border:2px solid var(--gray); border-radius:18px; text-align:left; }
+  .review-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
+  .review-head h2 { font-size:18px; font-weight:900; color:var(--ink); }
+  .review-count { padding:3px 10px; border-radius:999px; background:var(--red-light); color:var(--red-dark); font-size:13px; font-weight:800; }
+  .review-list { list-style:none; }
+  .review-item { padding:12px 0; border-top:2px solid #f2f2f2; }
+  .review-item:first-child { border-top:0; }
+  .review-q { font-size:12px; font-weight:900; letter-spacing:.8px; text-transform:uppercase; color:var(--gray-dark); }
+  .review-prompt { margin:3px 0 6px; font-size:16px; font-weight:700; color:var(--ink); }
+  .review-prompt strong { padding:0 5px; border-radius:6px; background:var(--green-light); color:var(--green-dark); }
+  .review-answers { display:flex; flex-wrap:wrap; gap:6px 8px; font-size:14px; font-weight:800; color:var(--muted); align-items:center; }
+  .tag-wrong { padding:2px 9px; border-radius:8px; background:var(--red-light); color:var(--red-dark); text-decoration:line-through; }
+  .tag-right { padding:2px 9px; border-radius:8px; background:var(--green-light); color:var(--green-dark); }
+  .review-empty { display:flex; align-items:center; gap:10px; padding:6px 0 10px; font-size:16px; font-weight:800; color:var(--green-dark); }
+  .review-empty svg { width:24px; height:24px; }
+  .send-status { margin-top:18px; font-size:18px; font-weight:800; min-height:26px; color:var(--muted); }
+  .send-status.success { color:var(--green-dark); }
+  .send-status.error { color:var(--red-dark); }
+  .btn-restart { margin-top:24px; width:100%; max-width:300px; height:54px; background:var(--green); color:#fff; border:0; border-radius:16px; font-size:16px; font-weight:800; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 0 var(--green-dark); }
+  .btn-restart:active { transform:translateY(4px); box-shadow:none; }
+
+  @keyframes fadeIn { from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:none;} }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
+  .shake { animation:shake .4s ease; }
+
+  @media (max-width:600px) {
+    .footer-inner { flex-direction:column; align-items:stretch; text-align:center; }
+    .fb-left { justify-content:center; } .fb-text { text-align:center; }
+    .btn-check { width:100%; } .word-chip { font-size:16px; padding:8px 14px; }
+    .passage p { font-size:17px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- QUIZ -->
+<section class="screen active" id="screen-quiz">
+  <header class="lesson-header">
+    <button class="icon-btn" id="quitBtn" type="button" aria-label="Restart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="progress-wrap">
+      <div class="progress" role="progressbar" aria-valuenow="0" aria-valuemax="8"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <span class="score-chip">
+      <svg viewBox="0 0 24 24" fill="#ff9600"><path d="M12 2c1 3.5-1.5 5.2-1.5 7.4 0 1 .6 1.9 1.6 1.9 1.3 0 2-1.2 1.9-2.8 2.6 1.7 4 4.3 4 7 0 4-3.1 6.5-6 6.5S6 19.6 6 15.8C6 10.4 11.1 7.9 12 2Z"/></svg>
+      <span id="scoreChip">0</span>
+    </span>
+  </header>
+
+  <main class="lesson-main">
+    <div class="lesson-inner">
+      <div class="q-meta" id="qMeta">Question 1 of 8</div>
+      <article class="passage">
+        <p class="passage-label">Read the text</p>
+        <p id="passageText"></p>
+      </article>
+      <h1 class="task-title">Unscramble the sentence</h1>
+      <p class="task-sub">Tap the words in the correct order.</p>
+      <div class="target-area" id="targetArea"></div>
+      <div class="word-bank" id="wordBank"></div>
+    </div>
+  </main>
+
+  <footer class="lesson-footer" id="footer" data-state="idle">
+    <div class="footer-inner">
+      <div class="fb-left">
+        <span class="fb-icon" id="fbIcon"></span>
+        <div class="fb-text">
+          <p class="fb-title" id="fbTitle">Choose the correct order</p>
+          <p class="fb-detail" id="fbDetail"></p>
+        </div>
+      </div>
+      <button class="btn-check" id="checkBtn" type="button" disabled>Check</button>
+    </div>
+  </footer>
+</section>
+
+<!-- RESULTS -->
+<section class="screen screen-center" id="screen-result">
+  <div class="result-card">
+    <div class="trophy"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="68" fill="#fff4cc"/><path d="M49 36h52v24c0 16-11.6 29-26 29S49 76 49 60V36Z" fill="#ffc800"/><rect x="68" y="88" width="14" height="14" fill="#f2ad00"/><rect x="55" y="101" width="40" height="10" rx="4" fill="#f2ad00"/><rect x="49" y="109" width="52" height="11" rx="4" fill="#ffc800"/></svg></div>
+    <h1 class="result-title" id="resultTitle">Lesson complete!</h1>
+    <p class="result-msg" id="resultMsg"></p>
+    <div class="result-score"><span id="resultScore">0</span><span class="of" id="resultTotal">/ 8</span></div>
+
+    <div class="review">
+      <div class="review-head"><h2>Review your mistakes</h2><span class="review-count" id="reviewCount"></span></div>
+      <p class="review-empty" id="reviewEmpty" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.7 2.7L16.5 9"/></svg>No mistakes. Perfect lesson!</p>
+      <ol class="review-list" id="reviewList"></ol>
+    </div>
+
+    <p class="send-status" id="sendStatus" role="status" aria-live="polite"></p>
+    <button class="btn-restart" id="restartBtn" type="button">Try again</button>
+  </div>
+</section>
+
+<noscript><p style="padding:24px;text-align:center;font-weight:800">Please enable JavaScript to take this test.</p></noscript>
+
+<script>
+/* ============ CONFIG & TRACKING ============ */
+const TEST_NAME = "Unit 2: Work & Routines — Reading & Unscramble Sentences";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+let userMistakes = [];
+
+/* ============ QUESTIONS (English only) ============ */
+const questions = [
+  {
+    passage: "Every month, the sales team has a conversation with its suppliers about costs and delivery dates. The legal department reviews all contracts before the company signs them.",
+    correct: ["The","legal","department","reviews","all","contracts."],
+    hint: "Present Simple for a regular task: the department reviews."
+  },
+  {
+    passage: "Ruslan works offshore on a gas platform. He is on duty for two weeks and then off duty for two weeks. Next month he is going to attend a safety meeting.",
+    correct: ["He","is","going","to","attend","a","safety","meeting."],
+    hint: "A future plan uses be going to + base verb."
+  },
+  {
+    passage: "Marat operates a crane on the deck every day. The mechanic repairs the engines and maintains the generators. They report to the supervisor at the end of the shift.",
+    correct: ["The","mechanic","repairs","the","engines."],
+    hint: "repair = to fix something that is broken."
+  },
+  {
+    passage: "Fortunately, the inspector arrives on time. Unfortunately, the delivery is late. The team is going to discuss the schedule tomorrow.",
+    correct: ["The","team","is","going","to","discuss","the","schedule."],
+    hint: "Negative or positive plan: is/are + going to + verb."
+  },
+  {
+    passage: "Nadia usually inspects the lifeboats in the morning. Today she is off duty, so Ivan is going to inspect them instead.",
+    correct: ["Ivan","is","going","to","inspect","them."],
+    hint: "inspect = to look at something carefully to check it."
+  },
+  {
+    passage: "Our company supplies pipes to several markets. The managers do maintenance work on the equipment every week. They are going to open a new office next year.",
+    correct: ["The","managers","do","maintenance","work."],
+    hint: "We say do maintenance work, not make maintenance work."
+  },
+  {
+    passage: "Do you often have conversations with international clients? Our marketing team works with partners from many countries. Next week they are going to prepare a new proposal.",
+    correct: ["They","are","going","to","prepare","a","new","proposal."],
+    hint: "Plural subject they → are going to."
+  },
+  {
+    passage: "The supervisor checks the platform twice a day. She reports to the installation manager. Tomorrow she is going to visit the onshore office.",
+    correct: ["She","reports","to","the","installation","manager."],
+    hint: "report to + person = to be accountable to a boss."
+  }
+];
+
+/* ============ STATE ============ */
+let score = 0, currentQ = 0, isLocked = false, startTime = Date.now();
+let targetWords = [], bankWords = [], reviewLog = [];
+const $ = id => document.getElementById(id);
+
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+/* ============ RENDER ============ */
+function renderQuestion(){
+  isLocked=false;
+  const q=questions[currentQ];
+  $("qMeta").textContent=`Question ${currentQ+1} of ${questions.length}`;
+  $("progressFill").style.width=`${(currentQ/questions.length)*100}%`;
+  $("scoreChip").textContent=score;
+  $("passageText").textContent=q.passage;
+  $("targetArea").innerHTML=""; $("targetArea").classList.remove("has-words","shake");
+  $("wordBank").innerHTML="";
+  $("footer").dataset.state="idle";
+  $("fbTitle").textContent="Choose the correct order";
+  $("fbDetail").textContent=""; $("fbIcon").innerHTML="";
+  $("checkBtn").disabled=true; $("checkBtn").textContent="Check";
+
+  const withIds=q.correct.map((text,i)=>({id:i,text}));
+  bankWords=shuffle(withIds); targetWords=[];
+  renderChips();
+}
+
+function renderChips(){
+  const ta=$("targetArea"), wb=$("wordBank");
+  ta.innerHTML=""; wb.innerHTML="";
+  ta.classList.toggle("has-words",targetWords.length>0);
+  targetWords.forEach((w,i)=>{
+    const c=document.createElement("button");
+    c.className="word-chip in-target"; c.type="button"; c.textContent=w.text;
+    c.onclick=()=>moveToBank(i); ta.appendChild(c);
+  });
+  bankWords.forEach((w,i)=>{
+    const c=document.createElement("button");
+    c.className="word-chip"; c.type="button"; c.textContent=w.text;
+    c.onclick=()=>moveToTarget(i); wb.appendChild(c);
+  });
+  $("checkBtn").disabled = targetWords.length===0 || isLocked;
+}
+
+function moveToTarget(bi){ if(isLocked)return; targetWords.push(bankWords.splice(bi,1)[0]); renderChips(); }
+function moveToBank(ti){ if(isLocked)return; bankWords.push(targetWords.splice(ti,1)[0]); renderChips(); }
+
+/* ============ CHECK ============ */
+function checkAnswer(){
+  if(isLocked||targetWords.length===0)return;
+  isLocked=true; $("checkBtn").disabled=true;
+  const q=questions[currentQ];
+  const user=targetWords.map(w=>w.text).join(" ");
+  const correct=q.correct.join(" ");
+  const ok=user===correct;
+
+  if(ok){
+    score++; $("scoreChip").textContent=score;
+    $("footer").dataset.state="correct";
+    $("fbTitle").textContent="Excellent!";
+    $("fbDetail").textContent=q.hint;
+    $("fbIcon").innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  }else{
+    userMistakes.push(user);                 // save wrong built sentence
+    reviewLog.push({index:currentQ,chosen:user});
+    $("footer").dataset.state="wrong";
+    $("fbTitle").textContent="Correct solution:";
+    $("fbDetail").textContent=correct+"  ·  "+q.hint;
+    $("fbIcon").innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>';
+    $("targetArea").classList.add("shake");
+  }
+  $("checkBtn").textContent = currentQ===questions.length-1 ? "See results" : "Continue";
+  $("checkBtn").disabled=false;
+}
+
+function next(){
+  currentQ++;
+  if(currentQ<questions.length) renderQuestion();
+  else showResults();
+}
+
+/* ============ RESULTS ============ */
+function fmt(s){const m=Math.floor(s/60);return m+":"+String(s%60).padStart(2,"0");}
+function buildReview(){
+  const list=$("reviewList"); list.innerHTML="";
+  const c=reviewLog.length;
+  $("reviewEmpty").hidden=c>0; $("reviewCount").hidden=c===0;
+  $("reviewCount").textContent=c+(c===1?" mistake":" mistakes");
+  reviewLog.forEach(it=>{
+    const q=questions[it.index];
+    const li=document.createElement("li"); li.className="review-item";
+    const num=document.createElement("p"); num.className="review-q"; num.textContent="Question "+(it.index+1);
+    const pr=document.createElement("p"); pr.className="review-prompt";
+    const strong=document.createElement("strong"); strong.textContent=q.correct.join(" "); pr.append("Sentence: ",strong);
+    const ans=document.createElement("p"); ans.className="review-answers";
+    const w=document.createElement("span"); w.className="tag-wrong"; w.textContent=it.chosen;
+    const r=document.createElement("span"); r.className="tag-right"; r.textContent=q.correct.join(" ");
+    ans.append("Your order:",w,"Correct:",r);
+    li.append(num,pr,ans); list.appendChild(li);
+  });
+}
+function showResults(){
+  $("screen-quiz").classList.remove("active");
+  $("screen-result").classList.add("active");
+  const pct=Math.round(score/questions.length*100);
+  $("resultScore").textContent=score;
+  $("resultTotal").textContent="/ "+questions.length;
+  let t="Keep practising!",m="Read the texts again and try one more time.";
+  if(pct===100){t="Perfect lesson!";m="You read and rebuilt every sentence correctly. Amazing!";}
+  else if(pct>=80){t="Great job!";m="You are almost there. Check the small mistakes below.";}
+  else if(pct>=60){t="Good effort!";m="Review your mistakes and try the lesson again.";}
+  $("resultTitle").textContent=t; $("resultMsg").textContent=m;
+  buildReview();
+  sendResultsToGoogle();
+}
+
+/* ============ GOOGLE SHEETS ============ */
+function sendResultsToGoogle(){
+  const st=$("sendStatus"); st.className="send-status"; st.textContent="Sending results to your teacher…";
+  const params=new URLSearchParams();
+  params.append("name",TEST_NAME);
+  params.append("score",String(score));
+  params.append("total",String(questions.length));
+  params.append("mistakes",userMistakes.join(", "));
+  fetch(GOOGLE_SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:params.toString(),keepalive:true})
+    .then(()=>{st.className="send-status success";st.textContent="Results sent successfully! ✅";})
+    .catch(()=>{st.className="send-status error";st.textContent="Could not send results. Please inform your teacher.";});
+}
+
+/* ============ EVENTS ============ */
+$("checkBtn").addEventListener("click",()=>{ isLocked?next():checkAnswer(); });
+$("quitBtn").addEventListener("click",()=>{ if(confirm("Restart this lesson?")) location.reload(); });
+$("restartBtn").addEventListener("click",()=>location.reload());
+document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&$("screen-quiz").classList.contains("active")){e.preventDefault();$("checkBtn").click();} });
+
+renderQuestion();
+</script>
+</body>
+</html>

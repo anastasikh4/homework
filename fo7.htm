@@ -1,0 +1,915 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Practice · Grammar & Listening</title>
+
+<style>
+:root {
+    --blue: #1769c2;
+    --blue-dark: #174778;
+    --ink: #193b60;
+    --muted: #58728d;
+    --border: #c6dbef;
+    --green: #225e3a;
+    --green-bg: #e4f5e9;
+    --red: #9e3040;
+    --red-bg: #fce8ed;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 30px 14px;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 12% 15%, #ffffff18 0 110px, transparent 111px),
+        radial-gradient(circle at 90% 75%, #ffffff12 0 180px, transparent 181px),
+        linear-gradient(145deg, #2486db, #1768bd 55%, #15549c);
+    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+button { font: inherit; }
+button:focus-visible, summary:focus-visible {
+    outline: 4px solid #f1b93c;
+    outline-offset: 4px;
+}
+main { max-width: 870px; margin: auto; }
+header, .panel {
+    padding: 29px;
+    margin-bottom: 21px;
+    background: #fff;
+    border: 1px solid #d3e5f6;
+    border-radius: 18px;
+    box-shadow: 0 9px 0 #10447a30, 0 15px 35px #103b6b20;
+}
+.eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #316b9b;
+}
+h1 {
+    font-size: clamp(29px, 5vw, 40px);
+    line-height: 1.2;
+    margin: 11px 0;
+    color: var(--blue-dark);
+}
+h2 { font-size: 23px; margin: 12px 0; line-height: 1.35; }
+p { margin: 10px 0; }
+.small { color: var(--muted); font-size: 13px; }
+.hidden { display: none !important; }
+.header-meta, .steps, .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.header-meta { margin-top: 17px; }
+.tag, .step {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #edf5fd;
+    color: #365f85;
+}
+.steps { margin-bottom: 23px; }
+.step.active { background: #d9ebff; color: #124c82; font-weight: 750; }
+.step.done { background: var(--green-bg); color: var(--green); }
+.meta { justify-content: space-between; color: var(--muted); font-size: 13px; }
+.progress {
+    height: 9px;
+    margin: 11px 0 25px;
+    border-radius: 15px;
+    background: #e7f0f8;
+    overflow: hidden;
+}
+#fill { height: 100%; width: 0; background: #398de0; transition: width .3s; }
+.prompt {
+    margin: 23px 0;
+    padding: 24px;
+    background: #f3f8fe;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: clamp(21px, 3.5vw, 27px);
+    line-height: 1.6;
+    font-weight: 550;
+}
+.blank {
+    display: inline-block;
+    min-width: 75px;
+    padding: 0 5px;
+    text-align: center;
+    color: #19598d;
+    border-bottom: 2px solid #75a9d7;
+}
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.option {
+    min-height: 85px;
+    padding: 19px;
+    border: 2px solid #b9d5ed;
+    border-radius: 12px;
+    background: #edf6ff;
+    color: var(--ink);
+    text-align: left;
+    font-size: 17px;
+    line-height: 1.55;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #d0e1f0;
+}
+.option:hover:not(:disabled) { background: #deeeff; border-color: #4e96d5; }
+.option:disabled { cursor: default; }
+.option.correct {
+    background: var(--green-bg);
+    border-color: #76ad89;
+    color: var(--green);
+    box-shadow: 0 4px 0 #c1dfcb;
+}
+.option.wrong {
+    background: var(--red-bg);
+    border-color: #c47e8d;
+    color: var(--red);
+    box-shadow: 0 4px 0 #edcbd3;
+}
+.option:disabled:not(.correct):not(.wrong) { opacity: .6; }
+.primary, .secondary {
+    min-height: 49px;
+    padding: 12px 21px;
+    border: 1px solid #9bc4e8;
+    border-radius: 10px;
+    background: #dceeff;
+    color: #164d7c;
+    font-weight: 700;
+    cursor: pointer;
+}
+.primary:hover { background: #cce5fc; }
+.secondary { background: #f5f9fd; color: #365f85; }
+.full { display: block; width: 100%; margin-top: 23px; }
+.audio-panel {
+    padding: 24px;
+    margin: 22px 0;
+    text-align: center;
+    border: 1px solid #bbd9f3;
+    border-radius: 14px;
+    background: linear-gradient(#edf6ff, #f8fbff);
+}
+.smile-play {
+    position: relative;
+    display: block;
+    width: 125px;
+    height: 125px;
+    margin: 4px auto 17px;
+    padding: 0;
+    border: 4px solid #c98e20;
+    border-radius: 50%;
+    background: #ffda69;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 7px 0 #dbad49;
+    transition: transform .15s;
+}
+.smile-play:hover:not(:disabled) { transform: translateY(-2px); }
+.smile-play:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 3px 0 #dbad49; }
+.smile-play:disabled { cursor: default; opacity: .65; }
+.eye { position: absolute; top: 33px; width: 10px; height: 16px; background: #654719; border-radius: 50%; }
+.eye.left { left: 31px; }
+.eye.right { right: 31px; }
+.mouth {
+    position: absolute;
+    left: 32px;
+    top: 59px;
+    width: 53px;
+    height: 29px;
+    border: 5px solid #654719;
+    border-top: 0;
+    border-radius: 0 0 50px 50px;
+}
+.play-badge {
+    position: absolute;
+    right: -10px;
+    bottom: -5px;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    background: #dceeff;
+    border: 3px solid #477fae;
+    border-radius: 50%;
+}
+.triangle {
+    width: 0;
+    height: 0;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-left: 14px solid #1d5689;
+    margin-left: 4px;
+}
+.smile-play.speaking { animation: gentle-pulse 1.2s ease-in-out infinite; }
+#speechStatus { min-height: 23px; }
+.voice-label { color: #3b6589; font-size: 12px; margin-bottom: 15px; }
+.transcript {
+    padding: 17px;
+    margin-top: 17px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 18px;
+    text-align: left;
+}
+.feedback { min-height: 85px; padding: 18px; margin-top: 23px; background: #f2f7fc; border-radius: 11px; }
+.feedback.good { background: var(--green-bg); color: var(--green); }
+.feedback.bad { background: var(--red-bg); color: var(--red); }
+.feedback strong { display: block; margin-bottom: 6px; font-size: 15px; }
+.feedback p { margin: 0; font-size: 15px; }
+.results { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 25px 0; }
+.result-card { padding: 20px; background: #f1f7fe; border: 1px solid var(--border); border-radius: 10px; }
+.result-card span { color: var(--muted); font-size: 13px; }
+.result-card strong { display: block; font-size: 28px; color: #235e91; }
+.final-score { font-size: 49px; color: #235e91; font-weight: 750; margin: 15px 0; }
+details { padding: 17px; margin-top: 18px; background: #f7faff; border: 1px solid var(--border); border-radius: 10px; }
+summary { color: #265e8d; font-weight: 650; cursor: pointer; }
+.review-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.review-item:last-child { border: 0; }
+.review-item p { margin: 6px 0; }
+#send-status { margin-top: 25px; font-weight: 650; }
+footer {
+    padding: 17px 20px;
+    background: #e7f2ff;
+    color: #365d80;
+    border-radius: 12px;
+    font-size: 13px;
+}
+@keyframes gentle-pulse { 50% { box-shadow: 0 7px 0 #dbad49, 0 0 0 9px #83b9ed33; } }
+@media (max-width: 580px) {
+    body { padding: 17px 12px; }
+    header, .panel { padding: 23px 18px; }
+    .options, .results { grid-template-columns: 1fr; }
+    .prompt { padding: 20px 16px; }
+    .option { min-height: 68px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+
+<body>
+<main>
+<header>
+    <div class="eyebrow">English Practice</div>
+    <h1>Grammar & Listening</h1>
+    <p class="small">Present Simple and be going to · Everyday situations and decisions</p>
+    <div class="header-meta">
+        <span class="tag">6 grammar questions</span>
+        <span class="tag">10 listening situations</span>
+        <span class="tag">Two answer options</span>
+    </div>
+</header>
+
+<section class="panel" id="quiz-screen">
+    <div class="steps">
+        <span class="step active" id="step0">Grammar</span>
+        <span class="step" id="step1">Listening</span>
+    </div>
+
+    <div class="meta">
+        <span id="question-counter"></span>
+        <span>Correct: <strong id="live-score">0</strong></span>
+    </div>
+
+    <div class="progress" id="progress-bar" role="progressbar"
+         aria-label="Completed questions" aria-valuemin="0"
+         aria-valuemax="16" aria-valuenow="0">
+        <div id="fill"></div>
+    </div>
+
+    <h2 id="section-title"></h2>
+    <p class="small" id="instruction"></p>
+    <div class="prompt" id="question-prompt"></div>
+
+    <div class="audio-panel hidden" id="audio-panel">
+        <button type="button" class="smile-play" id="listen-btn"
+                aria-label="Play the situation using Microsoft Mark">
+            <span class="eye left" aria-hidden="true"></span>
+            <span class="eye right" aria-hidden="true"></span>
+            <span class="mouth" aria-hidden="true"></span>
+            <span class="play-badge" aria-hidden="true">
+                <span class="triangle"></span>
+            </span>
+        </button>
+
+        <p class="small" id="speech-status" role="status" aria-live="polite"></p>
+        <p class="voice-label">Microsoft Mark — English (United States)</p>
+
+        <button type="button" class="secondary" id="transcript-btn">
+            Show transcript
+        </button>
+
+        <div class="transcript hidden" id="transcript"></div>
+
+        <p class="small" lang="ru">
+            Аудио запускается автоматически при переходе к заданию.
+            Если браузер блокирует запуск, нажми на улыбку.
+            Используется только Microsoft Mark: другой голос не подставляется.
+        </p>
+    </div>
+
+    <div class="options" id="options-container"></div>
+    <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true"></div>
+    <button type="button" class="primary full hidden" id="next-btn">Continue →</button>
+</section>
+
+<section class="panel hidden" id="win">
+    <div class="eyebrow">Practice complete</div>
+    <h2>Your results</h2>
+    <div class="final-score" id="final-score"></div>
+    <p id="final-message"></p>
+
+    <div class="results">
+        <div class="result-card">
+            <span>Grammar</span>
+            <strong id="result0"></strong>
+        </div>
+        <div class="result-card">
+            <span>Listening</span>
+            <strong id="result1"></strong>
+        </div>
+    </div>
+
+    <p class="small" id="support-summary"></p>
+
+    <details>
+        <summary>Review mistakes</summary>
+        <div id="mistake-review"></div>
+    </details>
+
+    <details>
+        <summary>All answers and listening scripts</summary>
+        <div id="answer-review"></div>
+    </details>
+
+    <div id="send-status" role="status" aria-live="polite"></div>
+    <p class="small" id="send-note"></p>
+
+    <button type="button" class="secondary full" id="restart-btn">Practise again</button>
+</section>
+
+<footer lang="ru">
+    Тест начинается сразу. За правильный первый ответ — один балл.
+    После завершения автоматически отправляются название теста,
+    результат и ошибочно выбранные варианты. Имя вводить не нужно.
+    Microsoft Mark должен быть доступен в списке голосов твоего устройства.
+</footer>
+
+<noscript><p>Enable JavaScript to use this page.</p></noscript>
+</main>
+
+<script>
+"use strict";
+
+const TEST_NAME = "Adult English — Present Simple and Going To — Microsoft Mark Listening";
+const GOOGLE_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+let userMistakes = [];
+let score = 0;
+let currentIndex = 0;
+let answered = false;
+let finished = false;
+let resultsSubmitted = false;
+let listeningUnlocked = false;
+let speechToken = 0;
+let speechWatchdog = null;
+let currentUtterance = null;
+let markVoice = null;
+let pendingAutoplayIndex = null;
+let voiceWaitTimer = null;
+
+const responses = [];
+const sectionScores = [0, 0];
+const transcriptUsed = new Set();
+const $ = id => document.getElementById(id);
+
+const questions = [
+    {
+        section: 0,
+        prompt: "___ your manager usually give helpful feedback?",
+        correct: "Does", wrong: "Do",
+        explanation: "Your manager = he/she. Вопрос: Does + подлежащее + give."
+    },
+    {
+        section: 0,
+        prompt: "We ___ usually watch short videos before work.",
+        correct: "don't", wrong: "doesn't",
+        explanation: "Отрицание с we: don't + начальная форма глагола."
+    },
+    {
+        section: 0,
+        prompt: "What ___ with these old family photos? Do you have a plan?",
+        correct: "are you going to do", wrong: "you are going to do",
+        explanation: "Порядок слов: What + are + you + going to + do?"
+    },
+    {
+        section: 0,
+        prompt: "I want less 'brain rot' in the evenings. I ___ another hour watching pointless clips tonight.",
+        correct: "am not going to spend", wrong: "don't going to spend",
+        explanation: "Отрицание: am/is/are + not + going to + глагол."
+    },
+    {
+        section: 0,
+        prompt: "___ the company going to open a new branch next year?",
+        correct: "Is", wrong: "Does",
+        explanation: "Вопрос с going to: Is the company going to open…?"
+    },
+    {
+        section: 0,
+        prompt: "My brother ___ happier when he limits his screen time.",
+        correct: "feels", wrong: "feel",
+        explanation: "My brother = he. В Present Simple: feels."
+    },
+    {
+        section: 1,
+        audio: "Oh no, I am so tired after this long week. I can hardly keep my eyes open.",
+        correct: "I am going to go to bed.",
+        wrong: "I am going to start a long workout.",
+        explanation: "Человек очень устал и хочет спать. Логично лечь спать."
+    },
+    {
+        section: 1,
+        audio: "These old photographs bring back happy memories. I want to keep them together and share them with my family.",
+        correct: "I am going to make a photo album.",
+        wrong: "I am going to throw all the photographs away.",
+        explanation: "Чтобы сохранить фотографии и поделиться ими, логично сделать альбом."
+    },
+    {
+        section: 1,
+        audio: "This new software is hard for me to use. There is a beginner training session tomorrow, and I want some help.",
+        correct: "I am going to attend the training session.",
+        wrong: "I am going to skip the training and avoid asking questions.",
+        explanation: "Человеку нужна помощь с программой: логично посетить обучение."
+    },
+    {
+        section: 1,
+        audio: "My partner and I often have an argument about housework. I want us to talk calmly and agree on a fair plan.",
+        correct: "I am going to suggest a cleaning schedule.",
+        wrong: "I am going to shout at my partner about the dishes.",
+        explanation: "Цель — спокойный разговор и справедливое распределение дел."
+    },
+    {
+        section: 1,
+        audio: "I call it brain rot: I spend hours watching pointless videos every night. I want less screen time.",
+        correct: "I am going to set a daily limit on the app.",
+        wrong: "I am going to watch even more videos tonight.",
+        explanation: "Чтобы сократить экранное время, логично установить лимит. Brain rot здесь — разговорное выражение."
+    },
+    {
+        section: 1,
+        audio: "I feel happier when I spend time outdoors. Tomorrow is my day off, and the weather forecast is good.",
+        correct: "I am going to take a long walk in the park.",
+        wrong: "I am going to stay indoors and scroll all day.",
+        explanation: "Человек чувствует себя счастливее на улице: логичный план — прогулка."
+    },
+    {
+        section: 1,
+        audio: "My colleague is always helpful. She explains difficult tasks and answers my questions. I want to thank her.",
+        correct: "I am going to write her a thank-you message.",
+        wrong: "I am going to complain that she never helps me.",
+        explanation: "Человек хочет поблагодарить коллегу: логично написать сообщение."
+    },
+    {
+        section: 1,
+        audio: "I want to win a fight in a boxing competition. I need better fitness and technique, and my coach has a training plan.",
+        correct: "I am going to follow my coach's training plan.",
+        wrong: "I am going to stop training before the competition.",
+        explanation: "Для подготовки к спортивному поединку логично следовать плану тренера."
+    },
+    {
+        section: 1,
+        audio: "The power is off in my apartment, and it is dark. My phone battery is low, but I have a charged torch.",
+        correct: "I am going to use the torch.",
+        wrong: "I am going to watch videos on my phone until the battery is empty.",
+        explanation: "Электричества нет, заряд телефона низкий. Логично использовать фонарь."
+    },
+    {
+        section: 1,
+        audio: "Every Monday, I help new colleagues learn our software. Helping people is a regular part of my job.",
+        correct: "I give helpful advice at work every week.",
+        wrong: "I never help anyone at work.",
+        explanation: "Это регулярная обязанность: логичное продолжение в Present Simple."
+    }
+];
+
+const totalQuestions = questions.length;
+
+function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+// Only the Microsoft Mark voice is permitted.
+// Windows may expose it as “Microsoft Mark Desktop - English (United States)”.
+function findMarkVoice() {
+    if (!("speechSynthesis" in window)) return null;
+    return window.speechSynthesis.getVoices().find(voice =>
+        /^en[-_]US$/i.test(voice.lang) &&
+        /^Microsoft Mark(?: Desktop)?(?:\s*[-–]\s*English \(United States\))?$/i.test(voice.name.trim())
+    ) || null;
+}
+
+function stopSpeech() {
+    speechToken++;
+    clearTimeout(speechWatchdog);
+    clearTimeout(voiceWaitTimer);
+    speechWatchdog = null;
+    voiceWaitTimer = null;
+    pendingAutoplayIndex = null;
+    $("listen-btn").classList.remove("speaking");
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    currentUtterance = null;
+}
+
+function updateProgress() {
+    $("fill").style.width = (responses.length / totalQuestions * 100) + "%";
+    $("progress-bar").setAttribute("aria-valuenow", responses.length);
+    $("live-score").textContent = score;
+}
+
+function unlockListening() {
+    if (answered || finished) return;
+    listeningUnlocked = true;
+    $("options-container").querySelectorAll("button").forEach(button => {
+        button.disabled = false;
+    });
+}
+
+function revealTranscript(manual = true) {
+    const question = questions[currentIndex];
+    if (!question.audio) return;
+    $("transcript").textContent = question.audio;
+    $("transcript").classList.remove("hidden");
+    $("transcript-btn").textContent = "Transcript shown";
+    if (manual && !answered) transcriptUsed.add(currentIndex);
+    if (!answered) unlockListening();
+}
+
+function showVoiceUnavailable() {
+    $("speech-status").textContent =
+        "Microsoft Mark is not available on this device. No other voice will be used. You can open the transcript.";
+}
+
+function playSituation() {
+    if (answered || finished || !questions[currentIndex].audio) return;
+    stopSpeech();
+
+    if (
+        !("speechSynthesis" in window) ||
+        !("SpeechSynthesisUtterance" in window)
+    ) {
+        showVoiceUnavailable();
+        return;
+    }
+
+    markVoice = findMarkVoice();
+    if (!markVoice) {
+        showVoiceUnavailable();
+        return;
+    }
+
+    const token = speechToken;
+    const questionIndex = currentIndex;
+    let started = false;
+
+    const message = new SpeechSynthesisUtterance(questions[currentIndex].audio);
+    currentUtterance = message;
+    message.voice = markVoice;
+    message.lang = "en-US";
+    message.rate = 0.88;
+    message.pitch = 1;
+    message.volume = 1;
+
+    function isCurrent() {
+        return token === speechToken &&
+            questionIndex === currentIndex &&
+            !answered && !finished;
+    }
+
+    message.onstart = () => {
+        if (!isCurrent()) return;
+        started = true;
+        clearTimeout(speechWatchdog);
+        $("listen-btn").classList.add("speaking");
+        $("speech-status").textContent = "Listening · Microsoft Mark";
+        unlockListening();
+    };
+
+    message.onend = () => {
+        if (!isCurrent()) return;
+        clearTimeout(speechWatchdog);
+        $("listen-btn").classList.remove("speaking");
+        $("speech-status").textContent =
+            "Choose the logical continuation. Press the smile to listen again.";
+        unlockListening();
+    };
+
+    message.onerror = () => {
+        if (!isCurrent()) return;
+        clearTimeout(speechWatchdog);
+        $("listen-btn").classList.remove("speaking");
+        $("speech-status").textContent =
+            "Audio could not start. Press the smile to try again, or open the transcript.";
+    };
+
+    $("speech-status").textContent = "Preparing Microsoft Mark…";
+
+    try {
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(message);
+
+        speechWatchdog = setTimeout(() => {
+            if (isCurrent() && !started) {
+                stopSpeech();
+                $("speech-status").textContent =
+                    "Automatic playback may be blocked. Press the smile to play, or open the transcript.";
+            }
+        }, 5000);
+    } catch (error) {
+        $("speech-status").textContent =
+            "Press the smile to try playback again, or open the transcript.";
+    }
+}
+
+function requestAutoplay() {
+    if (answered || finished || !questions[currentIndex].audio) return;
+
+    markVoice = findMarkVoice();
+    if (markVoice) {
+        // Called directly during navigation to preserve the user's click gesture.
+        playSituation();
+        return;
+    }
+
+    if (!("speechSynthesis" in window)) {
+        showVoiceUnavailable();
+        return;
+    }
+
+    pendingAutoplayIndex = currentIndex;
+    $("speech-status").textContent = "Checking for Microsoft Mark…";
+
+    voiceWaitTimer = setTimeout(() => {
+        if (pendingAutoplayIndex !== currentIndex || answered || finished) return;
+        pendingAutoplayIndex = null;
+        markVoice = findMarkVoice();
+        if (markVoice) playSituation();
+        else showVoiceUnavailable();
+    }, 1800);
+}
+
+function renderQuestion() {
+    stopSpeech();
+    answered = false;
+    listeningUnlocked = false;
+
+    const question = questions[currentIndex];
+    const listening = question.section === 1;
+
+    $("question-counter").textContent =
+        "Question " + (currentIndex + 1) + " of " + totalQuestions;
+
+    $("section-title").textContent = listening
+        ? "Listen & Continue"
+        : "Questions & Negatives";
+
+    $("instruction").textContent = listening
+        ? "Listen to the speaker. Choose the most logical next sentence."
+        : "Choose the correct form. Check the subject and word order.";
+
+    for (let i = 0; i < 2; i++) {
+        $("step" + i).className = "step" +
+            (i < question.section ? " done" :
+                i === question.section ? " active" : "");
+    }
+
+    $("audio-panel").classList.toggle("hidden", !listening);
+    $("transcript").classList.add("hidden");
+    $("transcript").textContent = "";
+    $("transcript-btn").textContent = "Show transcript";
+    $("listen-btn").disabled = false;
+
+    const prompt = $("question-prompt");
+    prompt.replaceChildren();
+
+    if (listening) {
+        prompt.textContent = "What does the speaker logically say next?";
+    } else {
+        const [before, after] = question.prompt.split("___");
+        const blank = document.createElement("span");
+        blank.className = "blank";
+        blank.id = "active-blank";
+        blank.textContent = "___";
+        prompt.append(
+            document.createTextNode(before),
+            blank,
+            document.createTextNode(after)
+        );
+    }
+
+    $("options-container").replaceChildren();
+    shuffle([question.correct, question.wrong]).forEach(option => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option";
+        button.textContent = option;
+        button.disabled = listening;
+        button.addEventListener("click", () => checkAnswer(option, button));
+        $("options-container").append(button);
+    });
+
+    $("feedback").className = "feedback";
+    $("feedback").textContent = listening
+        ? "Choose the continuation that fits the situation. Both options can be grammatical."
+        : "Choose one answer.";
+
+    $("next-btn").classList.add("hidden");
+    updateProgress();
+
+    if (listening) requestAutoplay();
+}
+
+function checkAnswer(selected, clickedButton) {
+    if (answered || finished) return;
+    const question = questions[currentIndex];
+    if (question.audio && !listeningUnlocked) return;
+
+    answered = true;
+    stopSpeech();
+
+    const correct = selected === question.correct;
+    $("options-container").querySelectorAll("button").forEach(button => {
+        button.disabled = true;
+        if (button.textContent === question.correct) button.classList.add("correct");
+    });
+
+    if (correct) {
+        score++;
+        sectionScores[question.section]++;
+    } else {
+        userMistakes.push(selected);
+        clickedButton.classList.add("wrong");
+    }
+
+    responses.push({ index: currentIndex, selected, correct });
+
+    const blank = $("active-blank");
+    if (blank) blank.textContent = question.correct;
+
+    if (question.audio) {
+        revealTranscript(false);
+        $("listen-btn").disabled = true;
+        $("speech-status").textContent = "Review the situation and explanation.";
+    }
+
+    $("feedback").className = "feedback " + (correct ? "good" : "bad");
+    const heading = document.createElement("strong");
+    heading.textContent = correct ? "Correct." : "Correct answer: " + question.correct;
+    const explanation = document.createElement("p");
+    explanation.lang = "ru";
+    explanation.textContent = question.explanation;
+    $("feedback").replaceChildren(heading, explanation);
+
+    $("next-btn").textContent = currentIndex === totalQuestions - 1
+        ? "View results →" : "Continue →";
+    $("next-btn").classList.remove("hidden");
+    updateProgress();
+}
+
+function nextQuestion() {
+    if (!answered || finished) return;
+    currentIndex++;
+    if (currentIndex < totalQuestions) renderQuestion();
+    else finishQuiz();
+}
+
+function makeReview(question, response) {
+    const item = document.createElement("div");
+    item.className = "review-item";
+    const text = document.createElement("strong");
+    text.textContent = question.audio
+        ? question.audio + " → " + question.correct
+        : question.prompt.replace("___", question.correct);
+    item.append(text);
+
+    if (response) {
+        const choice = document.createElement("p");
+        choice.textContent = "Your answer: " + response.selected;
+        item.append(choice);
+    }
+
+    const explanation = document.createElement("p");
+    explanation.className = "small";
+    explanation.lang = "ru";
+    explanation.textContent = question.explanation;
+    item.append(explanation);
+    return item;
+}
+
+function finishQuiz() {
+    if (finished) return;
+    finished = true;
+    stopSpeech();
+
+    $("quiz-screen").classList.add("hidden");
+    $("win").classList.remove("hidden");
+    $("final-score").textContent = score + " / " + totalQuestions;
+    $("final-message").textContent = score === totalQuestions
+        ? "Excellent work. Every first answer is correct."
+        : "Practice complete. Review your answers before trying again.";
+
+    sectionScores.forEach((value, section) => {
+        const total = questions.filter(q => q.section === section).length;
+        $("result" + section).textContent = value + " / " + total;
+    });
+
+    $("support-summary").textContent =
+        "Transcript opened before answering: " + transcriptUsed.size + " / 10 listening situations.";
+
+    $("answer-review").replaceChildren();
+    questions.forEach(question => $("answer-review").append(makeReview(question)));
+
+    $("mistake-review").replaceChildren();
+    const mistakes = responses.filter(response => !response.correct);
+    if (!mistakes.length) {
+        $("mistake-review").textContent = "No mistakes. Excellent work.";
+    } else {
+        mistakes.forEach(response => {
+            $("mistake-review").append(makeReview(questions[response.index], response));
+        });
+    }
+
+    sendResultsToGoogle();
+}
+
+async function sendResultsToGoogle() {
+    if (resultsSubmitted) return;
+    resultsSubmitted = true;
+
+    const params = new URLSearchParams({
+        name: TEST_NAME,
+        score: String(score),
+        total: String(totalQuestions),
+        mistakes: userMistakes.join(", ")
+    });
+
+    $("send-status").style.color = "#58728d";
+    $("send-status").textContent = "Sending results...";
+
+    try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString(),
+            keepalive: true
+        });
+        $("send-status").style.color = "#225e3a";
+        $("send-status").textContent = "Results sent successfully! ✅";
+        $("send-note").textContent =
+            "The request was sent. This browser cannot confirm that the spreadsheet saved it.";
+    } catch (error) {
+        console.error("Submission failed:", error);
+        $("send-status").style.color = "#9e3040";
+        $("send-status").textContent = "Failed to send results.";
+        $("send-note").textContent = "Your score remains visible above.";
+    }
+}
+
+$("next-btn").addEventListener("click", nextQuestion);
+$("listen-btn").addEventListener("click", playSituation);
+$("transcript-btn").addEventListener("click", () => revealTranscript(true));
+$("restart-btn").addEventListener("click", () => location.reload());
+window.addEventListener("pagehide", stopSpeech);
+
+if ("speechSynthesis" in window) {
+    window.speechSynthesis.addEventListener("voiceschanged", () => {
+        markVoice = findMarkVoice();
+        if (
+            markVoice &&
+            pendingAutoplayIndex === currentIndex &&
+            !answered && !finished
+        ) {
+            playSituation();
+        }
+    });
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
+```

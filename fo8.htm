@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everyday English · Adult Practice</title>
+
+<style>
+:root {
+  --bg: #edf2f6;
+  --paper: #ffffff;
+  --ink: #203247;
+  --muted: #586b7f;
+  --blue: #245c89;
+  --teal: #176c68;
+  --border: #cdd9e3;
+  --green: #176438;
+  --green-bg: #e3f4e8;
+  --red: #a12a39;
+  --red-bg: #fde8ec;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 26px 14px;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.65 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #2385bf;
+  outline-offset: 4px;
+}
+
+main {
+  max-width: 850px;
+  margin: auto;
+}
+
+header,
+.panel {
+  padding: 30px;
+  margin-bottom: 22px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 8px 26px #20324708;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+h1 {
+  font-size: clamp(28px, 5vw, 39px);
+  line-height: 1.2;
+  margin: 12px 0;
+}
+
+h2 {
+  color: var(--blue);
+  font-size: 27px;
+  margin: 8px 0 12px;
+  line-height: 1.3;
+}
+
+p {
+  margin: 10px 0;
+}
+
+.muted,
+.small {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 14px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.tags,
+.steps,
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.tag,
+.step {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #eff5f9;
+  color: #425e77;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.steps {
+  margin: 0 0 20px;
+}
+
+.step.active {
+  background: #ddecfa;
+  color: #174f7e;
+}
+
+.step.done {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.meta {
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.track {
+  height: 11px;
+  background: #e5ecf2;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 9px 0 24px;
+}
+
+#progressFill {
+  height: 100%;
+  width: 0;
+  background: #408d88;
+  transition: width .3s;
+}
+
+.primary,
+.secondary {
+  padding: 13px 23px;
+  border-radius: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  border: 2px solid #85afce;
+  color: #173f61;
+  background: #dcecfa;
+  min-height: 51px;
+}
+
+.primary:hover {
+  background: #cbe2f7;
+}
+
+.secondary {
+  background: #f4f7fa;
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+.full {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.question-box {
+  padding: 25px;
+  margin: 22px 0;
+  background: #f5f8fb;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+}
+
+#questionText {
+  font-size: clamp(22px, 4vw, 29px);
+  line-height: 1.55;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.blank {
+  color: var(--blue);
+  display: inline-block;
+  min-width: 76px;
+  text-align: center;
+  border-bottom: 3px solid #7eaccb;
+  padding: 0 5px;
+}
+
+.blank.completed {
+  color: var(--green);
+  border-bottom-color: #7cab8b;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.option {
+  min-height: 78px;
+  padding: 17px;
+  border: 2px solid #b8cbdc;
+  border-radius: 13px;
+  text-align: left;
+  background: #fff;
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.option:hover:not(:disabled) {
+  background: #edf6fd;
+  border-color: #4d8ab5;
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+.option.correct {
+  background: var(--green-bg);
+  border-color: #4c9965;
+  color: var(--green);
+}
+
+.option.wrong {
+  background: var(--red-bg);
+  border-color: #c36674;
+  color: var(--red);
+  animation: shake .3s;
+}
+
+.feedback {
+  margin-top: 20px;
+  padding: 17px;
+  background: #f3f6f9;
+  border-radius: 12px;
+  min-height: 85px;
+}
+
+.feedback.good {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.feedback.bad {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.feedback strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.feedback p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 23px 0;
+}
+
+.result-card {
+  background: #f0f6fa;
+  border: 1px solid var(--border);
+  padding: 17px 12px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.result-card strong {
+  display: block;
+  font-size: 27px;
+  color: var(--teal);
+}
+
+.final-score {
+  font-size: 46px;
+  color: var(--teal);
+  font-weight: 800;
+  margin: 15px 0;
+}
+
+details {
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  padding: 17px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 750;
+  color: var(--blue);
+}
+
+.review-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.review-item:last-child {
+  border: 0;
+}
+
+.review-item p {
+  margin: 5px 0;
+}
+
+#sendStatus {
+  font-weight: 750;
+  margin-top: 24px;
+}
+
+footer {
+  padding: 0 8px 20px;
+}
+
+@keyframes shake {
+  25%, 75% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@media (max-width: 580px) {
+  body {
+    padding: 12px;
+  }
+
+  header,
+  .panel {
+    padding: 22px 17px;
+  }
+
+  .options,
+  .results {
+    grid-template-columns: 1fr;
+  }
+
+  .question-box {
+    padding: 20px 15px;
+  }
+
+  .option {
+    min-height: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">Adult English · Guided practice</div>
+  <h1>Everyday English</h1>
+
+  <p class="muted">
+    Memories, relationships, digital habits and plans.
+  </p>
+
+  <div class="tags">
+    <span class="tag">Vocabulary</span>
+    <span class="tag">Present &amp; Past Simple</span>
+    <span class="tag">Going to · Challenge</span>
+    <span class="tag">24 questions</span>
+  </div>
+
+  <p class="small" lang="ru">
+    Выбери один из двух вариантов. После каждого ответа прочитай объяснение.
+    Без таймера. Тест начинается сразу.
+  </p>
+</header>
+
+<section class="panel" id="quiz" aria-labelledby="sectionTitle">
+  <div class="steps" aria-label="Practice sections">
+    <span class="step active" id="step0">1. Vocabulary</span>
+    <span class="step" id="step1">2. Present &amp; Past</span>
+    <span class="step" id="step2">3. Going to</span>
+  </div>
+
+  <div class="meta">
+    <span id="counter"></span>
+    <span>Correct: <strong id="liveScore">0</strong></span>
+  </div>
+
+  <div
+    class="track"
+    id="progressTrack"
+    role="progressbar"
+    aria-label="Completed questions"
+    aria-valuemin="0"
+    aria-valuemax="24"
+    aria-valuenow="0"
+  >
+    <div id="progressFill"></div>
+  </div>
+
+  <h2 id="sectionTitle"></h2>
+  <p class="small" id="instruction"></p>
+
+  <div class="question-box">
+    <div id="questionText"></div>
+  </div>
+
+  <div class="options" id="options"></div>
+
+  <div
+    class="feedback"
+    id="feedback"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+  <button
+    class="primary full hidden"
+    type="button"
+    id="nextButton"
+  >
+    Next question →
+  </button>
+</section>
+
+<section class="panel hidden" id="final" aria-labelledby="resultsTitle">
+  <div class="eyebrow">Practice complete</div>
+  <h2 id="resultsTitle">Your results</h2>
+
+  <div class="final-score" id="finalScore"></div>
+  <p id="finalMessage"></p>
+
+  <div class="results">
+    <div class="result-card">
+      Vocabulary
+      <strong id="result0"></strong>
+    </div>
+
+    <div class="result-card">
+      Present &amp; Past
+      <strong id="result1"></strong>
+    </div>
+
+    <div class="result-card">
+      Going to
+      <strong id="result2"></strong>
+    </div>
+  </div>
+
+  <details>
+    <summary>Review your mistakes / Разбор ошибок</summary>
+    <div id="mistakeReview"></div>
+  </details>
+
+  <details>
+    <summary>All correct answers / Все правильные ответы</summary>
+    <div id="answerReview"></div>
+  </details>
+
+  <div id="sendStatus" role="status" aria-live="polite"></div>
+  <p class="small" id="sendNote"></p>
+
+  <button class="secondary full" type="button" id="restartButton">
+    Practise again
+  </button>
+</section>
+
+<footer class="small" lang="ru">
+  После завершения автоматически отправляются название теста,
+  количество правильных ответов и ошибочно выбранные варианты.
+  Имя вводить не нужно.
+</footer>
+
+<noscript>
+  <p>Для работы теста включи JavaScript в браузере.</p>
+</noscript>
+
+</main>
+
+<script>
+"use strict";
+
+// ================================================================
+// CONFIGURATION & TRACKING
+// ================================================================
+const TEST_NAME =
+  "Adult Everyday English — Vocabulary, Present Past Simple and Going To Challenge";
+
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+let userMistakes = [];
+let responses = [];
+let score = 0;
+let currentIndex = 0;
+let answered = false;
+let finished = false;
+let resultsSubmitted = false;
+
+const sectionScores = [0, 0, 0];
+
+// ================================================================
+// QUESTIONS
+// ================================================================
+const questions = [
+  // SECTION 1: VOCABULARY — 8 QUESTIONS
+  {
+    section: 0,
+    text: "These old photographs bring back happy ___ of our first flat.",
+    correct: "memories",
+    wrong: "arguments",
+    explanation:
+      "Memories — воспоминания. Bring back memories — вызывать воспоминания."
+  },
+  {
+    section: 0,
+    text: "The new software is ___ to use. I need some training.",
+    correct: "hard",
+    wrong: "helpful",
+    explanation:
+      "Hard to use — трудный в использовании. Следующее предложение объясняет, почему нужно обучение."
+  },
+  {
+    section: 0,
+    text: "Which phrase means «поссориться или поспорить с кем-то»?",
+    correct: "have an argument",
+    wrong: "have a memory",
+    explanation:
+      "Have an argument with someone — поссориться или поспорить с кем-то."
+  },
+  {
+    section: 0,
+    text: "After hours of watching pointless videos, Max jokes, “That gave me ___.”",
+    correct: "brain rot",
+    wrong: "power",
+    explanation:
+      "Brain rot — неформальное выражение о чувстве «отупения» от чрезмерного просмотра бессодержательного контента. Это не медицинский диагноз."
+  },
+  {
+    section: 0,
+    text: "I feel ___ now than I did in my previous job.",
+    correct: "happier",
+    wrong: "happy",
+    explanation:
+      "Than указывает на сравнение. Happy → happier: y меняется на i, затем добавляется -er."
+  },
+  {
+    section: 0,
+    text: "My colleague explained everything clearly. Her advice was very ___.",
+    correct: "helpful",
+    wrong: "helpless",
+    explanation:
+      "Helpful — полезный, помогающий. Helpless — беспомощный."
+  },
+  {
+    section: 0,
+    text: "Which phrase means «победить в поединке»?",
+    correct: "win a fight",
+    wrong: "have an argument",
+    explanation:
+      "Win a fight — победить в поединке или драке. Выражение win in a fight тоже возможно."
+  },
+  {
+    section: 0,
+    text: "The building has no electricity. The ___ is off.",
+    correct: "power",
+    wrong: "memory",
+    explanation:
+      "Power здесь означает электроэнергию. The power is off — электричество отключено."
+  },
+
+  // SECTION 2: PRESENT SIMPLE & PAST SIMPLE — 10 QUESTIONS
+  {
+    section: 1,
+    text: "Nina usually ___ hard before an important presentation.",
+    correct: "works",
+    wrong: "worked",
+    explanation:
+      "Usually обозначает привычку: Present Simple. Nina = she, поэтому works."
+  },
+  {
+    section: 1,
+    text: "Yesterday, Nina ___ hard to finish the report.",
+    correct: "worked",
+    wrong: "works",
+    explanation:
+      "Yesterday — завершённое время в прошлом: Past Simple. Work → worked."
+  },
+  {
+    section: 1,
+    text: "My partner and I ___ an argument last night.",
+    correct: "had",
+    wrong: "have",
+    explanation:
+      "Last night указывает на прошлое. Have → had."
+  },
+  {
+    section: 1,
+    text: "We ___ usually have arguments about money.",
+    correct: "don't",
+    wrong: "doesn't",
+    explanation:
+      "Отрицание в Present Simple с we: don't + начальная форма глагола."
+  },
+  {
+    section: 1,
+    text: "___ your manager usually give helpful feedback?",
+    correct: "Does",
+    wrong: "Do",
+    explanation:
+      "Your manager = he или she. Вопрос в Present Simple: Does + подлежащее + give."
+  },
+  {
+    section: 1,
+    text: "___ you feel happier after your holiday last month?",
+    correct: "Did",
+    wrong: "Do",
+    explanation:
+      "Last month — прошлое. Вопрос: Did + подлежащее + начальная форма feel."
+  },
+  {
+    section: 1,
+    text: "I didn't ___ any short videos yesterday.",
+    correct: "watch",
+    wrong: "watched",
+    explanation:
+      "После didn't используется начальная форма: didn't watch."
+  },
+  {
+    section: 1,
+    text: "The power ___ off for an hour yesterday evening.",
+    correct: "was",
+    wrong: "is",
+    explanation:
+      "Yesterday evening — прошлое. Power — единственное число: was."
+  },
+  {
+    section: 1,
+    text: "My colleagues ___ very helpful during my first week last year.",
+    correct: "were",
+    wrong: "was",
+    explanation:
+      "Colleagues — множественное число. Прошедшая форма be: were."
+  },
+  {
+    section: 1,
+    text: "The boxer ___ his first professional fight last Saturday.",
+    correct: "won",
+    wrong: "wins",
+    explanation:
+      "Last Saturday указывает на Past Simple. Неправильный глагол: win → won."
+  },
+
+  // SECTION 3: BE GOING TO — HARDER PRACTICE, 6 QUESTIONS
+  {
+    section: 2,
+    text: "I've already decided: I ___ my phone outside the bedroom tonight.",
+    correct: "am going to leave",
+    wrong: "am going leave",
+    explanation:
+      "Для заранее принятого решения используем am going to + начальная форма глагола. Нельзя пропускать to."
+  },
+  {
+    section: 2,
+    text: "We agreed to discuss the problem calmly. We ___ another argument about it.",
+    correct: "aren't going to have",
+    wrong: "don't going to have",
+    explanation:
+      "Отрицательная форма: am/is/are + not + going to + глагол. С we: aren't going to have."
+  },
+  {
+    section: 2,
+    text: "What ___ with those old family photographs? Have you made a plan?",
+    correct: "are you going to do",
+    wrong: "you are going to do",
+    explanation:
+      "В специальном вопросе are ставится перед подлежащим: What are you going to do…?"
+  },
+  {
+    section: 2,
+    text: "Look! That heavy box is sliding towards the edge of the desk. It ___.",
+    correct: "is going to fall",
+    wrong: "is going to falling",
+    explanation:
+      "Going to используется для прогноза на основе видимых признаков. После to нужна начальная форма: fall."
+  },
+  {
+    section: 2,
+    text: "“Is your colleague going to help you prepare?” “Yes, ___.”",
+    correct: "she is",
+    wrong: "she is going to",
+    explanation:
+      "В этом коротком ответе повторяем только подлежащее и форму be: Yes, she is. She is going to может использоваться как отдельная сокращённая конструкция в другом контексте, но не передаёт стандартную модель короткого ответа, которую мы здесь тренируем."
+  },
+  {
+    section: 2,
+    text: "I have two plans for the weekend: I ___ my parents and organise our family memories into a photo album.",
+    correct: "am going to visit",
+    wrong: "am going to visiting",
+    explanation:
+      "После am going to используем начальную форму visit. Одна конструкция going to может относиться к двум действиям: visit and organise."
+  }
+];
+
+const totalQuestions = questions.length;
+const $ = id => document.getElementById(id);
+
+const sectionInfo = [
+  {
+    title: "1. Vocabulary in context",
+    instruction:
+      "Choose the word or phrase that fits. / Выбери подходящее слово или выражение."
+  },
+  {
+    title: "2. Present Simple or Past Simple?",
+    instruction:
+      "Notice time expressions and the subject. / Обрати внимание на время и подлежащее."
+  },
+  {
+    title: "3. Going to: challenge",
+    instruction:
+      "Check the whole phrase: plans, negatives, questions and predictions. / Проверь всю конструкцию."
+  }
+];
+
+// ================================================================
+// UTILITIES
+// ================================================================
+function shuffle(items) {
+  const copy = [...items];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+function showScreen(screen) {
+  ["quiz", "final"].forEach(id => {
+    $(id).classList.toggle("hidden", id !== screen);
+  });
+}
+
+function completeSentence(question) {
+  return question.text.includes("___")
+    ? question.text.replace("___", question.correct)
+    : question.text + " — " + question.correct;
+}
+
+function updateProgress() {
+  const completed = responses.length;
+
+  $("progressFill").style.width =
+    (completed / totalQuestions * 100) + "%";
+
+  $("progressTrack").setAttribute("aria-valuemax", totalQuestions);
+  $("progressTrack").setAttribute("aria-valuenow", completed);
+  $("liveScore").textContent = score;
+}
+
+// ================================================================
+// QUESTION DISPLAY
+// ================================================================
+function renderQuestion() {
+  answered = false;
+
+  const question = questions[currentIndex];
+  const info = sectionInfo[question.section];
+
+  $("counter").textContent =
+    "Question " + (currentIndex + 1) + " of " + totalQuestions;
+
+  $("sectionTitle").textContent = info.title;
+  $("instruction").textContent = info.instruction;
+
+  for (let i = 0; i < sectionInfo.length; i++) {
+    $("step" + i).className =
+      "step" +
+      (i < question.section
+        ? " done"
+        : i === question.section
+          ? " active"
+          : "");
+  }
+
+  const text = $("questionText");
+  text.replaceChildren();
+
+  if (question.text.includes("___")) {
+    const parts = question.text.split("___");
+
+    const blank = document.createElement("span");
+    blank.className = "blank";
+    blank.id = "currentBlank";
+    blank.textContent = "___";
+
+    // FIXED: Replaced the broken artifact with parts[1]
+    text.append(
+      document.createTextNode(parts[0]),
+      blank,
+      document.createTextNode(parts[1] || "")
+    );
+  } else {
+    text.textContent = question.text;
+  }
+
+  $("options").replaceChildren();
+
+  shuffle([question.correct, question.wrong]).forEach(option => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "option";
+    button.textContent = option;
+
+    button.addEventListener("click", () => {
+      checkAnswer(option, button);
+    });
+
+    $("options").append(button);
+  });
+
+  $("feedback").className = "feedback";
+  $("feedback").textContent =
+    "Choose one answer. / Выбери один ответ.";
+
+  $("nextButton").classList.add("hidden");
+
+  updateProgress();
+}
+
+// ================================================================
+// ANSWER CHECKING
+// ================================================================
+function checkAnswer(chosen, clickedButton) {
+  if (answered || finished) return;
+
+  answered = true;
+
+  const question = questions[currentIndex];
+  const correct = chosen === question.correct;
+
+  $("options").querySelectorAll("button").forEach(button => {
+    button.disabled = true;
+
+    if (button.textContent === question.correct) {
+      button.classList.add("correct");
+    }
+  });
+
+  if (correct) {
+    score++;
+    sectionScores[question.section]++;
+  } else {
+    userMistakes.push(chosen);
+    clickedButton.classList.add("wrong");
+  }
+
+  responses.push({
+    index: currentIndex,
+    chosen,
+    correct
+  });
+
+  const blank = $("currentBlank");
+
+  if (blank) {
+    blank.textContent = question.correct;
+    blank.classList.add("completed");
+  }
+
+  const feedback = $("feedback");
+  feedback.className = "feedback " + (correct ? "good" : "bad");
+
+  const heading = document.createElement("strong");
+  heading.textContent = correct
+    ? "Correct."
+    : "Correct answer: " + question.correct;
+
+  const explanation = document.createElement("p");
+  explanation.lang = "ru";
+  explanation.textContent = question.explanation;
+
+  feedback.replaceChildren(heading, explanation);
+
+  $("nextButton").textContent =
+    currentIndex === totalQuestions - 1
+      ? "See results / Посмотреть результат →"
+      : "Next question / Дальше →";
+
+  $("nextButton").classList.remove("hidden");
+
+  updateProgress();
+}
+
+function nextQuestion() {
+  if (!answered || finished) return;
+
+  currentIndex++;
+
+  if (currentIndex < totalQuestions) {
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+// ================================================================
+// REVIEW
+// ================================================================
+function createReviewItem(question, response) {
+  const item = document.createElement("div");
+  item.className = "review-item";
+
+  const sentence = document.createElement("strong");
+  sentence.textContent = completeSentence(question);
+  item.append(sentence);
+
+  if (response) {
+    const chosen = document.createElement("p");
+    chosen.textContent =
+      "Your answer: " + response.chosen +
+      " · Correct answer: " + question.correct;
+
+    item.append(chosen);
+  }
+
+  const explanation = document.createElement("p");
+  explanation.className = "small";
+  explanation.lang = "ru";
+  explanation.textContent = question.explanation;
+
+  item.append(explanation);
+
+  return item;
+}
+
+function buildReviews() {
+  $("answerReview").replaceChildren();
+
+  questions.forEach(question => {
+    $("answerReview").append(createReviewItem(question));
+  });
+
+  $("mistakeReview").replaceChildren();
+
+  const mistakes = responses.filter(response => !response.correct);
+
+  if (!mistakes.length) {
+    $("mistakeReview").textContent =
+      "No mistakes. Excellent work!";
+    return;
+  }
+
+  mistakes.forEach(response => {
+    $("mistakeReview").append(
+      createReviewItem(questions[response.index], response)
+    );
+  });
+}
+
+// ================================================================
+// FINAL SCREEN
+// ================================================================
+function finishQuiz() {
+  if (finished) return;
+
+  finished = true;
+
+  $("finalScore").textContent =
+    score + " / " + totalQuestions;
+
+  $("finalMessage").textContent =
+    score === totalQuestions
+      ? "Excellent work. You answered every question correctly."
+      : "Practice complete. Review the explanations before trying again.";
+
+  sectionScores.forEach((value, section) => {
+    const count = questions.filter(
+      question => question.section === section
+    ).length;
+
+    $("result" + section).textContent =
+      value + " / " + count;
+  });
+
+  buildReviews();
+  showScreen("final");
+  sendResultsToGoogle();
+}
+
+// ================================================================
+// GOOGLE SHEETS SUBMISSION
+// ================================================================
+async function sendResultsToGoogle() {
+  if (resultsSubmitted) return;
+
+  resultsSubmitted = true;
+
+  const params = new URLSearchParams();
+  params.append("name", TEST_NAME);
+  params.append("score", String(score));
+  params.append("total", String(totalQuestions));
+  params.append("mistakes", userMistakes.join(", "));
+
+  $("sendStatus").style.color = "#586b7f";
+  $("sendStatus").textContent = "Sending results...";
+  $("sendNote").textContent = "";
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: params.toString(),
+      keepalive: true
+    });
+
+    $("sendStatus").style.color = "#176438";
+    $("sendStatus").textContent =
+      "Results sent successfully! ✅";
+
+    $("sendNote").textContent =
+      "The request was sent. This browser cannot confirm that the spreadsheet saved it.";
+
+  } catch (error) {
+    console.error("Result submission failed:", error);
+
+    $("sendStatus").style.color = "#a12a39";
+    $("sendStatus").textContent =
+      "Could not send results.";
+
+    $("sendNote").textContent =
+      "Your result remains visible above. Please share it with your teacher.";
+  }
+}
+
+// ================================================================
+// EVENTS & IMMEDIATE START
+// ================================================================
+$("nextButton").addEventListener("click", nextQuestion);
+
+$("restartButton").addEventListener("click", () => {
+  location.reload();
+});
+
+// No start screen: Question 1 appears as soon as the page opens.
+showScreen("quiz");
+renderQuestion();
+</script>
+</body>
+</html>

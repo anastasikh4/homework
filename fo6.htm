@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business English: Processes & Plans</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #eef1f5;
+      color: #1e293b;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .app { width: 100%; max-width: 760px; }
+
+    .header {
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .title {
+      margin-bottom: 14px;
+      color: #172033;
+      font-size: 2em;
+    }
+
+    .progress-bar {
+      height: 10px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      background: #dbe1e8;
+      border-radius: 6px;
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: #27806f;
+      transition: width 0.35s;
+    }
+
+    .card {
+      padding: 28px;
+      background: #fff;
+      border: 1px solid #d5dce5;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .story-box {
+      margin-bottom: 22px;
+      padding: 20px;
+      color: #334155;
+      background: #f7f8fa;
+      border-left: 5px solid #27806f;
+      border-radius: 10px;
+      font-size: 17px;
+      line-height: 1.75;
+    }
+
+    .story-box p { margin-bottom: 12px; }
+    .story-box p:last-child { margin-bottom: 0; }
+
+    .story-box strong { color: #172033; }
+
+    .vocab {
+      padding: 1px 5px;
+      color: #145a4d;
+      background: #e1f2ed;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .grammar {
+      padding: 1px 5px;
+      color: #1e40af;
+      background: #e6edff;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .plan {
+      padding: 1px 5px;
+      color: #166534;
+      background: #e4f5e9;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .question-text {
+      margin-bottom: 18px;
+      color: #172033;
+      font-size: 1.35em;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 14px;
+      color: #172033;
+      background: #f8fafc;
+      border: 2px solid #d5dce5;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 1.05em;
+      font-weight: 700;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #edf5f2;
+      border-color: #27806f;
+    }
+
+    .btn:disabled { cursor: default; }
+    .btn.correct { background: #e2f3e9; border-color: #27806f; }
+    .btn.wrong { background: #fff0ef; border-color: #c2413b; }
+
+    .feedback {
+      min-height: 26px;
+      margin-top: 14px;
+      font-weight: 700;
+    }
+
+    .feedback.correct-text { color: #217354; }
+    .feedback.wrong-text { color: #b33d38; }
+
+    .win-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .emoji {
+      margin-bottom: 10px;
+      font-size: 3.5em;
+    }
+
+    .win-screen h1 {
+      color: #172033;
+      font-size: 2em;
+    }
+
+    .score {
+      margin: 14px 0;
+      font-size: 1.35em;
+      font-weight: 700;
+    }
+
+    .send-status {
+      min-height: 26px;
+      margin-top: 12px;
+      color: #217354;
+      font-weight: 700;
+    }
+
+    .restart {
+      margin-top: 18px;
+      padding: 11px 26px;
+      color: #fff;
+      background: #172033;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .restart:hover { background: #27806f; }
+
+    @media (max-width: 600px) {
+      .title { font-size: 1.55em; }
+      .card { padding: 18px; }
+      .story-box { padding: 15px; font-size: 16px; }
+      .question-text { font-size: 1.18em; }
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <div id="gameUI">
+      <header class="header">
+        <h1 class="title">Business English: Processes & Plans</h1>
+        <div class="progress-bar">
+          <div class="progress-fill" id="pFill"></div>
+        </div>
+      </header>
+
+      <section class="card">
+        <div class="story-box" id="storySection">
+          <p><strong>Business Update: A New Supplier Project</strong></p>
+
+          <p>
+            Northstar Components <span class="grammar">supplies</span> metal
+            <span class="vocab">pipes</span> to construction companies.
+            The operations team <span class="grammar">checks</span> each order
+            before it leaves the warehouse.
+          </p>
+
+          <p>
+            Every month, the sales team has a
+            <span class="vocab">conversation</span> with its suppliers about
+            costs and delivery dates. The legal department
+            <span class="grammar">reviews</span> all contracts.
+          </p>
+
+          <p>
+            <span class="vocab">Fortunately</span>, a recent contract was
+            approved ahead of schedule. The team considers this an important
+            <span class="vocab">achievement</span>.
+          </p>
+
+          <p>
+            Next week, the company
+            <span class="plan">is going to meet</span> a new distributor.
+            The marketing team
+            <span class="plan">is going to prepare</span> a presentation, and
+            the sales director
+            <span class="plan">is going to discuss</span> a new delivery plan.
+          </p>
+
+          <p>
+            <span class="vocab">Unfortunately</span>, the current shipment may
+            arrive late. The team needs to decide
+            <strong>who is</strong> responsible for informing the client and
+            <strong>whose</strong> proposal should be presented.
+          </p>
+        </div>
+
+        <div class="question-text" id="qText">Question...</div>
+        <div class="options" id="optBox"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <section id="winScreen" class="win-screen card">
+      <div class="emoji">✓</div>
+      <h1>Assessment complete</h1>
+      <p class="score" id="finalScore"></p>
+      <p id="finalMessage"></p>
+      <p class="send-status" id="sendStatus"></p>
+      <button class="restart" onclick="location.reload()">Restart</button>
+    </section>
+  </main>
+
+  <script>
+    const TEST_NAME = "Business English: Processes & Plans Quiz";
+
+    let userMistakes = [];
+    let current = 0;
+    let score = 0;
+    let resultsSent = false;
+
+    const questions = [
+      {
+        q: "1. What does Northstar Components supply?",
+        a: ["Metal pipes", "Office furniture", "Computer software", "Food products"],
+        c: "Metal pipes"
+      },
+      {
+        q: "2. Who checks each order before it leaves the warehouse?",
+        a: ["The operations team", "The legal department", "The marketing team", "The distributor"],
+        c: "The operations team"
+      },
+      {
+        q: "3. How often does the sales team speak with suppliers?",
+        a: ["Every month", "Every day", "Once a year", "Every Friday"],
+        c: "Every month"
+      },
+      {
+        q: "4. Which tense describes the team’s regular contract work?",
+        a: ["Present Simple", "Be going to", "Past Simple", "Present Continuous"],
+        c: "Present Simple"
+      },
+      {
+        q: "5. The legal department ____ all contracts.",
+        a: ["review", "reviews", "is going to reviews", "reviewing"],
+        c: "reviews"
+      },
+      {
+        q: "6. What does “achievement” mean in the update?",
+        a: ["An important success", "A delayed shipment", "A supplier meeting", "A price increase"],
+        c: "An important success"
+      },
+      {
+        q: "7. What is the team going to do next week?",
+        a: ["Meet a new distributor", "Close the warehouse", "Hire a new lawyer", "Cancel an order"],
+        c: "Meet a new distributor"
+      },
+      {
+        q: "8. The marketing team ____ a presentation.",
+        a: ["is going to prepare", "prepare", "prepares", "are going to prepares"],
+        c: "is going to prepare"
+      },
+      {
+        q: "9. Choose the correct question: ____ responsible for informing the client?",
+        a: ["Who is", "Whose", "Who are", "Which is"],
+        c: "Who is"
+      },
+      {
+        q: "10. Choose the correct question: ____ proposal should be presented?",
+        a: ["Who is", "Whose", "Who are", "Who's department"],
+        c: "Whose"
+      },
+      {
+        q: "11. What does “Fortunately” tell us?",
+        a: ["Something positive happened", "Something went wrong", "A plan changed", "A meeting was cancelled"],
+        c: "Something positive happened"
+      },
+      {
+        q: "12. The shipment may arrive late. Which word signals this negative situation?",
+        a: ["Achievement", "Fortunately", "Unfortunately", "Conversation"],
+        c: "Unfortunately"
+      },
+      {
+        q: "13. The sales director ____ a new delivery plan next week.",
+        a: ["is going to discuss", "discuss", "discusses yesterday", "are going to discuss"],
+        c: "is going to discuss"
+      },
+      {
+        q: "14. “The sales team has a conversation with suppliers every month.” This describes…",
+        a: ["A regular activity", "A future plan", "A completed past event", "A one-time prediction"],
+        c: "A regular activity"
+      }
+    ];
+
+    function load() {
+      if (current >= questions.length) {
+        finishQuiz();
+        return;
+      }
+
+      const data = questions[current];
+      document.getElementById("qText").textContent = data.q;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+
+      const box = document.getElementById("optBox");
+      box.innerHTML = "";
+
+      data.a.forEach(opt => {
+        const button = document.createElement("button");
+        button.className = "btn";
+        button.type = "button";
+        button.textContent = opt;
+        button.onclick = () => check(opt, button);
+        box.appendChild(button);
+      });
+
+      document.getElementById("pFill").style.width =
+        `${(current / questions.length) * 100}%`;
+    }
+
+    function check(choice, button) {
+      const data = questions[current];
+      const buttons = document.querySelectorAll("#optBox .btn");
+      buttons.forEach(item => item.disabled = true);
+
+      const feedback = document.getElementById("feedback");
+
+      if (choice === data.c) {
+        score++;
+        button.classList.add("correct");
+        feedback.textContent = "Correct.";
+        feedback.classList.add("correct-text");
+      } else {
+        userMistakes.push(choice);
+        button.classList.add("wrong");
+        feedback.textContent = `Not quite. Correct answer: ${data.c}`;
+        feedback.classList.add("wrong-text");
+
+        buttons.forEach(item => {
+          if (item.textContent === data.c) item.classList.add("correct");
+        });
+      }
+
+      setTimeout(() => {
+        current++;
+        load();
+      }, 900);
+    }
+
+    function finishQuiz() {
+      document.getElementById("gameUI").style.display = "none";
+      document.getElementById("winScreen").style.display = "block";
+      document.getElementById("pFill").style.width = "100%";
+
+      document.getElementById("finalScore").textContent =
+        `Your score: ${score} / ${questions.length}`;
+
+      document.getElementById("finalMessage").textContent =
+        score / questions.length >= 0.8
+          ? "You have a strong understanding of the business vocabulary and grammar."
+          : "Review the business update and grammar rules, then try again.";
+
+      sendResultsToGoogle();
+    }
+
+    function sendResultsToGoogle() {
+      if (resultsSent) return;
+      resultsSent = true;
+
+      const url =
+        "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+      const params = new URLSearchParams();
+      params.append("name", TEST_NAME);
+      params.append("score", score);
+      params.append("total", questions.length);
+      params.append("mistakes", userMistakes.join(", "));
+
+      fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        body: params
+      })
+      .then(() => {
+        document.getElementById("sendStatus").textContent =
+          "Results sent successfully! ✅";
+      })
+      .catch(() => {
+        document.getElementById("sendStatus").textContent =
+          "Could not confirm that results were sent.";
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

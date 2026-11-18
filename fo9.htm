@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Hero: Work & Routines (A2+)</title>
+    <style>
+        :root {
+            --rig-green: #2e7d32;
+            --rig-green-light: #43a047;
+            --rig-blue: #1f6391;
+            --rig-purple: #6d3b63;
+            --hero-yellow: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #27ae60;
+            --wrong: #e74c3c;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background: linear-gradient(160deg, #dcedc8 0%, #b3e5fc 100%);
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            padding: 16px;
+        }
+
+        .top-banner {
+            width: 95%;
+            max-width: 620px;
+            background: linear-gradient(90deg, var(--rig-green), var(--rig-green-light));
+            color: white;
+            text-align: center;
+            padding: 12px 10px;
+            border: 4px solid var(--comic-black);
+            border-radius: 12px;
+            box-shadow: 6px 6px 0 var(--rig-purple);
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+            font-size: 1rem;
+        }
+
+        #academy-card {
+            background-color: var(--white);
+            width: 95%;
+            max-width: 620px;
+            padding: 25px;
+            border: 6px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 12px 12px 0px var(--rig-blue);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 4px solid var(--comic-black);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .lvl-badge {
+            background: var(--rig-green);
+            color: white;
+            padding: 8px 20px;
+            display: inline-block;
+            transform: rotate(-2deg);
+            font-size: 1rem;
+            border: 3px solid var(--comic-black);
+            letter-spacing: 1px;
+            transition: background 0.3s;
+        }
+
+        #quiz-screen { text-align: center; }
+
+        #question-counter {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--rig-blue);
+        }
+
+        .prompt {
+            font-size: 1.4rem;
+            margin: 20px 0;
+            padding: 18px 10px;
+            background: #f9f9f9;
+            border: 3px dashed var(--rig-purple);
+            border-radius: 12px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: var(--hero-yellow);
+            border: 4px solid var(--comic-black);
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-family: 'Arial Black', sans-serif;
+            font-weight: bold;
+            border-radius: 12px;
+            box-shadow: 0 5px 0 #333;
+            cursor: pointer;
+            transition: all 0.08s ease;
+            min-width: 140px;
+            color: var(--comic-black);
+        }
+
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #333; }
+        .option-btn.correct { background: var(--success); color: #fff; box-shadow: 0 5px 0 #1e8449; }
+        .option-btn.wrong { background: var(--wrong); color: #fff; box-shadow: 0 5px 0 #922b21; animation: shake 0.35s ease; }
+        .option-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .feedback { font-size: 1rem; min-height: 30px; color: var(--wrong); font-weight: bold; margin-top: 10px; }
+        .hidden { display: none !important; }
+
+        #win { text-align: center; padding: 30px 0; }
+        #win h1 { font-size: 5rem; margin: 0; }
+        #win h2 { margin: 10px 0 30px; font-size: 2rem; }
+        #win .score-line { font-size: 1.4rem; margin-bottom: 20px; color: var(--rig-blue); }
+        #win .hero-btn {
+            background: var(--rig-green);
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            border: 4px solid var(--comic-black);
+            border-radius: 12px;
+            box-shadow: 0 5px 0 #1b5e20;
+            cursor: pointer;
+        }
+
+        #send-status { font-size: 1.1rem; font-weight: bold; margin-top: 18px; min-height: 24px; }
+
+        .progress-bar { height: 14px; background: #eee; border: 3px solid var(--comic-black); margin-top: 25px; border-radius: 8px; overflow: hidden; }
+        #fill { height: 100%; background: var(--success); width: 0%; transition: width 0.4s ease; }
+
+        @media (max-width: 520px) {
+            .prompt { font-size: 1.1rem; padding: 14px 8px; }
+            .option-btn { font-size: 0.95rem; padding: 14px 18px; min-width: 110px; }
+            .lvl-badge { font-size: 0.85rem; padding: 6px 14px; }
+            .top-banner { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-banner">UNIT 2: WORK &amp; ROUTINES &mdash; GRAMMAR &amp; VOCABULARY (A2+)</div>
+
+    <div id="academy-card">
+        <div class="header">
+            <div id="lvl-tag" class="lvl-badge">LEVEL 1: WORK STATUS VOCAB</div>
+        </div>
+
+        <div id="quiz-screen">
+            <h3 id="question-counter">Question 1/5</h3>
+            <div id="question-prompt" class="prompt"></div>
+            <div id="options-container" class="options-grid"></div>
+            <div id="feedback" class="feedback"></div>
+        </div>
+
+        <div id="win" class="hidden">
+            <h1>🏗️</h1>
+            <h2>SHIFT COMPLETE!</h2>
+            <div class="score-line" id="final-score"></div>
+            <button class="hero-btn" onclick="location.reload()">NEW SHIFT</button>
+            <div id="send-status"></div>
+        </div>
+
+        <div class="progress-bar"><div id="fill"></div></div>
+    </div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Work & Routines: Present Simple vs Present Continuous (A2+)";
+    let userMistakes = [];
+
+    const badgeColors = ["#2e7d32", "#1f6391", "#6d3b63"];
+
+    const levels = [
+        {
+            title: "WORK STATUS VOCAB",
+            questions: [
+                { prompt: "After a 14-day shift offshore, the workers go ___ to rest at home.", correct: "on leave", options: ["on leave", "on duty", "offshore"] },
+                { prompt: "Who is ___ the night shift at the control room tonight?", correct: "on duty", options: ["on duty", "on leave", "onshore"] },
+                { prompt: "He works on a drilling platform in the sea, so he has an ___ job.", correct: "offshore", options: ["offshore", "onshore", "off duty"] },
+                { prompt: "She prefers an ___ job at the headquarters because she wants to be near her family.", correct: "onshore", options: ["onshore", "offshore", "on leave"] },
+                { prompt: "When you finish your shift and go home, you are completely ___ .", correct: "off duty", options: ["off duty", "on duty", "on leave"] }
+            ]
+        },
+        {
+            title: "JOB ACTIONS (VERBS)",
+            questions: [
+                { prompt: "The HSE Officer ___ the new employees to ensure they follow safety rules.", correct: "supervises", options: ["supervises", "operates", "repairs"] },
+                { prompt: "Lars knows exactly how to ___ the heavy crane safely.", correct: "operate", options: ["operate", "inspect", "maintain"] },
+                { prompt: "Before starting work, the engineer always ___ the valves for any damage.", correct: "inspects", options: ["inspects", "repairs", "reports to"] },
+                { prompt: "The mechanic is busy right now because he needs to ___ the broken generator.", correct: "repair", options: ["repair", "maintain", "attend"] },
+                { prompt: "We must ___ all the critical equipment regularly to prevent accidents.", correct: "maintain", options: ["maintain", "supervise", "operate"] },
+                { prompt: "As a roustabout, I ___ the toolpusher at the end of every single shift.", correct: "report to", options: ["report to", "attend", "repair"] },
+                { prompt: "The entire crew ___ a mandatory safety meeting every Monday morning.", correct: "attends", options: ["attends", "operates", "inspects"] },
+                { prompt: "On Tuesdays, the team ___ on the main deck.", correct: "does maintenance work", options: ["does maintenance work", "attends a meeting", "reports to"] }
+            ]
+        },
+        {
+            title: "PRESENT SIMPLE (ROUTINES)",
+            questions: [
+                { prompt: "Elena usually ___ to the rig by helicopter, but sometimes she takes a boat.", correct: "flies", options: ["flies", "is flying", "fly"] },
+                { prompt: "The engineering team ___ the pipes every single week without fail.", correct: "inspects", options: ["inspects", "is inspecting", "inspect"] },
+                { prompt: "Omar normally ___ the crane, but this week he is doing something else.", correct: "operates", options: ["operates", "is operating", "operate"] },
+                { prompt: "They ___ a safety briefing on Fridays at 9 AM sharp.", correct: "attend", options: ["attend", "are attending", "attends"] },
+                { prompt: "The chief engineer ___ the backup systems once a month.", correct: "maintains", options: ["maintains", "is maintaining", "maintain"] }
+            ]
+        },
+        {
+            title: "PRESENT CONTINUOUS (NOW / TEMPORARY)",
+            questions: [
+                { prompt: "Be quiet! The welder ___ the main pipe right now.", correct: "is repairing", options: ["is repairing", "repairs", "repair"] },
+                { prompt: "This month, Nadia ___ the new crew, so she is very busy.", correct: "is supervising", options: ["is supervising", "supervises", "supervise"] },
+                { prompt: "We can't talk at the moment because we ___ a safety meeting.", correct: "are attending", options: ["are attending", "attend", "attends"] },
+                { prompt: "The team ___ the backup generator this week, not the main one.", correct: "is maintaining", options: ["is maintaining", "maintains", "maintain"] },
+                { prompt: "Look at Omar! He ___ the daily report to the boss at this very moment.", correct: "is writing", options: ["is writing", "writes", "write"] }
+            ]
+        },
+        {
+            title: "SIMPLE VS CONTINUOUS (CONTRAST)",
+            questions: [
+                { prompt: "Marco usually ___ the valves, but today he ___ a safety meeting.", correct: "inspects / is attending", options: ["inspects / is attending", "is inspecting / attends", "inspect / attend"] },
+                { prompt: "Elena ___ offshore every month, but this week she ___ at the onshore office.", correct: "works / is working", options: ["works / is working", "is working / works", "work / working"] },
+                { prompt: "The supervisor usually ___ a meeting on Mondays, but today he ___ maintenance work.", correct: "attends / is doing", options: ["attends / is doing", "is attending / does", "attend / do"] },
+                { prompt: "Nadia normally ___ to the toolpusher, but this morning she ___ the report herself.", correct: "reports / is writing", options: ["reports / is writing", "is reporting / writes", "report / write"] },
+                { prompt: "The welder ___ the valve every day, but right now he ___ the engine.", correct: "repairs / is maintaining", options: ["repairs / is maintaining", "is repairing / maintains", "repair / maintain"] }
+            ]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentQuestion = 0;
+    let completed = 0;
+    const totalQuestions = levels.reduce((sum, lvl) => sum + lvl.questions.length, 0);
+
+    const lvlTag = document.getElementById('lvl-tag');
+    const questionCounter = document.getElementById('question-counter');
+    const questionPrompt = document.getElementById('question-prompt');
+    const optionsContainer = document.getElementById('options-container');
+    const feedback = document.getElementById('feedback');
+    const progressFill = document.getElementById('fill');
+    const quizScreen = document.getElementById('quiz-screen');
+    const winScreen = document.getElementById('win');
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function renderQuestion() {
+        const level = levels[currentLevel];
+        const question = level.questions[currentQuestion];
+
+        lvlTag.textContent = `LEVEL ${currentLevel + 1}: ${level.title}`;
+        lvlTag.style.background = badgeColors[currentLevel % badgeColors.length];
+        questionCounter.textContent = `Question ${currentQuestion + 1}/${level.questions.length}`;
+        questionPrompt.textContent = question.prompt;
+        feedback.textContent = '';
+        optionsContainer.innerHTML = '';
+
+        const shuffledOptions = shuffleArray([...question.options]);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => handleAnswer(opt, question.correct, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selected, correct, btn) {
+        if (btn.disabled) return;
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            completed++;
+            updateProgress();
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < levels[currentLevel].questions.length) {
+                    renderQuestion();
+                } else {
+                    currentLevel++;
+                    currentQuestion = 0;
+                    if (currentLevel < levels.length) {
+                        renderQuestion();
+                    } else {
+                        showWin();
+                    }
+                }
+            }, 600);
+        } else {
+            // TRACK THE WRONG WORD/PHRASE
+            userMistakes.push(selected);
+            btn.classList.add('wrong');
+            feedback.textContent = 'Try again!';
+            setTimeout(() => { btn.classList.remove('wrong'); }, 500);
+        }
+    }
+
+    function updateProgress() {
+        const percent = (completed / totalQuestions) * 100;
+        progressFill.style.width = percent + '%';
+    }
+
+    function showWin() {
+        quizScreen.classList.add('hidden');
+        winScreen.classList.remove('hidden');
+        lvlTag.textContent = 'SHIFT COMPLETE';
+        progressFill.style.width = '100%';
+        document.getElementById('final-score').textContent = `Score: ${completed} / ${totalQuestions}`;
+        sendResultsToGoogle();
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", completed);
+        formData.append("total", totalQuestions);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#27ae60';
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c';
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    // start
+    renderQuestion();
+    updateProgress();
+</script>
+</body>
+</html>
