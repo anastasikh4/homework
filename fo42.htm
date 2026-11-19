@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Club · Read, Match & Write</title>
+
+<style>
+:root {
+    --ink: #203c62;
+    --muted: #526f8c;
+    --purple: #71429b;
+    --blue: #236ab0;
+    --border: #bdd7ef;
+    --yellow: #fff0b3;
+    --green: #24603b;
+    --green-bg: #e0f3e6;
+    --red: #a32d42;
+    --red-bg: #ffe5ec;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 23px 13px;
+    color: var(--ink);
+    background:
+        radial-gradient(circle, #ffffff30 2px, transparent 3px) 0 0 / 28px 28px,
+        linear-gradient(145deg, #3698e6, #226bc1);
+    font: 18px/1.65 "Trebuchet MS", Arial, sans-serif;
+}
+button { font: inherit; }
+button:focus-visible, summary:focus-visible {
+    outline: 4px solid #e9ac22;
+    outline-offset: 4px;
+}
+main { max-width: 900px; margin: auto; }
+header, .panel {
+    background: #fff;
+    border: 3px solid #c7e0f6;
+    border-radius: 23px;
+    padding: 26px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 0 #164f8a40;
+}
+header { text-align: center; }
+h1 {
+    font-size: clamp(31px, 6vw, 43px);
+    line-height: 1.2;
+    color: var(--purple);
+    margin: 8px 0;
+}
+h2 { color: var(--purple); font-size: 28px; margin: 8px 0; line-height: 1.35; }
+p { margin: 10px 0; }
+.small { color: var(--muted); font-size: 14px; }
+.hidden { display: none !important; }
+.steps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+.step {
+    padding: 6px 12px;
+    background: #edf5fc;
+    border-radius: 20px;
+    color: #4d6c89;
+    font-size: 14px;
+    font-weight: bold;
+}
+.step.active { color: #765014; background: var(--yellow); }
+.step.done { color: var(--green); background: var(--green-bg); }
+.meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 14px; }
+.track { margin-top: 9px; height: 14px; border: 2px solid #bdd6eb; background: #edf5fc; border-radius: 20px; overflow: hidden; }
+#fill { width: 0; height: 100%; background: #8bd270; transition: width .3s; }
+.intro { text-align: center; margin-bottom: 23px; }
+.match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.column-heading { font-size: 15px; color: #476d91; font-weight: bold; margin-bottom: 10px; }
+.question-card, .match-answer {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    min-height: 78px;
+    border: 2px solid #c5d9eb;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    background: #f4f8fd;
+    color: var(--ink);
+    font-size: 17px;
+    text-align: left;
+}
+.question-card.active { background: #fff4ca; border-color: #d5b456; }
+.question-card.solved, .match-answer.solved { background: var(--green-bg); border-color: #8cb99c; color: var(--green); }
+.match-answer { cursor: pointer; background: #e9f4ff; }
+.match-answer:hover:not(:disabled) { background: #d9edff; border-color: #6c9fca; }
+.match-answer:disabled { cursor: default; }
+.match-answer.wrong { background: var(--red-bg); border-color: #c47e8e; color: var(--red); }
+.primary, .secondary {
+    display: block;
+    padding: 13px 22px;
+    min-height: 53px;
+    border: 2px solid #98bddd;
+    border-radius: 12px;
+    background: #dceeff;
+    color: #1c507d;
+    font-weight: bold;
+    cursor: pointer;
+}
+.primary { margin: 23px auto 0; width: min(100%, 460px); box-shadow: 0 4px 0 #bbd5eb; }
+.secondary { background: #fff7dc; color: #765014; border-color: #d8bd70; }
+button:disabled { cursor: default; }
+.feedback {
+    margin-top: 21px;
+    padding: 15px;
+    min-height: 61px;
+    text-align: center;
+    background: #f1f6fb;
+    color: #4f6e8a;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: bold;
+}
+.feedback.good { background: var(--green-bg); color: var(--green); }
+.feedback.bad { background: var(--red-bg); color: var(--red); }
+.reading {
+    background: #eff7ff;
+    border: 2px solid #bad7ef;
+    border-radius: 15px;
+    padding: 20px;
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 23px;
+}
+.birthday-card {
+    max-width: 540px;
+    margin: auto;
+    padding: 25px;
+    background: #fff8df;
+    border: 3px dashed #d5b568;
+    border-radius: 18px;
+    font-size: 24px;
+    line-height: 2;
+}
+.card-title { font-size: 44px; text-align: center; margin-bottom: 13px; }
+.gap {
+    display: inline-block;
+    min-width: 92px;
+    padding: 0 7px;
+    border-bottom: 3px dashed #bc963b;
+    color: #79541a;
+    text-align: center;
+}
+.gap.active { background: #ffedaa; border-radius: 7px 7px 0 0; }
+.gap.solved { background: var(--green-bg); color: var(--green); border-color: #80ae8f; border-bottom-style: solid; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin: 23px auto 0; max-width: 540px; }
+.option {
+    padding: 15px;
+    min-height: 65px;
+    background: #eaf4ff;
+    color: var(--ink);
+    border: 2px solid #a9c9e5;
+    border-radius: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.option.correct { background: var(--green-bg); border-color: #7eaf8c; color: var(--green); }
+.option.wrong { background: var(--red-bg); border-color: #c78191; color: var(--red); }
+.build-emoji { text-align: center; font-size: 65px; margin: 15px; }
+.builder, .pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.builder {
+    min-height: 95px;
+    padding: 17px;
+    background: #f4f9ff;
+    border: 2px dashed #a9c7e2;
+    border-radius: 13px;
+    align-items: center;
+}
+.pool { margin: 20px 0; min-height: 56px; }
+.chunk {
+    padding: 10px 15px;
+    border: 2px solid #a7c6e2;
+    border-radius: 10px;
+    background: #deedff;
+    color: #1b4e7b;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.builder .chunk { background: #fff2bd; border-color: #ddc371; }
+.build-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.build-actions .primary { margin: 0; width: auto; }
+.final { text-align: center; }
+.trophy { font-size: 75px; }
+.final-score { color: var(--green); font-size: 43px; font-weight: bold; margin: 16px 0; }
+.results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 23px 0; }
+.result { border: 2px solid #c8deef; background: #f0f7ff; padding: 16px 8px; border-radius: 12px; font-size: 15px; }
+.result strong { display: block; font-size: 27px; }
+details { margin-top: 20px; padding: 16px; text-align: left; border: 1px solid #c6dbea; border-radius: 12px; background: #f6faff; }
+summary { cursor: pointer; font-weight: bold; color: #2d608b; }
+.review-item { padding: 12px 0; border-bottom: 1px solid #cfdfea; }
+.review-item:last-child { border: 0; }
+#send-status { margin-top: 23px; font-size: 15px; font-weight: bold; }
+footer { padding: 17px 20px; background: #e7f2ff; color: #3d6284; border-radius: 13px; font-size: 12px; }
+@media(max-width: 600px) {
+    header, .panel { padding: 22px 15px; }
+    .match-grid { gap: 10px; }
+    .question-card, .match-answer { padding: 11px; font-size: 15px; min-height: 95px; }
+    .birthday-card { padding: 20px 15px; font-size: 21px; }
+    .results { grid-template-columns: 1fr; }
+    .chunk { font-size: 18px; padding: 9px 12px; }
+}
+@media(prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+}
+</style>
+</head>
+
+<body>
+<main>
+<header>
+    <h1>Birthday Club 🎂</h1>
+    <p>Read, match and build!</p>
+
+    <div class="steps">
+        <span class="step active" id="step1">1. Match 💬</span>
+        <span class="step" id="step2">2. Birthday Card 💌</span>
+        <span class="step" id="step3">3. Build 🧩</span>
+    </div>
+
+    <div class="meta">
+        <span id="progress-label">Match the questions and answers</span>
+        <span>Score: <strong id="score">0</strong> / 12</span>
+    </div>
+    <div class="track" id="progress-track" role="progressbar"
+         aria-label="Completed tasks" aria-valuemin="0"
+         aria-valuemax="12" aria-valuenow="0">
+        <div id="fill"></div>
+    </div>
+</header>
+
+<section class="panel" id="level1">
+    <div class="intro">
+        <h2>1. Read and match</h2>
+        <p>Read the yellow question. Choose its answer.</p>
+    </div>
+
+    <div class="match-grid">
+        <div>
+            <div class="column-heading">Questions and messages</div>
+            <div id="questions-column"></div>
+        </div>
+        <div>
+            <div class="column-heading">Answers</div>
+            <div id="answers-column"></div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback1" role="status" aria-live="polite">
+        Start with the yellow question.
+    </div>
+
+    <button type="button" class="primary hidden" id="to-level2">
+        Next: Birthday Card →
+    </button>
+</section>
+
+<section class="panel hidden" id="level2">
+    <div class="intro">
+        <h2>2. Complete the birthday card</h2>
+        <p>Read the text. Choose a word for each gap.</p>
+    </div>
+
+    <div class="reading">
+        🎉 It is Lily's birthday.<br>
+        She is twelve today.<br>
+        The birthday card is from Ben.
+    </div>
+
+    <div class="birthday-card">
+        <div class="card-title" aria-hidden="true">🎂 🎁</div>
+        Dear <span class="gap" id="gap0">1</span>,<br>
+        You are <span class="gap" id="gap1">2</span> today!<br>
+        Happy Birthday!<br>
+        Love from<br>
+        <span class="gap" id="gap2">3</span>
+    </div>
+
+    <div class="options" id="card-options"></div>
+    <div class="feedback" id="feedback2" role="status" aria-live="polite"></div>
+
+    <button type="button" class="primary hidden" id="card-next">
+        Next gap →
+    </button>
+</section>
+
+<section class="panel hidden" id="level3">
+    <div class="intro">
+        <h2>3. Build the sentence</h2>
+        <p>Tap the pieces in order. Tap a piece in your answer to move it back.</p>
+        <p class="small" id="build-counter"></p>
+    </div>
+
+    <div class="build-emoji" id="build-emoji" aria-hidden="true"></div>
+    <div class="builder" id="builder" aria-label="Your sentence"></div>
+    <div class="pool" id="pool" aria-label="Sentence pieces"></div>
+
+    <div class="build-actions" id="build-actions">
+        <button type="button" class="primary" id="check-build" disabled>Check</button>
+        <button type="button" class="secondary" id="reset-build">Reset</button>
+    </div>
+
+    <div class="feedback" id="feedback3" role="status" aria-live="polite">
+        Use all the pieces.
+    </div>
+
+    <button type="button" class="primary hidden" id="build-next">Next →</button>
+</section>
+
+<section class="panel final hidden" id="final">
+    <div class="trophy" aria-hidden="true">🏆</div>
+    <h2>Well done!</h2>
+    <div class="final-score" id="final-score"></div>
+    <p id="final-message"></p>
+
+    <div class="results">
+        <div class="result">Read & Match<strong id="result1"></strong></div>
+        <div class="result">Birthday Card<strong id="result2"></strong></div>
+        <div class="result">Build a Sentence<strong id="result3"></strong></div>
+    </div>
+
+    <details>
+        <summary>Read the correct answers</summary>
+        <div id="answer-review"></div>
+    </details>
+
+    <details>
+        <summary>Review my mistakes</summary>
+        <div id="mistake-review"></div>
+    </details>
+
+    <div id="send-status" role="status" aria-live="polite"></div>
+    <p class="small" id="send-note"></p>
+
+    <button type="button" class="primary" id="restart-btn">Play again ↻</button>
+</section>
+
+<footer>
+    No name is needed. At the end, the test title, first-attempt score
+    and wrong choices are sent automatically. You can retry the matching
+    and sentence-building tasks, but each task earns a point only if
+    your first checked answer is correct.
+</footer>
+
+<noscript><p>Please enable JavaScript to play.</p></noscript>
+</main>
+
+<script>
+"use strict";
+
+const TEST_NAME = "Birthday Club — Read Match Complete and Build";
+const GOOGLE_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+let userMistakes = [];
+let totalScore = 0;
+let completedTasks = 0;
+let currentStage = 1;
+let finished = false;
+let resultsSubmitted = false;
+
+const sectionScores = { 1: 0, 2: 0, 3: 0 };
+const mistakeDetails = [];
+const $ = id => document.getElementById(id);
+
+const matchItems = [
+    {
+        prompt: "Who is the lady by the cake?",
+        answer: "She's my grandma.",
+        emoji: "👵"
+    },
+    {
+        prompt: "Thanks for the present, Oscar!",
+        answer: "You're welcome, Lucy!",
+        emoji: "🎁"
+    },
+    {
+        prompt: "How old is your cousin?",
+        answer: "She's twelve.",
+        emoji: "🎂"
+    },
+    {
+        prompt: "What's that in the little box?",
+        answer: "It's a watch.",
+        emoji: "⌚"
+    },
+    {
+        prompt: "What are these by the door?",
+        answer: "They're roller skates.",
+        emoji: "🛼"
+    }
+];
+
+const cardItems = [
+    { correct: "Lily", wrong: "Ben", label: "Who is the birthday card for?" },
+    { correct: "twelve", wrong: "ten", label: "How old is Lily?" },
+    { correct: "Ben", wrong: "Lily", label: "Who is the card from?" }
+];
+
+const buildItems = [
+    {
+        emoji: "👵",
+        chunks: ["This", "is", "my", "grandma."],
+        answer: "This is my grandma."
+    },
+    {
+        emoji: "🎂",
+        chunks: ["My cousin", "is", "twelve", "today."],
+        answer: "My cousin is twelve today."
+    },
+    {
+        emoji: "⌚",
+        chunks: ["That", "is", "a", "watch."],
+        answer: "That is a watch."
+    },
+    {
+        emoji: "🛼",
+        chunks: ["These", "are", "my", "roller skates."],
+        answer: "These are my roller skates."
+    }
+];
+
+const totalQuestions = matchItems.length + cardItems.length + buildItems.length;
+
+let matchIndex = 0;
+let matchLocked = false;
+let matchHadError = false;
+const solvedMatches = new Set();
+
+let cardIndex = 0;
+let cardLocked = false;
+
+let buildIndex = 0;
+let selectedChunks = [];
+let buildOrder = [];
+let buildHadError = false;
+let buildSolved = false;
+
+function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function updateProgress() {
+    $("score").textContent = totalScore;
+    $("fill").style.width = (completedTasks / totalQuestions * 100) + "%";
+    $("progress-track").setAttribute("aria-valuemax", totalQuestions);
+    $("progress-track").setAttribute("aria-valuenow", completedTasks);
+
+    for (let stage = 1; stage <= 3; stage++) {
+        $("step" + stage).className = "step" +
+            (finished || stage < currentStage ? " done" :
+                stage === currentStage ? " active" : "");
+    }
+
+    $("progress-label").textContent = finished
+        ? "All levels complete!"
+        : {
+            1: "Match the questions and answers",
+            2: "Complete the birthday card",
+            3: "Build the sentences"
+        }[currentStage];
+}
+
+function showStage(stage) {
+    currentStage = stage;
+    ["level1", "level2", "level3", "final"].forEach(id => {
+        $(id).classList.toggle("hidden", id !== "level" + stage);
+    });
+    updateProgress();
+}
+
+function setFeedback(id, message, type = "") {
+    $(id).className = "feedback" + (type ? " " + type : "");
+    $(id).textContent = message;
+}
+
+function addPoint(stage) {
+    totalScore++;
+    sectionScores[stage]++;
+}
+
+function trackMistake(chosen, correct, task) {
+    userMistakes.push(chosen);
+    mistakeDetails.push({ chosen, correct, task });
+}
+
+// ================================================================
+// STAGE 1 — READ AND MATCH
+// ================================================================
+function startMatching() {
+    $("questions-column").replaceChildren();
+    $("answers-column").replaceChildren();
+
+    matchItems.forEach((item, index) => {
+        const question = document.createElement("div");
+        question.className = "question-card" + (index === 0 ? " active" : "");
+        question.id = "match-question-" + index;
+        question.textContent = (index + 1) + ". " + item.prompt;
+        $("questions-column").append(question);
+    });
+
+    shuffle(matchItems.map((item, index) => ({ ...item, index })))
+        .forEach(item => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "match-answer";
+            button.textContent = item.answer;
+            button.dataset.index = String(item.index);
+            button.addEventListener("click", () => checkMatch(item.index, button));
+            $("answers-column").append(button);
+        });
+}
+
+function checkMatch(answerIndex, button) {
+    if (matchLocked || button.disabled || finished) return;
+
+    const item = matchItems[matchIndex];
+
+    if (answerIndex !== matchIndex) {
+        matchHadError = true;
+        matchLocked = true;
+        trackMistake(button.textContent, item.answer, item.prompt);
+        button.classList.add("wrong");
+        setFeedback("feedback1", "Not quite. Read the yellow question again.", "bad");
+
+        setTimeout(() => {
+            button.classList.remove("wrong");
+            matchLocked = false;
+        }, 550);
+        return;
+    }
+
+    matchLocked = true;
+    if (!matchHadError) addPoint(1);
+
+    completedTasks++;
+    solvedMatches.add(matchIndex);
+    button.disabled = true;
+    button.classList.add("solved");
+
+    const question = $("match-question-" + matchIndex);
+    question.classList.remove("active");
+    question.classList.add("solved");
+
+    setFeedback("feedback1", "Correct! " + item.emoji, "good");
+    updateProgress();
+
+    matchIndex++;
+    matchHadError = false;
+
+    if (matchIndex === matchItems.length) {
+        setFeedback("feedback1", "Great! All the answers match.", "good");
+        $("to-level2").classList.remove("hidden");
+    } else {
+        $("match-question-" + matchIndex).classList.add("active");
+        matchLocked = false;
+    }
+}
+
+// ================================================================
+// STAGE 2 — BIRTHDAY CARD
+// ================================================================
+function renderCardGap() {
+    cardLocked = false;
+    const item = cardItems[cardIndex];
+
+    for (let i = 0; i < cardItems.length; i++) {
+        $("gap" + i).classList.toggle("active", i === cardIndex);
+    }
+
+    $("card-options").replaceChildren();
+    shuffle([item.correct, item.wrong]).forEach(option => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option";
+        button.textContent = option;
+        button.addEventListener("click", () => checkCardGap(option, button));
+        $("card-options").append(button);
+    });
+
+    setFeedback("feedback2", item.label);
+    $("card-next").classList.add("hidden");
+}
+
+function checkCardGap(chosen, clickedButton) {
+    if (cardLocked || finished) return;
+    cardLocked = true;
+
+    const item = cardItems[cardIndex];
+    const correct = chosen === item.correct;
+
+    $("card-options").querySelectorAll("button").forEach(button => {
+        button.disabled = true;
+        if (button.textContent === item.correct) button.classList.add("correct");
+    });
+
+    if (correct) {
+        addPoint(2);
+        setFeedback("feedback2", "Yes! " + item.correct, "good");
+    } else {
+        clickedButton.classList.add("wrong");
+        trackMistake(chosen, item.correct, item.label);
+        setFeedback("feedback2", "The answer is " + item.correct + ".", "bad");
+    }
+
+    const gap = $("gap" + cardIndex);
+    gap.textContent = item.correct;
+    gap.className = "gap solved";
+
+    completedTasks++;
+    updateProgress();
+
+    $("card-next").textContent = cardIndex === cardItems.length - 1
+        ? "Next: Build the Sentence →" : "Next gap →";
+    $("card-next").classList.remove("hidden");
+}
+
+function nextCardGap() {
+    if (!cardLocked) return;
+    cardIndex++;
+    if (cardIndex < cardItems.length) {
+        renderCardGap();
+    } else {
+        showStage(3);
+        loadBuildQuestion();
+    }
+}
+
+// ================================================================
+// STAGE 3 — BUILD SENTENCES
+// ================================================================
+function loadBuildQuestion() {
+    buildSolved = false;
+    buildHadError = false;
+    selectedChunks = [];
+
+    const item = buildItems[buildIndex];
+    buildOrder = shuffle(item.chunks.map((_, index) => index));
+
+    if (buildOrder.every((id, index) => id === index)) {
+        buildOrder.push(buildOrder.shift());
+    }
+
+    $("build-emoji").textContent = item.emoji;
+    $("build-counter").textContent =
+        "Sentence " + (buildIndex + 1) + " / " + buildItems.length;
+
+    $("build-actions").classList.remove("hidden");
+    $("build-next").classList.add("hidden");
+    setFeedback("feedback3", "Use all the pieces.");
+    renderBuilder();
+}
+
+function renderBuilder() {
+    const item = buildItems[buildIndex];
+    $("builder").replaceChildren();
+    $("pool").replaceChildren();
+
+    if (!selectedChunks.length) {
+        const placeholder = document.createElement("span");
+        placeholder.className = "small";
+        placeholder.textContent = "Build your sentence here.";
+        $("builder").append(placeholder);
+    }
+
+    function makeChunk(id, inAnswer) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "chunk";
+        button.textContent = item.chunks[id];
+        button.disabled = buildSolved;
+        button.addEventListener("click", () => {
+            if (buildSolved) return;
+
+            if (inAnswer) {
+                selectedChunks = selectedChunks.filter(value => value !== id);
+            } else {
+                selectedChunks.push(id);
+            }
+
+            setFeedback("feedback3", "Use all the pieces.");
+            renderBuilder();
+        });
+        return button;
+    }
+
+    selectedChunks.forEach(id => $("builder").append(makeChunk(id, true)));
+
+    buildOrder.filter(id => !selectedChunks.includes(id))
+        .forEach(id => $("pool").append(makeChunk(id, false)));
+
+    $("check-build").disabled =
+        buildSolved || selectedChunks.length !== item.chunks.length;
+}
+
+function checkBuild() {
+    const item = buildItems[buildIndex];
+    if (buildSolved || selectedChunks.length !== item.chunks.length) return;
+
+    const sentence = selectedChunks.map(id => item.chunks[id]).join(" ");
+
+    if (sentence !== item.answer) {
+        buildHadError = true;
+        trackMistake(sentence, item.answer, "Build a sentence");
+        setFeedback("feedback3", "Not quite. Move the pieces and try again.", "bad");
+        return;
+    }
+
+    buildSolved = true;
+    if (!buildHadError) addPoint(3);
+    completedTasks++;
+
+    renderBuilder();
+    $("build-actions").classList.add("hidden");
+    setFeedback("feedback3", "Perfect! " + item.answer, "good");
+
+    $("build-next").textContent = buildIndex === buildItems.length - 1
+        ? "See my results 🏆" : "Next sentence →";
+    $("build-next").classList.remove("hidden");
+
+    updateProgress();
+}
+
+function nextBuild() {
+    if (!buildSolved) return;
+    buildIndex++;
+    if (buildIndex < buildItems.length) loadBuildQuestion();
+    else finishQuiz();
+}
+
+// ================================================================
+// RESULTS
+// ================================================================
+function addReview(containerId, text) {
+    const row = document.createElement("div");
+    row.className = "review-item";
+    row.textContent = text;
+    $(containerId).append(row);
+}
+
+function finishQuiz() {
+    if (finished) return;
+    finished = true;
+
+    ["level1", "level2", "level3"].forEach(id => $(id).classList.add("hidden"));
+    $("final").classList.remove("hidden");
+    $("final-score").textContent = totalScore + " / " + totalQuestions;
+    $("final-message").textContent = totalScore === totalQuestions
+        ? "Fantastic! Every first answer is correct!"
+        : "Great practice! Read the answers and play again.";
+
+    // FIXED: Replaced the corrupted artifact lines with proper object access
+    $("result1").textContent = sectionScores[1] + " / " + matchItems.length;
+    $("result2").textContent = sectionScores[2] + " / " + cardItems.length;
+    $("result3").textContent = sectionScores[3] + " / " + buildItems.length;
+
+    $("answer-review").replaceChildren();
+    matchItems.forEach(item => {
+        addReview("answer-review", item.emoji + " " + item.prompt + " — " + item.answer);
+    });
+    addReview("answer-review",
+        "Dear Lily, You are twelve today! Happy Birthday! Love from Ben.");
+    buildItems.forEach(item => {
+        addReview("answer-review", item.emoji + " " + item.answer);
+    });
+
+    $("mistake-review").replaceChildren();
+    if (!mistakeDetails.length) {
+        $("mistake-review").textContent = "No mistakes. Excellent!";
+    } else {
+        mistakeDetails.forEach(item => {
+            addReview("mistake-review",
+                item.task + " Your answer: " + item.chosen +
+                " Correct answer: " + item.correct);
+        });
+    }
+
+    updateProgress();
+    sendResultsToGoogle();
+}
+
+// ================================================================
+// GOOGLE SHEETS
+// ================================================================
+async function sendResultsToGoogle() {
+    if (resultsSubmitted) return;
+    resultsSubmitted = true;
+
+    const formData = new URLSearchParams();
+    formData.append("name", TEST_NAME);
+    formData.append("score", String(totalScore));
+    formData.append("total", String(totalQuestions));
+    formData.append("mistakes", userMistakes.join(", "));
+
+    $("send-status").style.color = "#526f8c";
+    $("send-status").textContent = "Sending results...";
+
+    try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString(),
+            keepalive: true
+        });
+
+        $("send-status").style.color = "#24603b";
+        $("send-status").textContent = "Results sent successfully! ✅";
+
+        $("send-note").textContent =
+            "The request was sent. This browser cannot confirm that the spreadsheet saved it.";
+
+    } catch (error) {
+        console.error("Submission failed:", error);
+        $("send-status").style.color = "#a32d42";
+        $("send-status").textContent = "Could not send results.";
+        $("send-note").textContent = "Your score is still shown above.";
+    }
+}
+
+// ================================================================
+// EVENTS & IMMEDIATE START
+// ================================================================
+$("to-level2").addEventListener("click", () => {
+    if (solvedMatches.size !== matchItems.length) return;
+    showStage(2);
+    renderCardGap();
+});
+
+$("card-next").addEventListener("click", nextCardGap);
+$("check-build").addEventListener("click", checkBuild);
+$("reset-build").addEventListener("click", () => {
+    if (buildSolved) return;
+    selectedChunks = [];
+    setFeedback("feedback3", "Use all the pieces.");
+    renderBuilder();
+});
+$("build-next").addEventListener("click", nextBuild);
+$("restart-btn").addEventListener("click", () => location.reload());
+
+startMatching();
+updateProgress();
+</script>
+</body>
+</html>

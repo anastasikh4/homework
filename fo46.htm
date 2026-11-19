@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Body Words · Look and Choose</title>
+
+<style>
+    :root {
+        --blue: #2980b9;
+        --green: #2ecc71;
+        --red: #e74c3c;
+        --ink: #2d3436;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #eef2f7;
+        color: var(--ink);
+        font-family: "Comic Sans MS", "Comic Neue", Arial, sans-serif;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 800px;
+        padding: 30px;
+        text-align: center;
+        background: white;
+        border: 6px solid #aed6f1;
+        border-radius: 32px;
+        box-shadow: 0 10px 30px #0000001a;
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        color: var(--blue);
+        font-size: clamp(2rem, 6vw, 3rem);
+    }
+
+    .instructions {
+        margin: 0 0 18px;
+        color: #566573;
+        font-size: 1.15rem;
+    }
+
+    .progress {
+        margin-bottom: 18px;
+        color: var(--blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .progress-track {
+        height: 16px;
+        margin: 0 0 25px;
+        overflow: hidden;
+        border: 2px solid #bdd6eb;
+        border-radius: 20px;
+        background: #edf5fc;
+    }
+
+    #progress-fill {
+        width: 0;
+        height: 100%;
+        background: var(--green);
+        transition: width 0.3s;
+    }
+
+    .picture {
+        min-height: 190px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 15px 0 22px;
+        padding: 12px;
+        border: 3px dashed #9bc5e2;
+        border-radius: 24px;
+        background: #f8fbff;
+    }
+
+    .picture img {
+        max-width: 180px;
+        max-height: 155px;
+        object-fit: contain;
+    }
+
+    .picture-emoji {
+        font-size: 7rem;
+        line-height: 1;
+    }
+
+    .question {
+        margin: 15px 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .option {
+        min-height: 65px;
+        padding: 14px;
+        border: 3px solid #bdc3c7;
+        border-radius: 16px;
+        background: #f8f9fa;
+        color: var(--ink);
+        font: inherit;
+        font-size: 1.3rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #bdc3c7;
+    }
+
+    .option:hover:not(:disabled) {
+        border-color: #85c1e9;
+        background: #e8f4f8;
+    }
+
+    .option:disabled { cursor: default; }
+
+    .option.correct {
+        border-color: #27ae60;
+        background: var(--green);
+        color: white;
+        box-shadow: 0 4px 0 #27ae60;
+    }
+
+    .option.wrong {
+        border-color: #c0392b;
+        background: var(--red);
+        color: white;
+        box-shadow: 0 4px 0 #c0392b;
+    }
+
+    .feedback {
+        min-height: 54px;
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 12px;
+        background: #f1f6fb;
+        color: #526f8c;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .feedback.good {
+        background: #e0f3e6;
+        color: #24603b;
+    }
+
+    .feedback.bad {
+        background: #ffe5ec;
+        color: #a32d42;
+    }
+
+    .next-button {
+        display: none;
+        margin: 22px auto 0;
+        padding: 14px 30px;
+        border: 0;
+        border-radius: 18px;
+        background: var(--green);
+        color: white;
+        font: inherit;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #27ae60;
+    }
+
+    .next-button:active {
+        transform: translateY(4px);
+        box-shadow: none;
+    }
+
+    #final-screen { display: none; }
+
+    #final-screen h2 {
+        margin: 10px 0;
+        color: var(--green);
+        font-size: 2.5rem;
+    }
+
+    #final-score {
+        margin: 15px 0;
+        color: var(--blue);
+        font-size: 1.6rem;
+        font-weight: bold;
+    }
+
+    #send-msg {
+        display: none;
+        margin: 18px 0;
+        padding: 12px;
+        border: 2px solid #27ae60;
+        border-radius: 12px;
+        background: #eafaf1;
+        color: #27ae60;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .restart-button {
+        margin-top: 10px;
+        padding: 14px 28px;
+        border: 0;
+        border-radius: 18px;
+        background: #2980b9;
+        color: white;
+        font: inherit;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    @media (max-width: 560px) {
+        body { padding: 12px; }
+        .card { padding: 22px 15px; border-radius: 24px; }
+        .options { grid-template-columns: 1fr; }
+        .picture { min-height: 160px; }
+        .picture img { max-height: 130px; }
+    }
+</style>
+</head>
+
+<body>
+<main class="card" id="quiz-screen">
+    <h1>Body Words 👀</h1>
+    <p class="instructions">Look at the picture. Choose the matching word.</p>
+
+    <div class="progress" id="progress-label">Question 1 of 13</div>
+    <div class="progress-track" role="progressbar"
+         aria-label="Quiz progress" aria-valuemin="0"
+         aria-valuemax="13" aria-valuenow="0">
+        <div id="progress-fill"></div>
+    </div>
+
+    <div class="picture" id="picture" aria-label="Picture clue"></div>
+    <div class="question" id="question">What is it?</div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback" role="status" aria-live="polite">
+        Choose an answer.
+    </div>
+    <button type="button" class="next-button" id="next-button">Next →</button>
+</main>
+
+<section class="card" id="final-screen">
+    <h2>🎉 Well done!</h2>
+    <p id="final-score"></p>
+    <p id="send-msg" role="status" aria-live="polite">
+        Results sent successfully! ✅
+    </p>
+    <button type="button" class="restart-button" onclick="location.reload()">
+        Play again ↻
+    </button>
+</section>
+
+<script>
+"use strict";
+
+const TEST_NAME = "Body Words — Picture Vocabulary Quiz";
+let userMistakes = [];
+
+const GOOGLE_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+// These are the same words shown in the supplied photo.
+const questions = [
+    { word: "leg", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f9b5.svg" },
+    { word: "head", image: null, emoji: "👤" },
+    { word: "long tail", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f400.svg" },
+    { word: "ear", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f442.svg" },
+    { word: "hand", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f590.svg" },
+    { word: "body", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f9cd.svg" },
+    { word: "dark hair", image: null, emoji: "👩🏽" },
+    { word: "arm", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f4aa.svg" },
+    { word: "eyes", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f440.svg" },
+    { word: "fair hair", image: null, emoji: "👱‍♀️" },
+    { word: "mouth", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f444.svg" },
+    { word: "nose", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f443.svg" },
+    { word: "feet", image: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f ფეხ.svg" }
+];
+
+// Use the exact word list from the photo as the answer choices.
+const allWords = [
+    "leg",
+    "head",
+    "long tail",
+    "ear",
+    "hand",
+    "body",
+    "dark hair",
+    "arm",
+    "eyes",
+    "fair hair",
+    "mouth",
+    "nose",
+    "feet"
+];
+
+const totalQuestions = questions.length;
+let currentIndex = 0;
+let score = 0;
+let firstAttemptMadeMistake = false;
+let answered = false;
+let resultsSent = false;
+
+const $ = id => document.getElementById(id);
+
+function shuffle(items) {
+    const copy = [...items];
+
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+
+    return copy;
+}
+
+function renderQuestion() {
+    if (currentIndex >= totalQuestions) {
+        showFinalScreen();
+        return;
+    }
+
+    answered = false;
+    firstAttemptMadeMistake = false;
+
+    const item = questions[currentIndex];
+
+    $("progress-label").textContent =
+        `Question ${currentIndex + 1} of ${totalQuestions}`;
+
+    $("progress-fill").style.width =
+        `${(currentIndex / totalQuestions) * 100}%`;
+
+    $("quiz-screen").querySelector('[role="progressbar"]')
+        .setAttribute("aria-valuenow", currentIndex);
+
+    const picture = $("picture");
+    picture.replaceChildren();
+
+    if (item.image) {
+        const image = document.createElement("img");
+        image.src = item.image;
+        image.alt = "Picture clue";
+        picture.append(image);
+    } else {
+        const emoji = document.createElement("div");
+        emoji.className = "picture-emoji";
+        emoji.textContent = item.emoji;
+        picture.append(emoji);
+    }
+
+    $("question").textContent = "What is it?";
+    $("feedback").className = "feedback";
+    $("feedback").textContent = "Choose an answer.";
+    $("next-button").style.display = "none";
+
+    const options = $("options");
+    options.replaceChildren();
+
+    const wrongWords = shuffle(allWords.filter(word => word !== item.word)).slice(0, 3);
+    const choices = shuffle([item.word, ...wrongWords]);
+
+    choices.forEach(word => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option";
+        button.textContent = word;
+        button.addEventListener("click", () => checkAnswer(button, word, item.word));
+        options.append(button);
+    });
+}
+
+function checkAnswer(button, selected, correct) {
+    if (answered) return;
+
+    const allButtons = $("options").querySelectorAll("button");
+
+    if (selected === correct) {
+        answered = true;
+        allButtons.forEach(option => option.disabled = true);
+        button.classList.add("correct");
+
+        if (!firstAttemptMadeMistake) {
+            score++;
+        }
+
+        $("feedback").className = "feedback good";
+        $("feedback").textContent = "Correct! 🌟";
+        $("next-button").style.display = "block";
+        return;
+    }
+
+    firstAttemptMadeMistake = true;
+    userMistakes.push(selected);
+    button.disabled = true;
+    button.classList.add("wrong");
+
+    $("feedback").className = "feedback bad";
+    $("feedback").textContent = "Try another word.";
+}
+
+function goToNextQuestion() {
+    currentIndex++;
+    renderQuestion();
+}
+
+function showFinalScreen() {
+    $("quiz-screen").style.display = "none";
+    $("final-screen").style.display = "block";
+    $("final-score").textContent =
+        `You scored ${score} out of ${totalQuestions}.`;
+
+    sendResultsToGoogle();
+}
+
+async function sendResultsToGoogle() {
+    if (resultsSent) return;
+    resultsSent = true;
+
+    const params = new URLSearchParams();
+    params.append("name", TEST_NAME);
+    params.append("score", String(score));
+    params.append("total", String(totalQuestions));
+    params.append("mistakes", userMistakes.join(", "));
+
+    try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: params.toString()
+        });
+
+        // With no-cors, the browser cannot confirm that the spreadsheet
+        // stored the request, but the request was sent.
+        $("send-msg").style.display = "block";
+    } catch (error) {
+        console.error("Error sending results:", error);
+        $("send-msg").style.display = "none";
+    }
+}
+
+$("next-button").addEventListener("click", goToNextQuestion);
+
+renderQuestion();
+</script>
+</body>
+</html>

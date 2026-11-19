@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothes Mission: Shorts, Shoes, T-shirt, Dress, Hat, Coat, Trousers, Socks</title>
+    <style>
+        :root { --primary: #2ecc71; --success: #2ecc71; --error: #ff4757; --bg: #f8f9fc; --blue: #3498db; }
+        * { box-sizing: border-box; font-family: 'Comic Sans MS', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .quiz-container { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border: 5px solid #fff; }
+
+        .progress { color: #aaa; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        .visual-box { font-size: 5rem; margin: 15px 0; min-height: 120px; display: flex; justify-content: center; align-items: center; background: #e0f2fe; border-radius: 20px; }
+
+        .builder { border: 4px dashed var(--blue); min-height: 85px; margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 8px; border-radius: 20px; background: #fff; padding: 10px; flex-wrap: wrap; }
+        .word-tag { background: var(--blue); color: white; padding: 10px 20px; border-radius: 12px; font-weight: bold; font-size: 1.4rem; animation: pop 0.2s; box-shadow: 0 4px 0 #2980b9; }
+
+        .pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
+        .action-btn { background: #fff; padding: 12px 18px; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+        .action-btn.disabled { opacity: 0.4; }
+
+        .feedback { margin-top: 15px; font-size: 1.8rem; font-weight: bold; min-height: 45px; }
+        .next-btn { display: none; background: var(--success); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.4rem; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #27ae60; }
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+
+        .win-status { font-size: 1.2rem; font-weight: bold; min-height: 24px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress">Mission: 1 / 15</div>
+    <div id="visual" class="visual-box"></div>
+    <h3 id="instr">Build the phrase:</h3>
+
+    <div class="builder" id="builder"></div>
+    <div class="pool" id="pool"></div>
+
+    <div class="feedback" id="feedback"></div>
+    <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT ➔</button>
+</div>
+
+<script>
+    // ============ TRACKING (REQUIRED) ============
+    const TEST_NAME = "Clothes Mission: Shorts, Shoes, T-shirt, Dress, Hat, Coat, Trousers, Socks";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    let userMistakes = [];
+    let correctCount = 0;
+
+    let currentStep = 0;
+    let userPath = [];
+    let wrongThisQuestion = false;
+
+    // EXACT words from the photo: shorts, shoes, T-shirt, dress, hat, coat, trousers, socks
+    // ROUND 1 = singular -> plural spelling (T-shirt, dress, hat, coat)
+    // ROUND 2 = ALWAYS plural (shorts, shoes, trousers, socks)
+    // ROUND 3 = counting with these words
+    const rawData = [
+        // ROUND 1
+        { visual: "👕", instr: "Make 'T-shirt' plural:", correct: ["T-shirts"], extras: ["T-shorts", "T-shirt"], ans: "T-shirts" },
+        { visual: "👗", instr: "Make 'dress' plural:", correct: ["dresses"], extras: ["dresss", "dress"], ans: "dresses" },
+        { visual: "👒", instr: "Make 'hat' plural:", correct: ["hats"], extras: ["hates", "hat"], ans: "hats" },
+        { visual: "🧥", instr: "Make 'coat' plural:", correct: ["coats"], extras: ["coatess", "coat"], ans: "coats" },
+
+        // ROUND 2 (always plural)
+        { visual: "🩳", instr: "This is ALWAYS plural:", correct: ["shorts"], extras: ["short", "shortes"], ans: "shorts" },
+        { visual: "👟👟", instr: "This is ALWAYS plural:", correct: ["shoes"], extras: ["shoe", "shoeses"], ans: "shoes" },
+        { visual: "👖", instr: "This is ALWAYS plural:", correct: ["trousers"], extras: ["trouser", "trouserses"], ans: "trousers" },
+        { visual: "🧦🧦", instr: "This is ALWAYS plural:", correct: ["socks"], extras: ["sock", "sockes"], ans: "socks" },
+
+        // ROUND 3 (counting)
+        { visual: "👕👕", instr: "Count the objects:", correct: ["two", "T-shirts"], extras: ["three", "T-shirt"], ans: "two T-shirts" },
+        { visual: "👗👗👗👗", instr: "Count the objects:", correct: ["four", "dresses"], extras: ["five", "dress"], ans: "four dresses" },
+        { visual: "🧥🧥🧥", instr: "Count the objects:", correct: ["three", "coats"], extras: ["two", "coat"], ans: "three coats" },
+        { visual: "👒👒👒👒👒", instr: "Count the objects:", correct: ["five", "hats"], extras: ["six", "hat"], ans: "five hats" },
+        { visual: "👟👟👟👟👟👟", instr: "Count the objects:", correct: ["six", "shoes"], extras: ["seven", "shoe"], ans: "six shoes" },
+        { visual: "👖👖", instr: "Count the objects:", correct: ["two", "trousers"], extras: ["three", "trouser"], ans: "two trousers" },
+        { visual: "🧦🧦🧦🧦", instr: "Count the objects:", correct: ["four", "socks"], extras: ["five", "sock"], ans: "four socks" }
+    ];
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if (!q) { showWin(); return; }
+
+        wrongThisQuestion = false;
+        document.getElementById('progress').innerText = `Mission: ${currentStep + 1} / ${rawData.length}`;
+        document.getElementById('visual').innerHTML = q.visual;
+        document.getElementById('instr').innerText = q.instr;
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('builder').innerHTML = "";
+
+        const pool = document.getElementById('pool');
+        pool.innerHTML = "";
+        userPath = [];
+
+        let allOptions = [...q.correct, ...q.extras];
+        allOptions.sort(() => Math.random() - 0.5).forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = item;
+            btn.onclick = () => {
+                if (btn.classList.contains('disabled')) return;
+
+                // Record a mistake if the tapped word is NOT part of the correct answer
+                if (!q.correct.includes(item)) {
+                    userMistakes.push(item);
+                    wrongThisQuestion = true;
+                }
+
+                userPath.push(item);
+                btn.classList.add('disabled');
+
+                const tag = document.createElement('span');
+                tag.className = "word-tag";
+                tag.innerText = item;
+                document.getElementById('builder').appendChild(tag);
+
+                if (userPath.length === q.correct.length) {
+                    if (userPath.join(" ") === q.ans) {
+                        document.getElementById('feedback').innerText = "EXCELLENT! 🌟";
+                        document.getElementById('feedback').style.color = "var(--success)";
+                        if (!wrongThisQuestion) correctCount++;
+                        document.getElementById('next-btn').style.display = "inline-block";
+                        pool.querySelectorAll('.action-btn').forEach(b => b.classList.add('disabled'));
+                    } else {
+                        document.getElementById('feedback').innerText = "TRY AGAIN! ❌";
+                        document.getElementById('feedback').style.color = "var(--error)";
+                        setTimeout(loadGame, 1000);
+                    }
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() { currentStep++; loadGame(); }
+
+    function showWin() {
+        document.querySelector('.quiz-container').innerHTML = `
+            <h1 style="font-size:4rem;">🏆</h1>
+            <h2>CLOTHES MASTER!</h2>
+            <p>You completed all ${rawData.length} clothing missions.</p>
+            <p style="font-size:1.6rem;font-weight:bold;color:var(--blue);">Score: ${correctCount} / ${rawData.length}</p>
+            <div id="send-status" class="win-status"></div>
+            <button class="action-btn" onclick="location.reload()" style="background:var(--blue); color:white; border:none; padding:15px 30px; box-shadow: 0 4px 0 #2980b9; margin-top:15px;">PLAY AGAIN</button>
+        `;
+        sendResultsToGoogle();
+    }
+
+    // ============ GOOGLE SHEETS (REQUIRED) ============
+    function sendResultsToGoogle() {
+        const url = GOOGLE_SCRIPT_URL;
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", correctCount);
+        formData.append("total", rawData.length);
+        formData.append("mistakes", userMistakes.join(", "));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#888";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2ecc71'; // green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch(() => {
+            statusEl.style.color = '#ff4757';
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    loadGame();
+</script>
+</body>
+</html>
