@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Driver Routine — Unscramble Chunks</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    /* BRIGHT F1 THEME */
+    * { box-sizing: border-box; }
+
+    body {
+        background: linear-gradient(135deg, #FFE9B0 0%, #FFB5B5 45%, #B5E8FF 100%);
+        background-attachment: fixed;
+        color: #1A1A2E;
+        font-family: 'Space Mono', 'Courier New', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%),
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    #game-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 780px;
+        background: #FFFFFF;
+        border: 8px solid #E10600;
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 20px 45px -12px rgba(225, 6, 0, 0.35), 0 0 0 8px #FFFFFF;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px dashed #FFD166;
+        color: #E10600;
+    }
+
+    .header span span { color: #1A1A2E; }
+
+    .question-area { min-height: 260px; }
+
+    .emoji-display {
+        font-size: 60px;
+        text-align: center;
+        margin-bottom: 12px;
+        line-height: 1.2;
+    }
+
+    .prompt-text {
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        color: #4B5675;
+        margin-bottom: 15px;
+    }
+
+    .sentence-drop-area {
+        background: #F5F8FF;
+        border: 3px dashed #DCE7FF;
+        border-radius: 14px;
+        min-height: 100px;
+        padding: 12px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-content: flex-start;
+        transition: border-color 0.2s;
+    }
+
+    .sentence-drop-area:empty::before {
+        content: "Tap the chunks below in the correct order...";
+        color: #B5B5C7;
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-style: italic;
+        padding: 14px;
+        display: block;
+    }
+
+    .word-bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        min-height: 50px;
+        padding: 14px;
+        background: #FFF8E0;
+        border: 2px dashed #FFD166;
+        border-radius: 14px;
+        justify-content: center;
+    }
+
+    .word-token {
+        background: #FFD166;
+        color: #6A4B00;
+        padding: 12px 20px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 14px;
+        border: 2px solid #E8B84A;
+        box-shadow: 0 3px 0 #E8B84A;
+        user-select: none;
+        transition: all 0.15s ease;
+        line-height: 1.3;
+        max-width: 100%;
+    }
+
+    .word-token:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 #E8B84A;
+    }
+
+    .word-token.placed {
+        background: #E2F8E5;
+        color: #1B7A47;
+        border-color: #00D26A;
+        box-shadow: 0 3px 0 #A7E5BE;
+    }
+
+    .word-token.placed:hover { background: #C7F0D0; }
+
+    .check-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 14px;
+        background: #E10600;
+        color: #FFF;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1.5px;
+        box-shadow: 0 5px 0 #B00500;
+        transition: all 0.15s ease;
+    }
+
+    .check-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #B00500; }
+    .check-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #B00500; }
+
+    #feedback {
+        min-height: 40px;
+        margin-top: 15px;
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        padding: 10px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    #feedback.success {
+        background: #E2F8E5;
+        color: #1B7A47;
+        border: 2px solid #00D26A;
+    }
+
+    #feedback.error {
+        background: #FFE5E5;
+        color: #D6336C;
+        border: 2px solid #FF7AA2;
+    }
+
+    #result-screen { text-align: center; padding: 20px; }
+
+    #result-screen h1 {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 32px;
+        color: #E10600;
+        text-shadow: 3px 3px 0 #FFD166;
+        margin-bottom: 15px;
+    }
+
+    #final-stats {
+        font-family: 'Space Mono', monospace;
+        font-size: 18px;
+        color: #1A1A2E;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 560px) {
+        #game-container { padding: 18px; border-width: 6px; }
+        .header { font-size: 12px; }
+        .emoji-display { font-size: 45px; }
+        .word-token { padding: 10px 16px; font-size: 13px; }
+        .check-btn { font-size: 14px; padding: 12px; }
+    }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="header">
+        <span>MISSION: <span id="progress">1/7</span></span>
+        <span>STATUS: <span id="time">RACE DAY</span></span>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-area">
+            <div class="emoji-display" id="emoji"></div>
+            <div class="prompt-text">Tap the chunks in the correct order to build the sentence!</div>
+            <div class="sentence-drop-area" id="drop-area"></div>
+            <div class="word-bank" id="word-bank"></div>
+        </div>
+
+        <button class="check-btn" onclick="checkSentence()">CHECK SEQUENCE</button>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>🏁 MISSION COMPLETE 🏁</h1>
+        <p id="final-stats"></p>
+        <div id="send-status" style="margin-top:15px; font-weight:bold; min-height:20px;"></div>
+        <button onclick="location.reload()" class="check-btn" style="background: #00D26A; box-shadow: 0 5px 0 #00A854;">REBOOT RACE</button>
+    </div>
+</div>
+
+<script>
+    /* ================================================================
+       TRACKING CONFIGURATION
+       ================================================================ */
+    const TEST_NAME = "F1 Driver Routine: Present Simple & Adverbs";
+    let userMistakes = []; 
+    let score = 0;
+    let currentQ = 0;
+
+    /* ================================================================
+       F1 THEMED QUESTIONS (Present Simple / Adverbs / Vocab)
+       ================================================================ */
+    const questions = [
+        {
+            emoji: "🏎️👨‍🔧",
+            chunks: ["Charles Leclerc", "drives for", "Ferrari"],
+            correct: "Charles Leclerc drives for Ferrari"
+        },
+        {
+            emoji: "⛑️✅",
+            chunks: ["He", "always checks", "his helmet"],
+            correct: "He always checks his helmet"
+        },
+        {
+            emoji: "🏁🏆",
+            chunks: ["The winner", "stands on", "the podium"],
+            correct: "The winner stands on the podium"
+        },
+        {
+            emoji: "🔧🚫",
+            chunks: ["Mechanics", "never sleep", "in the garage"],
+            correct: "Mechanics never sleep in the garage"
+        },
+        {
+            emoji: "📻🗣️",
+            chunks: ["Does the driver", "talk to", "the team?"],
+            correct: "Does the driver talk to the team?"
+        },
+        {
+            emoji: "🏎️💨",
+            chunks: ["The car", "goes very fast", "on the track"],
+            correct: "The car goes very fast on the track"
+        },
+        {
+            emoji: "🍾🥂",
+            chunks: ["They", "usually spray", "champagne"],
+            correct: "They usually spray champagne"
+        }
+    ];
+
+    function loadQuestion() {
+        if (currentQ >= questions.length) {
+            showResults();
+            return;
+        }
+
+        const data = questions[currentQ];
+        document.getElementById("progress").innerText = (currentQ + 1) + "/" + questions.length;
+        document.getElementById("emoji").innerText = data.emoji;
+
+        const feedbackEl = document.getElementById("feedback");
+        feedbackEl.className = "";
+        feedbackEl.innerText = "";
+
+        const dropArea = document.getElementById("drop-area");
+        const wordBank = document.getElementById("word-bank");
+        dropArea.innerHTML = "";
+        wordBank.innerHTML = "";
+
+        // Shuffle chunks for the puzzle
+        const shuffledChunks = [...data.chunks].sort(() => Math.random() - 0.5);
+
+        shuffledChunks.forEach((chunk) => {
+            const token = document.createElement("div");
+            token.classList.add("word-token");
+            token.innerText = chunk;
+            token.onclick = () => moveToken(token, dropArea, wordBank);
+            wordBank.appendChild(token);
+        });
+    }
+
+    function moveToken(token, dropArea, wordBank) {
+        if (token.parentElement.id === "word-bank") {
+            token.classList.add("placed");
+            dropArea.appendChild(token);
+        } else {
+            token.classList.remove("placed");
+            wordBank.appendChild(token);
+        }
+    }
+
+    function checkSentence() {
+        const dropArea = document.getElementById("drop-area");
+        const userSentence = Array.from(dropArea.children)
+            .map(token => token.innerText)
+            .join(" ");
+        const feedbackEl = document.getElementById("feedback");
+        const currentCorrect = questions[currentQ].correct;
+
+        if (userSentence === currentCorrect) {
+            feedbackEl.className = "success";
+            feedbackEl.innerText = "SUCCESS: Sequence Correct! +1 Point";
+            score++;
+            setTimeout(() => {
+                currentQ++;
+                loadQuestion();
+            }, 1500);
+        } else {
+            feedbackEl.className = "error";
+            feedbackEl.innerText = "ERROR: Sequence Incorrect. Try again!";
+            
+            // TRACK MISTAKE: Push the incorrect sequence to the array
+            userMistakes.push(userSentence);
+        }
+    }
+
+    function showResults() {
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        document.getElementById("final-stats").innerText = `Final Score: ${score}/${questions.length}. Perfect racing! 🏆`;
+        
+        // Trigger Google Sheets submission
+        sendResultsToGoogle();
+    }
+
+    /* ================================================================
+       GOOGLE SHEETS SUBMISSION LOGIC
+       ================================================================ */
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", questions.length);
+        // Join mistakes with commas as requested
+        formData.append("mistakes", userMistakes.join(", "));
+
+        const statusEl = document.getElementById("send-status");
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending telemetry data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2ecc71'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    // Initialize game
+    loadQuestion();
+</script>
+</body>
+</html>

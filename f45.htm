@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Racing Mission — English Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Space+Mono:wght@400;700&family=Black+Ops+One&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --racing-red: #E10600;
+        --racing-yellow: #FFD166;
+        --racing-green: #00D26A;
+        --racing-blue: #1A1A2E;
+        --racing-cream: #FFFDF5;
+        --racing-pink: #FF7AA2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        background: linear-gradient(135deg, #FFE9B0 0%, #FFB5B5 45%, #B5E8FF 100%);
+        background-attachment: fixed;
+        color: var(--racing-blue);
+        font-family: 'Space Mono', monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        margin: 0;
+        min-height: 100vh;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%),
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .tablet {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 720px;
+        border: 8px solid var(--racing-red);
+        background: var(--racing-cream);
+        padding: 28px;
+        border-radius: 24px;
+        box-shadow: 0 20px 45px -12px rgba(225, 6, 0, 0.35), 0 0 0 8px #FFFFFF;
+    }
+
+    h1 {
+        font-family: 'Black Ops One', cursive;
+        color: var(--racing-red);
+        text-align: center;
+        margin: 0 0 22px;
+        font-size: 26px;
+        letter-spacing: 1.5px;
+        text-shadow: 2px 2px 0 var(--racing-yellow);
+    }
+
+    h1::before { content: "🏎️ "; }
+    h1::after { content: " 🏁"; }
+
+    /* ================================================================
+       MISSION CARD
+       ================================================================ */
+    .mission {
+        display: none;
+        border: 3px dashed var(--racing-yellow);
+        border-radius: 18px;
+        padding: 20px 22px;
+        background: #FFFFFF;
+        box-shadow: 0 6px 0 #E2E8F0, 0 10px 24px -10px rgba(225, 6, 0, 0.15);
+        animation: cardIn 0.4s ease;
+    }
+
+    .mission.active { display: block; }
+
+    @keyframes cardIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================================================================
+       OPTIONS
+       ================================================================ */
+    .option {
+        display: block;
+        width: 100%;
+        text-align: left;
+        margin: 10px 0;
+        padding: 15px 18px;
+        border: 2.5px solid #DCE7FF;
+        border-radius: 14px;
+        background: #F5F8FF;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--racing-blue);
+        position: relative;
+    }
+
+    .option:hover {
+        background: #EAF2FF;
+        border-color: #A9C7FF;
+        transform: translateX(4px);
+    }
+
+    /* Correct — green */
+    .option.is-correct {
+        background: #E2F8E5 !important;
+        border-color: var(--racing-green);
+        color: #1B7A47;
+        box-shadow: 0 4px 0 #A7E5BE;
+        transform: translateX(4px);
+    }
+    .option.is-correct::after {
+        content: " ★ CORRECT! ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--racing-green);
+        color: #FFF;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* Wrong — pink */
+    .option.is-wrong {
+        background: #FFE5E5 !important;
+        border-color: var(--racing-pink);
+        color: #D6336C;
+        box-shadow: 0 4px 0 #FFB8CC;
+        transform: translateX(4px);
+        animation: shake 0.5s ease;
+    }
+    .option.is-wrong::after {
+        content: " ✗ WRONG! ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--racing-pink);
+        color: #FFF;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* Reveal the right answer when user picked wrong */
+    .option.reveal-correct {
+        background: #FFF8E0 !important;
+        border-color: var(--racing-yellow);
+        box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.5);
+    }
+    .option.reveal-correct::after {
+        content: " ← The right one ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--racing-yellow);
+        color: #6A4B00;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 11px;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(4px); }
+        20%      { transform: translateX(-4px); }
+        40%      { transform: translateX(6px); }
+        60%      { transform: translateX(-4px); }
+        80%      { transform: translateX(4px); }
+    }
+
+    /* ================================================================
+       NEXT BUTTON
+       ================================================================ */
+    .next-btn {
+        display: none;
+        margin-top: 16px;
+        width: 100%;
+        padding: 14px;
+        background: var(--racing-blue);
+        color: #FFF;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 1.5px;
+        box-shadow: 0 5px 0 #0a0a15;
+        transition: all 0.15s ease;
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #0a0a15; }
+    .next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0a0a15; }
+
+    /* ================================================================
+       IMAGES + STATUS
+       ================================================================ */
+    .cam-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border: 4px solid var(--racing-red);
+        border-radius: 14px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px -8px rgba(225, 6, 0, 0.35);
+        background: linear-gradient(135deg, #FFE9B0, #B5E8FF);
+    }
+
+    .status {
+        display: inline-block;
+        background: var(--racing-red);
+        color: #FFF;
+        text-transform: uppercase;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 5px 14px;
+        border-radius: 999px;
+        letter-spacing: 1.5px;
+        margin-bottom: 14px;
+    }
+
+    .mission p {
+        font-family: 'Space Mono', monospace;
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--racing-blue);
+        margin: 8px 0 14px;
+    }
+
+    /* ================================================================
+       FINAL SCREEN
+       ================================================================ */
+    #m_final {
+        text-align: center;
+        border-color: var(--racing-green);
+        background: linear-gradient(135deg, #E2F8E5, #FFFFFF);
+    }
+
+    #m_final h2 {
+        font-family: 'Black Ops One', cursive;
+        color: var(--racing-green);
+        font-size: 42px;
+        margin: 10px 0;
+        text-shadow: 3px 3px 0 var(--racing-yellow);
+    }
+
+    #m_final p {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    #m_final p:last-of-type {
+        color: var(--racing-red);
+        font-size: 18px;
+        margin-top: 16px;
+    }
+
+    @media (max-width: 560px) {
+        .tablet { padding: 20px; border-width: 6px; }
+        h1 { font-size: 18px; }
+        .cam-img { height: 150px; }
+        .option { font-size: 13px; padding: 12px 14px; }
+        .option.is-correct::after,
+        .option.is-wrong::after,
+        .option.reveal-correct::after {
+            position: static;
+            display: block;
+            transform: none;
+            margin-top: 8px;
+            text-align: center;
+        }
+        #m_final h2 { font-size: 30px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="tablet">
+    <h1>F1 Master Protocol</h1>
+    <div id="missions-container">
+        <!-- Missions will be generated by JavaScript -->
+    </div>
+</div>
+
+<script>
+    // --- MANDATORY CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "F1 Present Simple and Phrasal Verbs";
+    let userMistakes = [];
+    let score = 0;
+
+    // Quiz Data - Easily expandable and randomized
+    const quizData = [
+        {
+            id: 'm1',
+            status: '🕒 Team Routine',
+            img: 'https://www.zrkuban.ru/media/GT9XFzhD.jpeg',
+            alt: 'F1 Team',
+            sentence: '"He always ________ up with his team drivers."',
+            options: ['meets', 'meet'],
+            correct: 'meets'
+        },
+        {
+            id: 'm2',
+            status: '🚦 Race Prep',
+            img: 'https://i.pinimg.com/736x/57/45/f5/5745f505abe0d39759e23e8c09c107f9.jpg',
+            alt: 'Racing driver',
+            sentence: '"He never ________ about the race."',
+            options: ['worries', 'worry'],
+            correct: 'worries'
+        },
+        {
+            id: 'm3',
+            status: '🛣️ Track Conditions',
+            img: 'https://avatars.mds.yandex.net/i?id=47ea0763bc3dec50b14432d9e70eff8e_l-9844228-images-thumbs&n=13',
+            alt: 'Bad road',
+            sentence: '"He ________ bad roads."',
+            options: ['hates', 'hate'],
+            correct: 'hates'
+        },
+        {
+            id: 'm4',
+            status: '🛌 Rest Day',
+            img: 'https://www.shutterstock.com/image-photo/real-white-led-digital-clock-260nw-1756633685.jpg',
+            alt: 'Night sky',
+            sentence: '"He never ________ to bed late before a race day."',
+            options: ['goes', 'go'],
+            correct: 'goes'
+        },
+        {
+            id: 'm5',
+            status: '🥤 Diet',
+            img: 'https://i.pinimg.com/originals/20/bb/11/20bb11fa630e334fb4b1d934dfcf1793.jpg',
+            alt: 'Drink',
+            sentence: '"He doesn\'t usually ________ bad cola."',
+            options: ['drink', 'drinks'],
+            correct: 'drink'
+        },
+        {
+            id: 'm6',
+            status: '🥗 Pre-Race Meal',
+            img: 'https://i.pinimg.com/736x/cd/c2/59/cdc25986e8ef91f0625ce993052ebefe.jpg',
+            alt: 'Salad',
+            sentence: '"This driver always ________ a salad before the race starts."',
+            options: ['eats', 'eat'],
+            correct: 'eats'
+        },
+        {
+            id: 'm7',
+            status: '🚦 Safety Rules',
+            img: 'https://черкесск09.рф/uploads/posts/2017-04/1492541494_sv.jpg',
+            alt: 'Red light',
+            sentence: '"Drivers should always worry ________ red traffic lights."',
+            options: ['about', 'on'],
+            correct: 'about'
+        },
+        {
+            id: 'm8',
+            status: '👕 Uniform',
+            img: 'https://i.pinimg.com/736x/fb/3f/8e/fb3f8e02dbb390912b57bfa0e763fd41.jpg',
+            alt: 'Racing suit',
+            sentence: '"Lewis Hamilton always puts ________ his uniform before driving."',
+            options: ['on', 'in'],
+            correct: 'on'
+        },
+        {
+            id: 'm9',
+            status: '🤝 Paddock',
+            img: 'https://i.pinimg.com/originals/d5/66/03/d56603cf764a3a9288a628e9273a3a92.jpg',
+            alt: 'Handshake',
+            sentence: '"All drivers are always friendly, they ________ up and then the race starts."',
+            options: ['meet', 'meets'],
+            correct: 'meet'
+        }
+    ];
+
+    const totalQuestions = quizData.length;
+    let currentIndex = 0;
+    let answered = false;
+
+    // Utility to shuffle arrays (Fisher-Yates)
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // Build the DOM dynamically with mixed-up options
+    function renderMissions() {
+        const container = document.getElementById('missions-container');
+        
+        // Shuffle the options for EVERY question before rendering
+        quizData.forEach((data, index) => {
+            const shuffledOptions = shuffleArray(data.options);
+
+            const missionDiv = document.createElement('div');
+            missionDiv.className = `mission ${index === 0 ? 'active' : ''}`;
+            missionDiv.id = data.id;
+            missionDiv.dataset.correct = data.correct;
+
+            let optionsHTML = '';
+            shuffledOptions.forEach(opt => {
+                // Note: data-answer now holds the actual text of the option, not "a" or "b"
+                optionsHTML += `<button class="option" data-answer="${opt}">${opt}</button>\n`;
+            });
+
+            missionDiv.innerHTML = `
+                <span class="status">${data.status}</span>
+                ${data.img ? `<img class="cam-img" src="${data.img}" alt="${data.alt || 'F1'}">` : ''}
+                <p>Complete the rule:</p>
+                <p style="color:var(--racing-red); font-weight:bold;">${data.sentence}</p>
+                ${optionsHTML}
+                <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+            `;
+
+            container.appendChild(missionDiv);
+        });
+
+        // Add final screen
+        const finalDiv = document.createElement('div');
+        finalDiv.className = 'mission';
+        finalDiv.id = 'm_final';
+        finalDiv.innerHTML = `
+            <h2>🏁 FINISH LINE 🏁</h2>
+            <p>ALL MISSIONS COMPLETE</p>
+            <p id="score-display" style="font-size: 24px; color: var(--racing-red); font-weight: bold; margin: 10px 0;">Score: 0 / ${totalQuestions}</p>
+            <p id="result-msg" style="display: none; color: var(--racing-green); font-weight: bold; margin-top: 15px;">Results sent successfully! ✅</p>
+            <button class="next-btn show" onclick="location.reload()" style="background:var(--racing-green); box-shadow:0 5px 0 #00A854; margin-top: 20px;">REBOOT RACE 🔁</button>
+        `;
+        container.appendChild(finalDiv);
+
+        attachEventListeners();
+    }
+
+    function attachEventListeners() {
+        const missions = document.querySelectorAll('.mission');
+        
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const mission = e.target.closest('.mission');
+                if (!mission || answered) return;
+                answered = true;
+
+                const chosenAnswer = option.dataset.answer;
+                const correctAnswer = mission.dataset.correct;
+                const isCorrect = chosenAnswer === correctAnswer;
+
+                // Disable further clicks on this mission
+                mission.querySelectorAll('.option').forEach(btn => {
+                    btn.style.cursor = 'default';
+                    btn.style.pointerEvents = 'none';
+                });
+
+                // Mark the chosen option
+                if (isCorrect) {
+                    score++;
+                    option.classList.add('is-correct');
+                } else {
+                    // MANDATORY: Track wrong choice
+                    userMistakes.push(chosenAnswer); 
+                    
+                    option.classList.add('is-wrong');
+
+                    // Also reveal the correct option
+                    const correctBtn = mission.querySelector(`.option[data-answer="${correctAnswer}"]`);
+                    if (correctBtn) correctBtn.classList.add('reveal-correct');
+                }
+
+                // Show the Next button
+                const nextBtn = mission.querySelector('.next-btn');
+                if (nextBtn) nextBtn.classList.add('show');
+            });
+        });
+    }
+
+    function nextMission() {
+        const missions = document.querySelectorAll('.mission');
+        missions[currentIndex].classList.remove('active');
+        currentIndex++;
+
+        if (currentIndex < missions.length) {
+            missions[currentIndex].classList.add('active');
+            answered = false;
+
+            // If we just arrived at the final screen
+            if (missions[currentIndex].id === 'm_final') {
+                document.getElementById('score-display').textContent = `Score: ${score} / ${totalQuestions}`;
+                sendResultsToGoogle();
+            }
+        }
+    }
+
+    // --- MANDATORY GOOGLE SHEETS INTEGRATION ---
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message on final screen
+            const msgEl = document.getElementById('result-msg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Initialize the quiz on page load
+    window.onload = renderMissions;
+
+</script>
+
+</body>
+</html>

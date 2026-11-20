@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Formula 1 · Paddock Conversation Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+        #quiz-container {
+            background: #222;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(225, 6, 0, 0.3);
+            width: 95%;
+            max-width: 600px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid #e10600;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #444;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%;
+            background: #e10600;
+            width: 0%;
+            transition: 0.3s;
+        }
+        .f1-mascot { font-size: 50px; margin-bottom: 10px; }
+        h2 {
+            font-style: italic;
+            color: #e10600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+        .passage {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid #ffb703;
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        .passage strong { color: #fff; }
+        .question {
+            font-size: 18px;
+            margin: 20px 0;
+            min-height: 50px;
+            font-weight: bold;
+            color: #f0f0f0;
+            line-height: 1.4;
+        }
+        .options { display: grid; gap: 10px; }
+        button {
+            background: #333;
+            color: white;
+            border: 2px solid #444;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        button:hover { background: #444; border-color: #ffb703; }
+        #feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 16px;
+        }
+        .hidden { display: none; }
+        #rank {
+            color: #ffb703;
+            font-size: 36px;
+            margin: 20px 0;
+            text-shadow: 0 0 10px rgba(255,183,3,0.5);
+            font-weight: 900;
+        }
+        #send-status {
+            color: #58cc02;
+            min-height: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div class="progress-bar">
+        <div id="progress-fill"></div>
+    </div>
+    <div class="f1-mascot">🏎️🏁⏱️</div>
+
+    <div id="game-view">
+        <div id="category" style="color:#ffb703;font-size:13px;text-transform:uppercase;font-weight:bold;letter-spacing:1px;">
+            Paddock Conversation
+        </div>
+
+        <div class="passage">
+            <strong>Team Radio Conversation:</strong><br>
+            “I need to change into my clean team jacket. Have you seen it?”<br>
+            “I’m not sure, but I think Maya knows. She’s wearing her new headset; go and ask her.”<br>
+            “There she is. I’ll go over and speak to her. Thanks for the help.”<br>
+            “No problem. Tell her the race car is fine and there’s nothing to worry about.”<br>
+            “I’ll let her know. I remember seeing her car in the garage.”
+        </div>
+
+        <div class="question" id="question-text">Loading question...</div>
+        <div class="options" id="options-container"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-view" class="hidden">
+        <h2>Quiz Completed!</h2>
+        <div id="rank">P1</div>
+        <p id="score-text"></p>
+        <div id="send-status"></div>
+        <button onclick="location.reload()">RESTART LAP</button>
+    </div>
+</div>
+
+<script>
+    const TEST_NAME = "Formula 1 Paddock Conversation Quiz";
+    let userMistakes = [];
+
+    const questions = [
+        {
+            q: "What does the speaker need to change into?",
+            options: ["A pair of racing boots", "A clean team jacket", "A new helmet"],
+            correct: 1,
+            cat: "Finding an item"
+        },
+        {
+            q: "Who does the speaker think knows where the jacket is?",
+            options: ["The mechanic", "The race engineer", "Maya"],
+            correct: 2,
+            cat: "Finding information"
+        },
+        {
+            q: "What is Maya wearing?",
+            options: ["A pair of gloves", "A new headset", "A red team jacket"],
+            correct: 1,
+            cat: "Describing appearance"
+        },
+        {
+            q: "What will the speaker do when they see Maya?",
+            options: ["Give her a headset", "Go and speak to her", "Take her car to the garage"],
+            correct: 1,
+            cat: "Future intention"
+        },
+        {
+            q: "What does the team member say about the race car?",
+            options: ["It is outside the garage", "It is fine", "It needs a new tyre"],
+            correct: 1,
+            cat: "Checking details"
+        },
+        {
+            q: "Where does the speaker remember seeing Maya's car?",
+            options: ["On the track", "Near the pit entrance", "In the garage"],
+            correct: 2,
+            cat: "Remembering information"
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('category').innerText = q.cat;
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        q.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.innerText = option;
+            button.onclick = () => checkAnswer(index);
+            container.appendChild(button);
+        });
+
+        updateProgress();
+    }
+
+    function checkAnswer(index) {
+        const feedback = document.getElementById('feedback');
+        const buttons = document.querySelectorAll('#options-container button');
+
+        buttons.forEach(button => button.disabled = true);
+
+        if (index === questions[currentIdx].correct) {
+            score++;
+            feedback.innerText = "CORRECT! 🟢";
+            feedback.style.color = "#58cc02";
+        } else {
+            userMistakes.push(questions[currentIdx].options[index]);
+            feedback.innerText = "NOT QUITE — CHECK THE TEAM RADIO 🔴";
+            feedback.style.color = "#ff4b4b";
+        }
+
+        setTimeout(() => {
+            feedback.innerText = "";
+            currentIdx++;
+
+            if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 1000);
+    }
+
+    function updateProgress() {
+        const percent = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-fill').style.width = percent + "%";
+    }
+
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: questions.length,
+            mistakes: userMistakes.join(", ")
+        });
+
+        fetch(url, {
+            method: "POST",
+            mode: "no-cors",
+            body: params
+        })
+        .then(() => {
+            document.getElementById('send-status').innerText =
+                "Results sent successfully! ✅";
+        })
+        .catch(() => {
+            document.getElementById('send-status').innerText =
+                "Could not send results.";
+            document.getElementById('send-status').style.color = "#ff4b4b";
+        });
+    }
+
+    function showResults() {
+        document.getElementById('game-view').classList.add('hidden');
+        document.getElementById('result-view').classList.remove('hidden');
+
+        let rankText = "KEEP PRACTICING";
+        if (score === questions.length) rankText = "P1 (GOLD)";
+        else if (score >= 4) rankText = "P2 (SILVER)";
+        else if (score >= 2) rankText = "P3 (BRONZE)";
+
+        document.getElementById('rank').innerText = rankText;
+        document.getElementById('score-text').innerText =
+            `You answered ${score} out of ${questions.length} questions correctly.`;
+
+        sendResultsToGoogle();
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
