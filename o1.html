@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission: Personal Information</title>
+<style>
+  :root {
+    --blue: #2196f3;
+    --pink: #e91e63;
+    --green: #4caf50;
+    --yellow: #ffb300;
+    --purple: #7e57c2;
+    --text-dark: #1a2a4a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fff1f3;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255, 200, 100, 0.35) 0%, transparent 30%),
+      radial-gradient(circle at 85% 80%, rgba(150, 220, 255, 0.35) 0%, transparent 30%),
+      radial-gradient(circle, rgba(255, 255, 255, 0.9) 2px, transparent 2px);
+    background-size: auto, auto, 34px 34px;
+    color: var(--text-dark);
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  button { font-family: inherit; }
+  button:focus-visible { outline: 4px solid #17659a; outline-offset: 4px; }
+
+  h1 {
+    color: var(--purple);
+    text-transform: uppercase;
+    font-size: 28px;
+    text-shadow: 3px 3px 0 rgba(255, 200, 100, 0.6);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    color: var(--purple);
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .score-banner {
+    display: inline-block;
+    background: #ffffff;
+    color: #653ba3;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 8px 24px;
+    border-radius: 30px;
+    border: 3px solid var(--yellow);
+    box-shadow: 0 4px 0 rgba(255, 179, 0, 0.35);
+    margin-bottom: 20px;
+  }
+
+  .box {
+    max-width: 720px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 26px 24px 28px;
+    border-radius: 24px;
+    border: 4px solid var(--purple);
+    box-shadow: 8px 8px 0 rgba(126, 87, 194, 0.25);
+  }
+
+  .hidden { display: none !important; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: #f5f0ff;
+    border: 3px solid #d1c4e9;
+    border-radius: 14px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px;
+    transition: 0.2s;
+    user-select: none;
+    text-align: left;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+    color: var(--text-dark);
+    width: 100%;
+  }
+
+  .card:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(126, 87, 194, 0.18);
+  }
+
+  .card.selected {
+    border-color: var(--blue);
+    background: #e3f2fd;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.25);
+    transform: scale(1.02);
+  }
+
+  .card.matched {
+    background: #d5f0dd;
+    border-color: var(--green);
+    cursor: default;
+    color: #1b5e20;
+  }
+
+  .card.wrong {
+    background: #fde8e8;
+    border-color: var(--pink);
+    color: #a51d30;
+    animation: shake 0.35s;
+  }
+
+  .card:disabled { cursor: default; }
+
+  .choice-btn {
+    background: #ffffff;
+    color: var(--text-dark);
+    border: 3px solid #d1c4e9;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border-radius: 14px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 560px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: left;
+    transition: 0.15s;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: #e3f2fd;
+    transform: translateX(4px);
+  }
+
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-btn.correct {
+    background: #d5f0dd;
+    border-color: var(--green);
+    color: #1b5e20;
+    font-weight: 700;
+  }
+
+  .choice-btn.wrong {
+    background: #fde8e8;
+    border-color: var(--pink);
+    color: #b71c1c;
+    font-weight: 700;
+    animation: shake 0.35s;
+  }
+
+  .emoji-display {
+    font-size: 60px;
+    margin: 20px;
+    letter-spacing: 4px;
+  }
+
+  .status {
+    margin-top: 18px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    min-height: 35px;
+    color: #653ba3;
+  }
+
+  .next-btn,
+  .restart-btn {
+    background: #e9ddff;
+    color: #452274;
+    padding: 14px 36px;
+    border-radius: 50px;
+    border: 3px solid #7e57c2;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 5px 0 #b59ad8;
+    transition: 0.1s;
+  }
+
+  .next-btn:hover,
+  .restart-btn:hover { transform: translateY(-1px); }
+
+  .next-btn:active,
+  .restart-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #b59ad8;
+  }
+
+  #audio-btn {
+    font-size: 70px;
+    background: #fff9e6;
+    border: 4px solid var(--yellow);
+    border-radius: 50%;
+    width: 130px;
+    height: 130px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 0 rgba(255, 179, 0, 0.4);
+    transition: 0.15s;
+  }
+
+  #audio-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    background: #fff3c4;
+  }
+
+  #audio-btn:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(255, 179, 0, 0.4);
+  }
+
+  #audio-btn:disabled { opacity: 0.55; cursor: default; }
+
+  .options-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .listening-grid { grid-template-columns: 1fr; }
+
+  .listening-card {
+    font-size: 24px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .counter,
+  .small {
+    font-size: 14px;
+    color: #52647a;
+  }
+
+  .fallback {
+    margin: 15px auto;
+    padding: 14px;
+    background: #fff4d4;
+    border: 2px solid #d8b958;
+    border-radius: 12px;
+    max-width: 560px;
+  }
+
+  .final-screen { padding: 20px; }
+
+  .final-screen h1 { font-size: 36px; }
+
+  .final-screen p {
+    font-size: 1.15em;
+    margin: 16px 0;
+  }
+
+  .xp-final {
+    color: #a52b64;
+    font-size: 1.4em;
+    font-weight: 800;
+  }
+
+  #result-msg { font-weight: 800; }
+
+  @keyframes shake {
+    25%, 75% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+  }
+
+  @media (max-width: 500px) {
+    body { padding: 15px 10px; }
+    h1 { font-size: 21px; }
+    h2 { font-size: 19px; }
+    .box { padding: 20px 16px 22px; }
+    .grid { grid-template-columns: 1fr; gap: 10px; }
+    .card { font-size: 15px; min-height: 70px; }
+    .emoji-display { font-size: 50px; }
+    .choice-btn { font-size: 16px; padding: 13px; }
+    .next-btn, .restart-btn { font-size: 17px; padding: 12px 26px; }
+    #audio-btn { width: 100px; height: 100px; font-size: 55px; }
+    .listening-card { font-size: 20px; }
+    .final-screen { padding: 5px; }
+    .final-screen h1 { font-size: 28px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>🦸 MISSION: PERSONAL INFO</h1>
+<div class="score-banner">⭐ XP: <span id="xp">0</span></div>
+
+<section class="box" id="level1">
+  <h2>🎯 Level 1: Match the pairs</h2>
+  <p>Match the question with the correct answer!</p>
+  <div class="grid" id="grid1"></div>
+  <div class="status" id="status1" role="status" aria-live="polite"></div>
+</section>
+
+<section class="box hidden" id="level2">
+  <h2>🧩 Level 2: Choose the correct question</h2>
+  <p>Read the answer and choose the correct question word.</p>
+  <div class="counter" id="counter2"></div>
+  <div class="emoji-display" id="emoji2" aria-hidden="true"></div>
+  <div id="options2" class="options-column"></div>
+  <div class="status" id="status2" role="status" aria-live="polite"></div>
+  <button type="button" class="next-btn hidden" id="next-btn">
+    NEXT ▶
+  </button>
+</section>
+
+<section class="box hidden" id="level3">
+  <h2>🎧 Level 3: Spelling Radar</h2>
+  <p>Press the antenna, listen to the spelling, and choose the correct word!</p>
+  <div class="counter" id="counter3"></div>
+  <button type="button" id="audio-btn" aria-label="Listen to spelling">📡</button>
+  <div class="fallback hidden" id="audio-fallback"></div>
+  <div class="grid listening-grid" id="grid3"></div>
+  <div class="status" id="status3" role="status" aria-live="polite"></div>
+</section>
+
+<section class="box hidden final-screen" id="final">
+  <h1>🏆 MISSION COMPLETE!</h1>
+  <p>Final Score: <span class="xp-final" id="final-xp"></span></p>
+  <p>Tasks completed: <strong id="final-score"></strong></p>
+  <p id="result-msg" role="status" aria-live="polite"></p>
+  <div class="small" id="result-note"></div>
+  <button type="button" class="restart-btn" id="restart-btn">
+    PLAY AGAIN 🔄
+  </button>
+</section>
+
+<script>
+"use strict";
+
+// ================================================================
+// MANDATORY CONFIGURATION
+// ================================================================
+const TEST_NAME = "Personal Information Quest";
+let userMistakes = [];
+let score = 0;
+
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+// ================================================================
+// LEVEL 1 DATA — 4 PAIRS (Questions and Answers)
+// ================================================================
+const pairData = [
+  {
+    q: "What is your surname?",
+    e: "It is Johnson."
+  },
+  {
+    q: "How do you spell that?",
+    e: "J-O-H-N-S-O-N."
+  },
+  {
+    q: "Where do you live?",
+    e: "I live in New York."
+  },
+  {
+    q: "What is your email address?",
+    e: "tom.j@webmail.com"
+  }
+];
+
+// ================================================================
+// LEVEL 2 DATA — EXACTLY 2 OPTIONS PER QUESTION
+// ================================================================
+const testData = [
+  {
+    e: "📞",
+    c: "What is your phone number?",
+    o: [
+      "What is your phone number?",
+      "How do you spell your phone?"
+    ]
+  },
+  {
+    e: "🏠",
+    c: "What is your home address?",
+    o: [
+      "What is your home address?",
+      "Where is your home number?"
+    ]
+  }
+];
+
+// ================================================================
+// LEVEL 3 DATA — 3 SPELLING ITEMS (Simulating the listening)
+// ================================================================
+const audioData = [
+  {
+    q: "K-A-T-E",
+    e: "Kate"
+  },
+  {
+    q: "J-A-M-E-S",
+    e: "James"
+  },
+  {
+    q: "S-M-I-T-H",
+    e: "Smith"
+  }
+];
+
+const totalQuestions = pairData.length + testData.length + audioData.length;
+
+// ================================================================
+// STATE
+// ================================================================
+let xp = 0;
+let matchedCount = 0;
+let firstCard = null;
+let matchingLocked = false;
+let cur2 = 0;
+let cur3 = 0;
+let level2Answered = false;
+let listeningLocked = false;
+let listeningReady = false;
+let finished = false;
+let resultsSubmitted = false;
+
+const $ = id => document.getElementById(id);
+
+function shuffle(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function showScreen(id) {
+  ["level1", "level2", "level3", "final"].forEach(screenId => {
+    $(screenId).classList.toggle("hidden", screenId !== id);
+  });
+}
+
+function updateXP() {
+  $("xp").textContent = xp;
+}
+
+// ================================================================
+// LEVEL 1 — MATCHING PAIRS
+// ================================================================
+function initL1() {
+  const grid = $("grid1");
+  grid.replaceChildren();
+
+  const cards = [];
+
+  pairData.forEach((item, index) => {
+    cards.push({ id: index, text: item.q, type: "start" });
+    cards.push({ id: index, text: item.e, type: "end" });
+  });
+
+  shuffle(cards).forEach(cardInfo => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "card";
+    card.textContent = cardInfo.text;
+    card.dataset.pairId = String(cardInfo.id);
+    card.dataset.type = cardInfo.type;
+    card.setAttribute("aria-pressed", "false");
+
+    card.addEventListener("click", () => selectMatchingCard(card));
+    grid.append(card);
+  });
+}
+
+function selectMatchingCard(card) {
+  if (matchingLocked || card.disabled || card === firstCard) return;
+
+  card.classList.add("selected");
+  card.setAttribute("aria-pressed", "true");
+
+  if (!firstCard) {
+    firstCard = card;
+    return;
+  }
+
+  const previous = firstCard;
+  firstCard = null;
+  matchingLocked = true;
+
+  const isPair =
+    previous.dataset.pairId === card.dataset.pairId &&
+    previous.dataset.type !== card.dataset.type;
+
+  if (isPair) {
+    [previous, card].forEach(element => {
+      element.classList.remove("selected");
+      element.classList.add("matched");
+      element.disabled = true;
+      element.setAttribute("aria-pressed", "false");
+    });
+
+    matchedCount++;
+    score++;
+    xp += 50;
+    updateXP();
+
+    $("status1").textContent = "CORRECT! ✅ +50 XP";
+
+    if (matchedCount === pairData.length) {
+      setTimeout(() => {
+        showScreen("level2");
+        initL2();
+      }, 900);
+    } else {
+      matchingLocked = false;
+    }
+  } else {
+    // Track mistake
+    userMistakes.push(previous.textContent + " ... " + card.textContent);
+    $("status1").textContent = "TRY AGAIN!";
+
+    previous.classList.add("wrong");
+    card.classList.add("wrong");
+
+    setTimeout(() => {
+      [previous, card].forEach(element => {
+        element.classList.remove("selected", "wrong");
+        element.setAttribute("aria-pressed", "false");
+      });
+      matchingLocked = false;
+    }, 550);
+  }
+}
+
+// ================================================================
+// LEVEL 2 — TWO ANSWER OPTIONS
+// ================================================================
+function initL2() {
+  level2Answered = false;
+
+  const question = testData[cur2];
+  const box = $("options2");
+
+  $("counter2").textContent = "Question " + (cur2 + 1) + " of " + testData.length;
+  $("emoji2").textContent = question.e;
+  $("next-btn").classList.add("hidden");
+  $("status2").textContent = "";
+
+  box.replaceChildren();
+
+  shuffle(question.o).forEach(option => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice-btn";
+    button.textContent = option;
+
+    button.addEventListener("click", () => {
+      if (level2Answered) return;
+      level2Answered = true;
+
+      const buttons = box.querySelectorAll("button");
+      buttons.forEach(item => {
+        item.disabled = true;
+      });
+
+      if (option === question.c) {
+        button.classList.add("correct");
+        score++;
+        xp += 100;
+        updateXP();
+        $("status2").textContent = "SUPER! ✅ +100 XP";
+      } else {
+        button.classList.add("wrong");
+        // Track mistake
+        userMistakes.push(option);
+
+        $("status2").textContent = "Look at the correct answer in green.";
+
+        buttons.forEach(item => {
+          if (item.textContent === question.c) {
+            item.classList.add("correct");
+          }
+        });
+      }
+
+      $("next-btn").textContent =
+        cur2 === testData.length - 1 ? "TO LEVEL 3 ▶" : "NEXT ▶";
+
+      $("next-btn").classList.remove("hidden");
+    });
+
+    box.append(button);
+  });
+}
+
+function nextL2() {
+  if (!level2Answered) return;
+
+  cur2++;
+  if (cur2 < testData.length) {
+    initL2();
+  } else {
+    showScreen("level3");
+    initL3();
+  }
+}
+
+// ================================================================
+// LEVEL 3 — LISTENING / SPELLING
+// ================================================================
+function initL3() {
+  listeningLocked = false;
+  listeningReady = false;
+
+  $("counter3").textContent = "Audio " + (cur3 + 1) + " of " + audioData.length;
+  $("status3").textContent = "Click 📡 and listen!";
+  $("audio-fallback").classList.add("hidden");
+  $("audio-fallback").textContent = "";
+  $("audio-btn").disabled = false;
+
+  const grid = $("grid3");
+  grid.replaceChildren();
+
+  // Shuffle options so they aren't in the same order as the audio list
+  const options = shuffle([...audioData]);
+
+  options.forEach(item => {
+    const originalIndex = audioData.indexOf(item);
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "card listening-card";
+    button.textContent = item.e;
+    button.disabled = true;
+
+    button.addEventListener("click", () => {
+      if (listeningLocked || !listeningReady || finished) return;
+
+      if (originalIndex === cur3) {
+        listeningLocked = true;
+        button.classList.add("matched");
+
+        grid.querySelectorAll("button").forEach(option => {
+          option.disabled = true;
+        });
+
+        $("audio-btn").disabled = true;
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+        score++;
+        xp += 150;
+        updateXP();
+
+        $("status3").textContent = "CORRECT! ✅ +150 XP";
+
+        setTimeout(() => {
+          cur3++;
+          if (cur3 < audioData.length) {
+            initL3();
+          } else {
+            finish();
+          }
+        }, 850);
+      } else {
+        listeningLocked = true;
+        button.classList.add("wrong");
+        // Track mistake
+        userMistakes.push(button.textContent);
+
+        $("status3").textContent = "TRY AGAIN!";
+
+        setTimeout(() => {
+          button.classList.remove("wrong");
+          listeningLocked = false;
+        }, 500);
+      }
+    });
+
+    grid.append(button);
+  });
+}
+
+function enableListeningOptions() {
+  listeningReady = true;
+  $("grid3").querySelectorAll("button").forEach(button => {
+    button.disabled = false;
+  });
+}
+
+function showAudioFallback() {
+  if (finished || listeningLocked) return;
+
+  $("audio-fallback").textContent = "Audio unavailable. Read the spelling: " + audioData[cur3].q;
+  $("audio-fallback").classList.remove("hidden");
+  $("status3").textContent = "Read and choose the correct word.";
+  enableListeningOptions();
+}
+
+function playAudio() {
+  if (finished || listeningLocked || cur3 >= audioData.length) return;
+
+  if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+    showAudioFallback();
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const indexAtStart = cur3;
+  // Read the spelling out letter by letter
+  const textToSpeak = audioData[cur3].q.replace(/-/g, ", ");
+  const message = new SpeechSynthesisUtterance(textToSpeak);
+
+  message.lang = "en-US";
+  message.rate = 0.85; // Slightly slower for spelling
+
+  message.onerror = event => {
+    if (event.error !== "canceled" && event.error !== "interrupted" && cur3 === indexAtStart && !finished) {
+      showAudioFallback();
+    }
+  };
+
+  $("status3").textContent = "🎧 Listening...";
+  enableListeningOptions();
+
+  try {
+    window.speechSynthesis.speak(message);
+  } catch (error) {
+    showAudioFallback();
+  }
+}
+
+// ================================================================
+// FINAL SCREEN & GOOGLE SHEETS (MANDATORY)
+// ================================================================
+function finish() {
+  if (finished) return;
+  finished = true;
+
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+  $("final-xp").textContent = xp + " XP";
+  $("final-score").textContent = score + " / " + totalQuestions;
+
+  showScreen("final");
+  sendResultsToGoogle();
+}
+
+async function sendResultsToGoogle() {
+  if (resultsSubmitted) return;
+  resultsSubmitted = true;
+
+  const params = new URLSearchParams({
+    name: TEST_NAME,
+    score: String(score),
+    total: String(totalQuestions),
+    mistakes: userMistakes.join(", ")
+  });
+
+  const message = $("result-msg");
+  const note = $("result-note");
+
+  message.style.color = "#52647a";
+  message.textContent = "Sending results...";
+  note.textContent = "";
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: params.toString(),
+      keepalive: true
+    });
+
+    // Display the required success message in green
+    message.style.color = "#1b5e20";
+    message.textContent = "Results sent successfully! ✅";
+    note.textContent = "The request has been sent to the teacher.";
+  } catch (error) {
+    console.error("Error sending results:", error);
+    message.style.color = "#a51d30";
+    message.textContent = "Failed to send results.";
+    note.textContent = "Your score is shown above.";
+  }
+}
+
+// ================================================================
+// EVENTS & LAUNCH
+// ================================================================
+$("next-btn").addEventListener("click", nextL2);
+$("audio-btn").addEventListener("click", playAudio);
+$("restart-btn").addEventListener("click", () => location.reload());
+
+initL1();
+</script>
+</body>
+</html>

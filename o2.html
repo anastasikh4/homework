@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Practice Zone: Hobbies & Present Simple 🎸</title>
+    <style>
+        :root {
+            --primary: #ffeb3b;
+            --secondary: #ff5722;
+            --bg: #e1f5fe;
+            --card: #fff176;
+            --success: #2ecc71;
+            --error: #e74c3c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #222;
+        }
+        h1 {
+            font-size: 28px;
+            color: #d81b60;
+            margin: 8px 0;
+            text-shadow: 2px 2px 0 white;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 680px;
+            margin: 0 auto;
+            min-height: 520px;
+        }
+        .level-info {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 12px 0 20px;
+        }
+        .big-emoji {
+            font-size: 70px;
+            margin: 15px 0;
+            display: block;
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        #card-grid { grid-template-columns: repeat(4, 1fr); }
+        #l3-grid {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 460px;
+            margin: 20px auto;
+        }
+
+        @media (max-width: 500px) {
+            #card-grid { grid-template-columns: repeat(2, 1fr); }
+            .card { height: 90px; font-size: 14px; }
+        }
+
+        .card {
+            height: 90px;
+            background: var(--card);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            border: 4px solid #fff59d;
+            transition: all 0.2s;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: #1976d2;
+            padding: 5px;
+            text-align: center;
+        }
+        .card:hover { transform: scale(1.04); }
+        .card.flipped { background: white; border-color: #ffeb3b; }
+        .card.matched { background: #c8e6c9; border-color: #81c784; color: #2e7d32; pointer-events: none; opacity: 0.6; }
+        .card .card-emoji { font-size: 26px; margin-bottom: 4px; }
+
+        /* Sentence / Word Builder Style */
+        .sentence-builder {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            min-height: 55px;
+            border-bottom: 3px dashed #ddd;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 10px;
+        }
+        .word-in-sentence {
+            background: var(--secondary);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 0 #d84315;
+        }
+        .word-pool {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .word-btn {
+            background: #fff;
+            padding: 8px 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #ccc;
+        }
+        .word-btn:hover { background: #f0f0f0; transform: translateY(-2px); }
+        .word-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+        /* Dialogue gap-fill style (Stage 2) */
+        .dialogue {
+            text-align: left;
+            max-width: 600px;
+            margin: 10px auto;
+            background: #fafafa;
+            border-radius: 14px;
+            padding: 14px;
+            border: 3px dashed #ddd;
+        }
+        .dialogue-line { margin: 10px 0; font-size: 1.05rem; line-height: 1.5; }
+        .speaker { font-weight: bold; color: #d81b60; }
+        .gap { display: inline-flex; gap: 6px; vertical-align: middle; flex-wrap: wrap; margin: 4px 0;}
+        .gap-btn {
+            background: var(--card);
+            border: 2px solid #fbc02d;
+            border-radius: 10px;
+            padding: 4px 10px;
+            font-weight: bold;
+            color: #1976d2;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .gap-btn:hover { transform: scale(1.08); }
+        .gap-btn.wrong { background: #ffcdd2; border-color: #e74c3c; color: #c62828; animation: shake 0.3s; }
+        .gap-solved {
+            color: var(--success);
+            font-weight: bold;
+            border-bottom: 3px solid var(--success);
+            padding: 0 4px;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .feedback { margin-top: 15px; font-weight: bold; min-height: 30px; font-size: 1.3rem; }
+        .correct-text { color: var(--success); }
+        .wrong-text { color: var(--error); }
+
+        #next-level-btn {
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px 45px;
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 35px;
+            margin: 20px auto 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            display: none;
+        }
+        #next-level-btn:hover { transform: scale(1.05); }
+        .hidden { display: none; }
+
+        .status-msg {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+        .rule-near { color: #1976d2; font-weight: 900; }
+        .rule-far { color: #d32f2f; font-weight: 900; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Hobbies & Actions! 🌟</h1>
+    <div id="level-indicator" class="level-info">Stage 1 — Match the Action! 🔢</div>
+
+    <!-- STAGE 1: MEMORY MATCH (Action <-> Hobby) -->
+    <div id="level1">
+        <p style="color: #555; font-weight: bold; margin-bottom: 10px;">
+            Flip the cards and pair each <span class="rule-near">action</span> with its <span class="rule-far">hobby</span>.
+        </p>
+        <div class="grid" id="card-grid"></div>
+        <div class="feedback" id="l1-feedback"></div>
+    </div>
+
+    <!-- STAGE 2: DIALOGUE GAP-FILL (Present Simple) -->
+    <div id="level2" class="hidden">
+        <p style="color: #555; font-weight: bold; margin-bottom: 10px;">
+            Complete the dialogue. Tap the correct words for each gap.
+        </p>
+        <div class="dialogue" id="dialogue"></div>
+        <div class="feedback" id="l2-feedback"></div>
+    </div>
+
+    <!-- STAGE 3: BUILD THE SENTENCE (Chunked words) -->
+    <div id="level3" class="hidden">
+        <span id="l3-emoji" class="big-emoji">🧩</span>
+        <div class="sentence-builder" id="builder"></div>
+        <div class="word-pool" id="pool"></div>
+        <div class="feedback" id="l3-feedback"></div>
+    </div>
+
+    <button id="next-level-btn" onclick="advanceStage()">YAY! NEXT LEVEL! 🚀</button>
+
+    <!-- Status Message for Google Sheets Sync -->
+    <div id="send-status" class="status-msg"></div>
+</div>
+
+<script>
+    // ========== MANDATORY TRACKING DATA ==========
+    const TEST_NAME = "Hobbies: Do/Play & Present Simple";
+    let userMistakes = [];
+    let totalScore = 0;
+    let totalQuestions = 0;
+
+    // STAGE 1: pair an action with the hobby
+    const rulePairs = [
+        { text: "do",         match: "A", emoji: "🏺", rule: "pottery" },
+        { text: "play",       match: "B", emoji: "♟️", rule: "chess" },
+        { text: "play",       match: "C", emoji: "🥁", rule: "the drums" },
+        { text: "do",         match: "D", emoji: "🥋", rule: "judo" }
+    ];
+
+    // STAGE 2: NEW dialogue testing Present Simple questions/negatives
+    const dialogueLines = [
+        { s: "Bob",  t: "Hi. {G0} (you/have) a hobby?" },
+        { s: "Jim",  t: "Yes, I {G1} (do). I paint pictures." },
+        { s: "Jim",  t: "{G2} (you/like) my picture? It shows my cat." },
+        { s: "Bob",  t: "Yes, I do. It's lovely. {G3} (your sister/paint) too?" },
+        { s: "Jim",  t: "No, she {G4} (not/like) painting." },
+        { s: "Bob",  t: "What {G5} (she/do)?" },
+        { s: "Jim",  t: "She {G6} (play) the guitar!" }
+    ];
+    
+    // Answers: do, plays, Do you like, Does your sister paint, doesn't like, does she do
+    const gapAnswers = ["do", "do", "Do you like", "Does your sister paint", "doesn't like", "does she do", "plays"];
+    
+    // Options for each gap (to create the buttons)
+    const gapOptions = [
+        ["do", "does", "doing"],
+        ["do", "does", "doing"],
+        ["Do you like", "Does you like", "Are you like"],
+        ["Does your sister paint", "Do your sister paint", "Is your sister paint"],
+        ["doesn't like", "don't like", "not like"],
+        ["does she do", "do she do", "is she do"],
+        ["plays", "play", "playing"]
+    ];
+
+    // STAGE 3: build the sentence using CHUNKS
+    const buildItems = [
+        { 
+            emoji: "🎸", 
+            chunks: ["He", "plays", "the guitar", "very well."], 
+            answer: "He plays the guitar very well." 
+        },
+        { 
+            emoji: "🧘", 
+            chunks: ["Do", "you", "do", "yoga?"], 
+            answer: "Do you do yoga?" 
+        },
+        { 
+            emoji: "🏀", 
+            chunks: ["She", "does not", "play", "basketball."], 
+            answer: "She does not play basketball." 
+        },
+        { 
+            emoji: "🥋", 
+            chunks: ["Does", "he", "do", "karate?"], 
+            answer: "Does he do karate?" 
+        }
+    ];
+
+    let currentStage = 1;
+    let selectedCards = [];
+    let gapsSolved = 0;
+    let l3Idx = 0;
+    let currentL3Sentence = [];
+
+    // --- STAGE 1 LOGIC ---
+    function startStage1() {
+        document.getElementById('level-indicator').innerText = "Stage 1 — Match the Action! 🔢";
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        selectedCards = [];
+
+        // build 8 cards: each action + its hobby
+        let cards = [];
+        rulePairs.forEach(p => {
+            cards.push({ value: p.text,  match: p.match, emoji: p.emoji });
+            cards.push({ value: p.rule,  match: p.match, emoji: "🔤" });
+        });
+        cards.sort(() => Math.random() - 0.5);
+
+        cards.forEach(cardData => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.match = cardData.match;
+            card.dataset.value = cardData.value;
+            card.dataset.emoji = cardData.emoji;
+            card.onclick = () => {
+                if (selectedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
+                    card.classList.add('flipped');
+                    card.innerHTML = `<span class="card-emoji">${card.dataset.emoji}</span>${card.dataset.value}`;
+                    selectedCards.push(card);
+                    if (selectedCards.length === 2) setTimeout(verifyL1Match, 600);
+                }
+            };
+            grid.appendChild(card);
+        });
+    }
+
+    function verifyL1Match() {
+        const [c1, c2] = selectedCards;
+        if (c1.dataset.match === c2.dataset.match && c1.dataset.value !== c2.dataset.value) {
+            c1.className = 'card matched';
+            c2.className = 'card matched';
+            document.getElementById('l1-feedback').innerHTML = "<span class='correct-text'>Match Found! 🎉</span>";
+            totalScore++;
+        } else {
+            c1.classList.remove('flipped');
+            c2.classList.remove('flipped');
+            c1.innerHTML = '';
+            c2.innerHTML = '';
+            document.getElementById('l1-feedback').innerHTML = "<span class='wrong-text'>Try again! ❌</span>";
+            
+            // Track mistake
+            userMistakes.push(c1.dataset.value + " / " + c2.dataset.value);
+        }
+        selectedCards = [];
+
+        if (document.querySelectorAll('.card.matched').length === rulePairs.length * 2) {
+            document.getElementById('next-level-btn').style.display = 'block';
+            document.getElementById('l1-feedback').innerHTML = "<span class='correct-text'>Stage 1 Complete! 🏆</span>";
+        }
+    }
+
+    // --- STAGE 2 LOGIC (dialogue gap fill) ---
+    function startStage2() {
+        document.getElementById('level-indicator').innerText = "Stage 2 — Complete the Dialogue! 💬";
+        document.getElementById('level1').classList.add('hidden');
+        document.getElementById('level2').classList.remove('hidden');
+        document.getElementById('next-level-btn').style.display = 'none';
+        gapsSolved = 0;
+        renderDialogue();
+    }
+
+    function renderDialogue() {
+        const box = document.getElementById('dialogue');
+        box.innerHTML = '';
+        dialogueLines.forEach(line => {
+            const div = document.createElement('div');
+            div.className = 'dialogue-line';
+            let html = `<span class="speaker">${line.s}:</span> `;
+            
+            // replace {Gn} with a gap widget containing dynamic options
+            html = html + line.t.replace(/\{G(\d)\}/g, (m, idx) => {
+                let btns = gapOptions[idx].map(word => 
+                    `<button class="gap-btn" data-word="${word}">${word}</button>`
+                ).join('');
+                return `<span class="gap" id="gap${idx}">${btns}</span>`;
+            });
+            div.innerHTML = html;
+            box.appendChild(div);
+        });
+
+        // attach handlers
+        document.querySelectorAll('.gap').forEach(gap => {
+            const gapIndex = parseInt(gap.id.replace('gap', ''));
+            gap.querySelectorAll('.gap-btn').forEach(btn => {
+                btn.onclick = () => handleGapClick(gapIndex, btn);
+            });
+        });
+    }
+
+    function handleGapClick(gapIndex, btn) {
+        const correct = gapAnswers[gapIndex];
+        const chosen = btn.dataset.word;
+        const feedback = document.getElementById('l2-feedback');
+        
+        if (chosen === correct) {
+            const gap = document.getElementById('gap' + gapIndex);
+            gap.outerHTML = `<span class="gap-solved">${correct}</span>`;
+            gapsSolved++;
+            totalScore++;
+            feedback.innerHTML = "<span class='correct-text'>Nice! ✓</span>";
+            
+            if (gapsSolved === gapAnswers.length) {
+                document.getElementById('next-level-btn').style.display = 'block';
+                feedback.innerHTML = "<span class='correct-text'>Stage 2 Complete! 🏆</span>";
+            }
+        } else {
+            btn.classList.add('wrong');
+            
+            // Track mistake
+            userMistakes.push(chosen);
+            
+            feedback.innerHTML = "<span class='wrong-text'>Not quite — try another word! ❌</span>";
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // --- STAGE 3 LOGIC (build the sentence with CHUNKS) ---
+    function startStage3() {
+        document.getElementById('level-indicator').innerText = "Stage 3 — Build the Sentence! 🧩";
+        document.getElementById('level2').classList.add('hidden');
+        document.getElementById('level3').classList.remove('hidden');
+        document.getElementById('next-level-btn').style.display = 'none';
+        l3Idx = 0;
+        loadBuildQuestion();
+    }
+
+    function loadBuildQuestion() {
+        const item = buildItems[l3Idx];
+        document.getElementById('l3-emoji').innerText = item.emoji;
+        document.getElementById('l3-feedback').innerHTML = `<span style="color:#000;font-size:1.1rem;">Put the chunks in the correct order:</span>`;
+        const pool = document.getElementById('pool');
+        const builder = document.getElementById('builder');
+        pool.innerHTML = "";
+        builder.innerHTML = "";
+        currentL3Sentence = [];
+
+        let shuffled = [...item.chunks].sort(() => Math.random() - 0.5);
+        shuffled.forEach(chunk => {
+            const btn = document.createElement('button');
+            btn.className = 'word-btn';
+            btn.innerText = chunk;
+            btn.onclick = () => {
+                currentL3Sentence.push(chunk);
+                btn.disabled = true;
+                const span = document.createElement('span');
+                span.className = 'word-in-sentence';
+                span.innerText = chunk;
+                builder.appendChild(span);
+                if (currentL3Sentence.length === item.chunks.length) verifyL3();
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function verifyL3() {
+        const result = currentL3Sentence.join(" ");
+        const target = buildItems[l3Idx].answer;
+        const feedback = document.getElementById('l3-feedback');
+        
+        if (result === target) {
+            feedback.innerHTML = "<span class='correct-text'>Super! Perfect order! ✨</span>";
+            totalScore++;
+            setTimeout(() => {
+                l3Idx++;
+                if (l3Idx < buildItems.length) loadBuildQuestion();
+                else showGlobalGameOver();
+            }, 1000);
+        } else {
+            feedback.innerHTML = "<span class='wrong-text'>Oops! Let's rebuild it. ❌</span>";
+            
+            // Track mistake
+            userMistakes.push(result);
+            
+            setTimeout(loadBuildQuestion, 1200);
+        }
+    }
+
+    function advanceStage() {
+        if (currentStage === 1) {
+            currentStage = 2;
+            totalQuestions += rulePairs.length; // 4 pairs
+            startStage2();
+        } else if (currentStage === 2) {
+            currentStage = 3;
+            totalQuestions += gapAnswers.length; // 7 gaps
+            startStage3();
+        }
+    }
+
+    function showGlobalGameOver() {
+        totalQuestions += buildItems.length; // 4 sentences
+        document.getElementById('level-indicator').innerText = "Mission Accomplished!";
+        document.getElementById('level3').innerHTML = `
+            <span class='big-emoji'>👑</span>
+            <h3>Congratulations! You've mastered Do / Play & Present Simple!</h3>
+            <p>Final Score: ${totalScore} / ${totalQuestions}</p>
+        `;
+        sendResultsToGoogle();
+    }
+
+    // ========== MANDATORY GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", totalScore);
+        formData.append("total", totalQuestions);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending telemetry data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2ecc71';
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c';
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    window.onload = startStage1;
+</script>
+
+</body>
+</html>
