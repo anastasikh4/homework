@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Mission: Clothes Shopping</title>
+<style>
+  :root {
+    --blue: #1976d2;
+    --blue-dark: #0d47a1;
+    --pink: #d81b60;
+    --green: #2e7d32;
+    --red: #c62828;
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666666;
+    --border: #e0e0e0;
+    --card-bg: #f8f9fa;
+    --card-hover: #e3f2fd;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1 {
+    color: var(--blue);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-size: 1.9rem;
+  }
+
+  h2 {
+    color: var(--text);
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  .xp-display {
+    color: var(--green);
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    background: #e8f5e9;
+    display: inline-block;
+    padding: 8px 22px;
+    border-radius: 20px;
+  }
+
+  .box {
+    max-width: 650px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 25px;
+    border: 3px solid var(--border);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    display: none;
+  }
+
+  .box.active { display: block; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 3px solid var(--border);
+    border-radius: 15px;
+    padding: 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    flex-direction: column;
+    color: var(--text);
+    font-weight: 600;
+    user-select: none;
+  }
+
+  .card:hover {
+    border-color: var(--blue);
+    background: var(--card-hover);
+    transform: translateY(-2px);
+  }
+
+  .card.correct {
+    border-color: var(--green);
+    background: #e8f5e9;
+    color: var(--green);
+  }
+
+  .card.wrong {
+    border-color: var(--red);
+    background: #ffebee;
+    color: var(--red);
+  }
+
+  .card.selected {
+    border-color: var(--blue);
+    background: var(--card-hover);
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.2);
+  }
+
+  .card.matched {
+    opacity: 0.4;
+    cursor: default;
+    border-color: var(--green);
+    background: #e8f5e9;
+    transform: none;
+  }
+
+  .card.matched:hover {
+    transform: none;
+    background: #e8f5e9;
+  }
+
+  .card .emoji-big {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .word-target {
+    font-size: 1.4rem;
+    color: var(--pink);
+    font-weight: bold;
+    margin: 20px 0;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+  }
+
+  .emoji-prompt {
+    font-size: 4rem;
+    margin: 20px 0;
+    line-height: 1;
+  }
+
+  .tick-btn {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: inherit;
+    transition: 0.2s;
+  }
+
+  .tick-btn:hover {
+    background: #1b5e20;
+  }
+
+  .btn-next {
+    background: var(--blue);
+    color: white;
+    padding: 15px 40px;
+    border-radius: 50px;
+    border: none;
+    font-size: 1.15rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    font-family: inherit;
+    transition: 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-next:hover {
+    background: var(--blue-dark);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+  }
+
+  .btn-next:active {
+    transform: translateY(2px);
+  }
+
+  .next-wrap {
+    grid-column: 1 / -1;
+    padding-top: 10px;
+  }
+
+  #grid3 .card {
+    font-size: 1.1rem;
+    min-height: 80px;
+  }
+  
+  .status-msg {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 15px;
+    min-height: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🛍️ Word Mission: Clothes Shopping</h1>
+<div class="xp-display">XP SCORE: <span id="xp">0</span></div>
+
+<!-- STAGE 1: Word & Emoji Match -->
+<div class="box active" id="level1">
+  <h2>Stage 1: Word &amp; Picture Match</h2>
+  <p class="subtitle">Match each clothing item to its picture.</p>
+  <div class="grid" id="grid1"></div>
+</div>
+
+<!-- STAGE 2: Look -> Find True/False -->
+<div class="box" id="level2">
+  <h2>Stage 2: True or False?</h2>
+  <p class="subtitle">Read the situation from the dialogue. Is the sentence true or false?</p>
+  <div class="emoji-prompt" id="target2">🛍️</div>
+  <div class="word-target" id="sentence2">Loading...</div>
+  <div class="grid" id="grid2" style="grid-template-columns: 1fr 1fr;"></div>
+</div>
+
+<!-- STAGE 3: Read Clue -> Match Word -->
+<div class="box" id="level3">
+  <h2>Stage 3: Read &amp; Match the Word</h2>
+  <p class="subtitle">Read the customer's problem, then click <b>MATCH ✅</b> on the correct item.</p>
+  <div class="word-target" id="target3">Clue</div>
+  <div class="grid" id="grid3"></div>
+</div>
+
+<script>
+  // ========== MANDATORY TRACKING DATA ==========
+  const TEST_NAME = "Clothes Shopping Vocabulary & Dialogue";
+  let userMistakes = [];
+  let correctAnswers = 0;
+
+  /* =========================================================
+     DATA (Adapted from the photo's shopping context)
+     ========================================================= */
+  const words = [
+    { t: "shoes", e: "👞", def: "I like these, but they're too big. Do you have them in size 35?" },
+    { t: "hoodie", e: "🧥", def: "This is OK, but I don't like brown colour. Do you have it in blue?" },
+    { t: "jeans", e: "👖", def: "These are too big. I have Medium. Where can I try them on?" },
+    { t: "shirt", e: "👔", def: "I don't like the colour of this for my school. Do you have it in white?" },
+    { t: "trainers", e: "👟", def: "These are too small for sport. Do you have them in a larger size?" },
+    { t: "bag", e: "👜", def: "I don't like the colour of this bag." }
+  ];
+
+  // Stage 2 Data: True/False statements based on the dialogue
+  const tfData = [
+    { text: "The shop assistant asks: 'What size are you?'", img: "🗣️ 📏", isTrue: true, word: "size" },
+    { text: "The customer wants a jumper in size Medium.", img: "🛍️ M", isTrue: true, word: "jumper" },
+    { text: "The shop has the jumper in black.", img: "🚫 🖤", isTrue: false, word: "colour" },
+    { text: "The customer doesn't want to try on the jumper.", img: "❌ 👕", isTrue: false, word: "try on" },
+    { text: "The changing rooms are over there.", img: "🚪 👉", isTrue: true, word: "changing rooms" },
+    { text: "The shoes are too small for the customer.", img: "big 👞 ", isTrue: false, word: "shoes" } 
+  ];
+
+  let xp = 0;
+  let firstCard = null;
+  let lockBoard = false;
+  let currentIdx = 0;
+  let tfIndex = 0;
+
+  /* =========================================================
+     HELPERS
+     ========================================================= */
+  function updateXP(val) {
+    xp += val;
+    document.getElementById('xp').innerText = xp;
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildChoices(target, pool, n) {
+    const others = shuffle(pool.filter(w => w.t !== target.t)).slice(0, n - 1);
+    return shuffle([target, ...others]);
+  }
+
+  /* =========================================================
+     STAGE 1 — MEMORY / MATCHING
+     ========================================================= */
+  function initL1() {
+    const grid = document.getElementById('grid1');
+    grid.innerHTML = '';
+    firstCard = null;
+    lockBoard = false;
+
+    const subset = shuffle(words).slice(0, 4);
+
+    let deck = [];
+    subset.forEach((w, i) => {
+      deck.push({ id: i, val: w.t, type: 'text',  word: w });
+      deck.push({ id: i, val: w.e, type: 'emoji', word: w });
+    });
+    deck = shuffle(deck);
+
+    deck.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      if (c.type === 'emoji') {
+        div.innerHTML = `<span class="emoji-big">${c.val}</span>`;
+      } else {
+        div.textContent = c.val;
+      }
+
+      div.onclick = () => {
+        if (lockBoard) return;
+        if (div.classList.contains('matched')) return;
+        if (div === firstCard) return;
+
+        div.classList.add('selected');
+
+        if (!firstCard) {
+          firstCard = { div, id: c.id };
+          return;
+        }
+
+        const prev = firstCard;
+        firstCard = null;
+
+        if (prev.id === c.id && prev.div !== div) {
+          /* MATCH */
+          div.classList.add('matched');
+          prev.div.classList.add('matched');
+          div.classList.remove('selected');
+          prev.div.classList.remove('selected');
+          updateXP(50);
+          correctAnswers++;
+
+          if (document.querySelectorAll('#grid1 .matched').length === 8) {
+            const wrap = document.createElement('div');
+            wrap.className = 'next-wrap';
+            wrap.innerHTML = `<button class="btn-next" onclick="startL2()">NEXT STAGE ▶</button>`;
+            grid.appendChild(wrap);
+          }
+        } else {
+          /* NO MATCH */
+          userMistakes.push(c.val); // Track wrong choice
+          lockBoard = true;
+          const p = prev.div;
+          setTimeout(() => {
+            div.classList.remove('selected');
+            p.classList.remove('selected');
+            lockBoard = false;
+          }, 500);
+        }
+      };
+
+      grid.appendChild(div);
+    });
+  }
+
+  /* =========================================================
+     STAGE 2 — TRUE/FALSE
+     ========================================================= */
+  function startL2() {
+    document.getElementById('level1').classList.remove('active');
+    document.getElementById('level2').classList.add('active');
+    tfIndex = 0;
+    loadL2();
+  }
+
+  function loadL2() {
+    if (tfIndex >= tfData.length) {
+      startL3();
+      return;
+    }
+
+    const grid = document.getElementById('grid2');
+    grid.innerHTML = '';
+    
+    const data = tfData[tfIndex];
+    
+    document.getElementById('target2').innerText = data.img;
+    document.getElementById('sentence2').innerText = data.text;
+
+    const btnTrue = document.createElement('div');
+    btnTrue.className = 'card';
+    btnTrue.innerText = "TRUE ✅";
+    btnTrue.onclick = () => checkTF(true, btnTrue);
+
+    const btnFalse = document.createElement('div');
+    btnFalse.className = 'card';
+    btnFalse.innerText = "FALSE ❌";
+    btnFalse.onclick = () => checkTF(false, btnFalse);
+
+    grid.appendChild(btnTrue);
+    grid.appendChild(btnFalse);
+  }
+
+  function checkTF(userChoice, btn) {
+    const data = tfData[tfIndex];
+    if (userChoice === data.isTrue) {
+      btn.classList.add('correct');
+      updateXP(50);
+      correctAnswers++;
+      tfIndex++;
+      setTimeout(loadL2, 800);
+    } else {
+      // MANDATORY: Track mistake
+      userMistakes.push(userChoice ? "True" : "False");
+      btn.classList.add('wrong');
+      setTimeout(() => btn.classList.remove('wrong'), 600);
+    }
+  }
+
+  /* =========================================================
+     STAGE 3 — READ CLUE → MATCH WORD
+     ========================================================= */
+  function startL3() {
+    document.getElementById('level2').classList.remove('active');
+    document.getElementById('level3').classList.add('active');
+    currentIdx = 0;
+    loadL3();
+  }
+
+  function loadL3() {
+    if (currentIdx >= 4) {
+      finish();
+      return;
+    }
+
+    const grid   = document.getElementById('grid3');
+    const target = words[currentIdx % words.length];
+
+    grid.innerHTML = '';
+    document.getElementById('target3').innerText = target.def;
+
+    const choices = buildChoices(target, words, 4);
+
+    choices.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `<span style="font-size:1.1rem;">${item.t}</span>
+                        <button class="tick-btn">MATCH ✅</button>`;
+
+      card.onclick = (e) => {
+        if (e.target.classList.contains('tick-btn')) {
+          if (item.t === target.t) {
+            card.classList.add('correct');
+            updateXP(100);
+            correctAnswers++;
+            currentIdx++;
+            setTimeout(loadL3, 900);
+          } else {
+            // MANDATORY: Track mistake
+            userMistakes.push(item.t);
+            card.classList.add('wrong');
+            setTimeout(() => card.classList.remove('wrong'), 700);
+          }
+        }
+      };
+
+      grid.appendChild(card);
+    });
+  }
+
+  /* =========================================================
+     FINISH & GOOGLE SHEETS
+     ========================================================= */
+  function finish() {
+    document.getElementById('target3').innerText = '🏆 DIALOGUE MASTER!';
+
+    const grid = document.getElementById('grid3');
+    grid.innerHTML = `
+      <div class="next-wrap">
+        <h3 style="color: var(--green); font-size: 1.6rem; margin: 10px 0;">
+          Quest Complete!
+        </h3>
+        <p style="color: var(--muted); margin-bottom: 6px;">You know your clothes vocabulary!</p>
+        <p style="font-size: 1.2rem; font-weight: bold; color: var(--green);">
+          Final Score: ${xp} XP
+        </p>
+        <button class="btn-next" onclick="location.reload()">PLAY AGAIN 🔄</button>
+        <div id="send-status" class="status-msg"></div>
+      </div>
+    `;
+    
+    sendResultsToGoogle();
+  }
+
+  // ========== MANDATORY GOOGLE SHEETS SENDING FUNCTION ==========
+  function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const formData = new URLSearchParams();
+    formData.append("name", TEST_NAME);
+    formData.append("score", correctAnswers);
+    formData.append("total", 4 + tfData.length + 4); // 4 pairs + 6 TF + 4 words
+    formData.append("mistakes", userMistakes.join(', '));
+
+    const statusEl = document.getElementById('send-status');
+    statusEl.style.color = "#666";
+    statusEl.innerText = "Sending telemetry...";
+
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formData.toString()
+    })
+    .then(() => {
+      // Display the required success message in green
+      statusEl.style.color = '#2e7d32'; 
+      statusEl.innerText = "Results sent successfully! ✅";
+    })
+    .catch((error) => {
+      console.error("Error sending results:", error);
+      statusEl.style.color = '#c62828'; 
+      statusEl.innerText = "Failed to send results ❌.";
+    });
+  }
+
+  /* =========================================================
+     START
+     ========================================================= */
+  initL1();
+</script>
+
+</body>
+</html>
