@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Simple vs Past Continuous · A1+</title>
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --secondary: #3498db;
+            --highlight: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #2ecc71;
+            --error: #e74c3c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f1;
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        #academy-card {
+            background-color: white;
+            width: 95%;
+            max-width: 650px;
+            padding: 25px;
+            border: 5px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 10px 10px 0px var(--primary);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 4px dashed #bdc3c7;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+        }
+        .lvl-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 6px 15px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border: 2px solid var(--comic-black);
+            border-radius: 8px;
+            letter-spacing: 1px;
+        }
+        .score-row {
+            margin: 12px 0 4px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .score-row span {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        /* ═══════ CHAT WINDOW ═══════ */
+        .chat-window {
+            background: #fdfbfb;
+            border: 3px solid var(--comic-black);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 180px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .chat-bubble {
+            background: #ffffff;
+            border: 2px solid var(--comic-black);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            font-weight: 500;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+            animation: slideIn 0.4s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-bubble .speaker {
+            display: inline-block;
+            background: var(--comic-black);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 5px;
+            margin-right: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 100px;
+            padding: 4px 10px;
+            margin: 0 5px;
+            background: #f1f2f6;
+            border: 2px dashed var(--primary);
+            border-radius: 6px;
+            color: var(--primary);
+            font-weight: 900;
+            text-align: center;
+            vertical-align: middle;
+            transition: 0.3s;
+        }
+        .gap.active {
+            background: #fef9e7;
+            color: var(--comic-black);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px rgba(241,196,15,0.5);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 3px rgba(241,196,15,0.5); }
+            50% { box-shadow: 0 0 0 6px rgba(241,196,15,0.2); }
+        }
+        .gap.filled {
+            background: var(--success);
+            color: white;
+            border-style: solid;
+            border-color: var(--comic-black);
+            animation: none;
+        }
+        .gap.filled-wrong {
+            background: #ffcdd2;
+            color: #c62828;
+            border-style: solid;
+            border-color: var(--error);
+            animation: none;
+        }
+
+        /* ═══════ OPTIONS PANEL ═══════ */
+        .option-panel {
+            background: #f4ecf7;
+            border: 3px dashed var(--primary);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .panel-title {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* ═══════ BUTTONS ═══════ */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; /* 3 columns for 3 options */
+            gap: 10px;
+        }
+        .hero-btn {
+            background: #fff;
+            border: 3px solid var(--comic-black);
+            padding: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.2s;
+            color: var(--comic-black);
+        }
+        .hero-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: #f1f2f6;
+            box-shadow: 0 4px 0 var(--comic-black);
+        }
+        .hero-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+        .hero-btn:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+        .hero-btn.correct-flash {
+            background: var(--success) !important;
+            color: #fff;
+            border-color: var(--success);
+        }
+        .hero-btn.wrong-flash {
+            background: var(--error) !important;
+            color: #fff;
+            border-color: var(--error);
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .hidden { display: none !important; }
+
+        /* ═══════ PROGRESS ═══════ */
+        .progress-bar {
+            height: 14px;
+            background: #eee;
+            border: 2px solid var(--comic-black);
+            margin-top: 25px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: 0.4s;
+        }
+        .progress-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        /* ═══════ WIN SCREEN ═══════ */
+        #win { text-align: center; }
+        #win h1 { font-size: 3.5rem; margin: 0; }
+        #win h2 { color: var(--primary); margin: 10px 0; }
+        #win p { font-size: 1rem; color: #555; }
+        
+        .notebook-box {
+            background: #e8f8f5;
+            border: 3px dashed #1abc9c;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .notebook-box h3 {
+            margin-top: 0;
+            color: #16a085;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .notebook-box p {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: var(--comic-black);
+            margin-bottom: 12px;
+            line-height: 1.6;
+            border-bottom: 1px solid #d1f2eb;
+            padding-bottom: 8px;
+        }
+        .notebook-box b {
+            color: var(--error);
+        }
+
+        @media (max-width: 520px) {
+            .chat-bubble { font-size: 1rem; padding: 12px; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hero-btn { font-size: 0.95rem; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="academy-card">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-badge">GRAMMAR: PAST TENSES (A1+)</div>
+        <div class="score-row">⭐ POINTS: <span id="score">0</span></div>
+    </div>
+
+    <!-- ══════════ MAIN EXERCISE ══════════ -->
+    <div id="lvl0" class="screen">
+        <div class="chat-window" id="chatBox"></div>
+        <div class="option-panel" id="optionPanel">
+            <div class="panel-title" id="panelTitle">🎯 Choose the correct option</div>
+            <div class="btn-grid" id="chatBtnBox"></div>
+        </div>
+    </div>
+
+    <!-- ══════════ WIN ══════════ -->
+    <div id="win" class="hidden">
+        <h1>📚✨</h1>
+        <h2>QUIZ COMPLETE!</h2>
+        <p>You successfully finished the Past Tenses test.</p>
+        <p style="margin-top:12px; font-size:1.2rem; font-weight:bold; color:var(--primary);"> Final score: <span id="finalScore">0</span> points </p>
+        
+        <!-- NOTEBOOK SECTION -->
+        <div class="notebook-box">
+            <h3>📝 Write these sentences in your notebook:</h3>
+            <div id="notebook-answers"></div>
+        </div>
+
+        <div id="send-status" style="margin-top: 15px; font-weight: bold; font-size: 1.1rem; min-height: 20px;"></div>
+        
+        <button class="hero-btn" onclick="location.reload()" style="width:100%; background: var(--secondary); color:white; margin-top:20px; padding:15px; font-size:1.1rem; grid-column: span 1;"> PLAY AGAIN 🔄 </button>
+    </div>
+
+    <div class="progress-bar"><div id="fill"></div></div>
+    <div class="progress-label">PROGRESS: <span id="progressTxt">0 / 8 questions</span></div>
+</div>
+
+<script>
+    // ======== MANDATORY TRACKING DATA ======
+    const TEST_NAME = "Past Simple vs Past Continuous (A1+)";
+    let userMistakes = [];
+    let correctAnswers = 0;
+    let completedGaps = 0;
+    const totalQuestions = 8; 
+
+    /* ══════════════════════════════════════════════ 
+       DIALOGUE AND QUESTIONS (8 Simplified Sentences)
+       ══════════════════════════════════════════════ */
+    const steps = [
+        { 
+            speaker: "story", 
+            html: "I <span class='gap' id='g1'>_____</span> when the phone rang.", 
+            gaps: [
+                { id: "g1", options: ["was sleeping", "slept", "sleeps"], correct: "was sleeping", display: "was sleeping" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "After I <span class='gap' id='g2'>_____</span> my breakfast, I went to school.", 
+            gaps: [
+                { id: "g2", options: ["ate", "was eating", "eats"], correct: "ate", display: "ate" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "She <span class='gap' id='g3'>_____</span> the window and looked outside.", 
+            gaps: [
+                { id: "g3", options: ["opened", "was opening", "opens"], correct: "opened", display: "opened" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "We stayed home because it <span class='gap' id='g4'>_____</span>.", 
+            gaps: [
+                { id: "g4", options: ["rained", "was raining", "rains"], correct: "was raining", display: "was raining" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "While they <span class='gap' id='g5'>_____</span> tennis, it started to rain.", 
+            gaps: [
+                { id: "g5", options: ["played", "were playing", "play"], correct: "were playing", display: "were playing" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "He <span class='gap' id='g6'>_____</span> TV and then went to bed.", 
+            gaps: [
+                { id: "g6", options: ["watched", "was watching", "watches"], correct: "watched", display: "watched" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "They <span class='gap' id='g7'>_____</span> dinner and then washed the dishes.", 
+            gaps: [
+                { id: "g7", options: ["cooked", "were cooking", "cooks"], correct: "cooked", display: "cooked" }
+            ] 
+        },
+        { 
+            speaker: "story", 
+            html: "I didn't hear the teacher because I <span class='gap' id='g8'>_____</span>.", 
+            gaps: [
+                { id: "g8", options: ["talked", "was talking", "talks"], correct: "was talking", display: "was talking" }
+            ] 
+        }
+    ];
+
+    let currentStep = 0;
+    let gapIndex = 0;
+    let score = 0;
+    const chatBox = document.getElementById('chatBox');
+    const chatBtnBox = document.getElementById('chatBtnBox');
+    const optionPanel = document.getElementById('optionPanel');
+
+    /* ══════════════════════════════════════════════ 
+       REVEAL BUBBLES 
+       ══════════════════════════════════════════════ */
+    function revealBubble(stepIdx) {
+        const step = steps[stepIdx];
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + step.speaker;
+        
+        let label = "STORY";
+        if (step.speaker === "story") label = "STORY";
+        
+        bubble.innerHTML = `<span class="speaker">${label}</span>${step.html}`;
+        chatBox.appendChild(bubble);
+        
+        // Auto-scroll to bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (step.gaps && step.gaps.length > 0) {
+            gapIndex = 0;
+            activateGap(step.gaps[0]);
+        } else {
+            optionPanel.style.display = 'none';
+            setTimeout(() => {
+                currentStep++;
+                if (currentStep < steps.length) revealBubble(currentStep);
+                else nextLevel();
+            }, 600);
+        }
+    }
+
+    function activateGap(gapData) {
+        optionPanel.style.display = 'block';
+        document.querySelectorAll('.gap').forEach(g => g.classList.remove('active'));
+        
+        const activeEl = document.getElementById(gapData.id);
+        if (activeEl) activeEl.classList.add('active');
+
+        chatBtnBox.innerHTML = '';
+        // Shuffle the plain text options
+        const shuffled = [...gapData.options].sort(() => Math.random() - 0.5);
+        
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'hero-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkGap(gapData, opt, btn);
+            chatBtnBox.appendChild(btn);
+        });
+    }
+
+    function checkGap(gapData, chosen, btn) {
+        const allBtns = chatBtnBox.querySelectorAll('.hero-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        const gapEl = document.getElementById(gapData.id);
+        const step = steps[currentStep];
+        
+        completedGaps++;
+        document.getElementById('fill').style.width = (completedGaps / totalQuestions * 100) + '%';
+        document.getElementById('progressTxt').innerText = completedGaps + " / " + totalQuestions + " questions";
+
+        if (chosen === gapData.correct) {
+            // CORRECT ANSWER
+            btn.classList.add('correct-flash');
+            gapEl.innerText = gapData.display;
+            gapEl.classList.remove('active');
+            gapEl.classList.add('filled');
+            
+            score += 10; // 8 questions * 10 = 80 max points
+            correctAnswers++;
+            document.getElementById('score').innerText = score;
+
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            setTimeout(() => {
+                proceedToNext(step);
+            }, 700);
+        } else {
+            // WRONG ANSWER
+            btn.classList.add('wrong-flash');
+            
+            // MANDATORY: Track mistake
+            userMistakes.push(chosen);
+            
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+
+            // Highlight the correct button
+            allBtns.forEach(b => {
+                if (b.innerText === gapData.correct) {
+                    b.classList.add('correct-flash');
+                }
+            });
+
+            // Show the correct answer in the gap
+            gapEl.innerText = gapData.display;
+            gapEl.classList.remove('active');
+            gapEl.classList.add('filled-wrong');
+
+            setTimeout(() => {
+                proceedToNext(step);
+            }, 2000);
+        }
+    }
+
+    function proceedToNext(step) {
+        if (step.gaps && gapIndex < step.gaps.length - 1) {
+            gapIndex++;
+            activateGap(step.gaps[gapIndex]);
+        } else {
+            currentStep++;
+            if (currentStep < steps.length) revealBubble(currentStep);
+            else nextLevel();
+        }
+    }
+
+    /* ══════════════════════════════════════════════ 
+       LEVEL SWITCHING & GOOGLE SHEETS 
+       ══════════════════════════════════════════════ */
+    function nextLevel() {
+        document.getElementById('lvl0').classList.add('hidden');
+        document.getElementById('win').classList.remove('hidden');
+        document.getElementById('lvl-tag').innerText = "FINISH!";
+        document.getElementById('finalScore').innerText = score;
+        document.getElementById('progressTxt').innerText = totalQuestions + " / " + totalQuestions + " questions";
+        document.getElementById('fill').style.width = '100%';
+        
+        generateNotebookAnswers();
+        sendResultsToGoogle();
+    }
+
+    // Generate the sentences for the notebook
+    function generateNotebookAnswers() {
+        const container = document.getElementById('notebook-answers');
+        container.innerHTML = '';
+        
+        let counter = 1; 
+        
+        steps.forEach((step) => {
+            let text = step.html;
+            
+            // Replace the gap span with the correct answer
+            if (step.gaps && step.gaps.length > 0) {
+                step.gaps.forEach(gap => {
+                    const gapRegex = new RegExp(`<span class='gap' id='${gap.id}'>_____</span>`, 'g');
+                    text = text.replace(gapRegex, `<b>${gap.correct}</b>`);
+                });
+            }
+            
+            container.innerHTML += `<p>${counter}. ${text}</p>`;
+            counter++;
+        });
+    }
+
+    // ========== MANDATORY GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", correctAnswers);
+        formData.append("total", totalQuestions);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2ecc71'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    /* ══════════════════════════════════════════════ 
+       INIT 
+       ══════════════════════════════════════════════ */
+    revealBubble(0);
+</script>
+</body>
+</html>
