@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Road Safety & Transport Academy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@700;800&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Baloo 2', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(180deg, #4fc3f7 0%, #81d4fa 40%, #b3e5fc 100%);
+            background-attachment: fixed;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decorative clouds */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before {
+            width: 180px; height: 60px;
+            top: 40px; left: -30px;
+            box-shadow: 80px 20px 0 -10px rgba(255,255,255,0.7),
+                        160px -10px 0 -15px rgba(255,255,255,0.6);
+        }
+        body::after {
+            width: 220px; height: 70px;
+            bottom: 60px; right: -50px;
+            box-shadow: -100px 30px 0 -15px rgba(255,255,255,0.7),
+                        -200px 5px 0 -20px rgba(255,255,255,0.5);
+        }
+
+        /* ===== MAIN CARD ===== */
+        .detective-card {
+            background: #fff;
+            width: 100%;
+            max-width: 560px;
+            padding: 30px 25px 25px;
+            border-radius: 30px;
+            border: 5px solid #0d47a1;
+            box-shadow: 0 12px 0 #0d47a1, 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Star badge at top of card */
+        .detective-card::before {
+            content: '⭐';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 46px;
+            filter: drop-shadow(0 3px 0 #b8860b);
+            animation: starSpin 3s ease-in-out infinite;
+        }
+
+        @keyframes starSpin {
+            0%, 100% { transform: translateX(-50%) rotate(-10deg) scale(1); }
+            50% { transform: translateX(-50%) rotate(10deg) scale(1.1); }
+        }
+
+        /* ===== HEADERS ===== */
+        .level-tag {
+            display: inline-block;
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d);
+            color: #5d4037;
+            font-family: 'Fredoka One', cursive;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 3px solid #5d4037;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #5d4037;
+        }
+
+        h1 {
+            color: #0d47a1;
+            font-family: 'Fredoka One', cursive;
+            font-size: 22px;
+            margin: 0 0 18px 0;
+            padding-bottom: 12px;
+            border-bottom: 4px dashed #bbdefb;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== WORD DISPLAY ===== */
+        .word-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px;
+            font-weight: 800;
+            color: #d32f2f;
+            margin: 15px 0;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+            text-shadow: 3px 3px 0 #ffe082, 6px 6px 0 rgba(0,0,0,0.08);
+            animation: wordBounce 0.6s ease-out;
+            min-height: 60px;
+            word-wrap: break-word;
+        }
+
+        @keyframes wordBounce {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .translation-hint {
+            display: inline-block;
+            font-size: 16px;
+            color: #fff;
+            background: #7e57c2;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 5px 0 20px;
+            border: 3px solid #4527a0;
+            box-shadow: 0 4px 0 #4527a0;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-grid {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(180deg, #42a5f5, #1976d2);
+            color: white;
+            border: 3px solid #0d47a1;
+            padding: 15px 25px;
+            font-size: 20px;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0d47a1;
+            transition: 0.12s;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+            text-align: center;
+            min-width: 70px;
+            text-transform: uppercase;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(180deg, #64b5f6, #2196f3);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0d47a1;
+        }
+
+        /* For long options in Level 2 */
+        .btn-grid.long-options {
+            flex-direction: column;
+        }
+        .btn-grid.long-options .action-btn {
+            font-size: 18px;
+            text-transform: none;
+        }
+
+        /* ===== FEEDBACK ===== */
+        #feedback {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 22px;
+            min-height: 30px;
+            font-family: 'Fredoka One', cursive;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-correct {
+            color: #2e7d32;
+            animation: popFeedback 0.4s ease-out;
+        }
+
+        .feedback-wrong {
+            color: #c62828;
+            animation: shakeFeedback 0.4s ease-out;
+        }
+
+        @keyframes popFeedback {
+            0% { transform: scale(0.5); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shakeFeedback {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* ===== VICTORY ===== */
+        .victory-title {
+            color: #2e7d32;
+            font-family: 'Fredoka One', cursive;
+            font-size: 30px;
+            margin: 15px 0;
+            animation: victoryPulse 1s ease-in-out infinite;
+            text-shadow: 3px 3px 0 #c8e6c9;
+        }
+
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .victory-text {
+            color: #555;
+            font-size: 17px;
+            margin: 10px 0 20px;
+            font-weight: 700;
+        }
+
+        .victory-emoji {
+            font-size: 70px;
+            display: block;
+            margin: 10px 0;
+            animation: trophyBounce 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes trophyBounce {
+            0% { transform: translateY(0) rotate(-5deg); }
+            100% { transform: translateY(-12px) rotate(5deg); }
+        }
+
+        .replay-btn {
+            background: linear-gradient(180deg, #66bb6a, #43a047);
+            color: white;
+            border: 3px solid #1b5e20;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1b5e20;
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            transition: 0.12s;
+        }
+
+        .replay-btn:hover { transform: translateY(-2px); }
+        .replay-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b5e20; }
+
+        .victory-card::before,
+        .victory-card::after {
+            content: '🎉';
+            position: absolute;
+            font-size: 40px;
+            animation: floatStar 2s ease-in-out infinite;
+        }
+        .victory-card::before { top: 20px; left: 20px; }
+        .victory-card::after { top: 20px; right: 20px; animation-delay: 0.5s; }
+
+        @keyframes floatStar {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-10px) rotate(10deg); }
+        }
+        
+        .status-msg {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .detective-card { padding: 25px 15px 20px; border-radius: 25px; }
+            .word-display { font-size: 24px; }
+            h1 { font-size: 18px; }
+            .action-btn { font-size: 16px; padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="detective-card" id="detective-card">
+    <div class="level-tag" id="level-label">LEVEL 1</div>
+    <h1 id="task-desc">Letter Matcher!</h1>
+    <div class="word-display" id="main-word">Loading...</div>
+    <div class="translation-hint" id="translation-hint">Значение: Загрузка...</div>
+    <div id="interaction-area" class="btn-grid"></div>
+    <div id="feedback"></div>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Road Safety & Transport Vocabulary (Letters)";
+    let userMistakes = [];
+    let totalScore = 0;
+
+    // ========== VOCABULARY DATA ==========
+    const vocabulary = [
+        // --- Image 1 ---
+        { full: "ride a bike", masked: "ride a b_ke", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["ride a bike", "ride a bikee", "ryde a bike"], translation: "кататься на велосипеде" },
+        { full: "fly a plane", masked: "fly a pl_ne", ans1: "a", opts1: ["a", "e", "i", "u"], opts2: ["fly a plane", "fly a plaine", "fly a plain"], translation: "управлять самолётом" },
+        { full: "sail a boat", masked: "s_il a boat", ans1: "a", opts1: ["a", "e", "o", "u"], opts2: ["sail a boat", "sail a bote", "sale a boat"], translation: "плавать на лодке" },
+        { full: "drive a car", masked: "drive a c_r", ans1: "a", opts1: ["a", "i", "o", "u"], opts2: ["drive a car", "drive a kar", "drive a ca"], translation: "водить машину" },
+        
+        // --- Image 2 ---
+        { full: "wear a seat belt", masked: "we_r a seat belt", ans1: "a", opts1: ["a", "e", "i", "o"], opts2: ["wear a seat belt", "wear a seet belt", "were a seat belt"], translation: "пристегивать ремень безопасности" },
+        { full: "walk straight across the road", masked: "walk str_ight across the road", ans1: "a", opts1: ["a", "e", "i", "o"], opts2: ["walk straight across the road", "walk strait across the road", "walk streight across the road"], translation: "переходить дорогу прямо" },
+        { full: "look both ways", masked: "look both w_ys", ans1: "a", opts1: ["a", "e", "i", "o"], opts2: ["look both ways", "look both wayes", "look both waies"], translation: "смотреть в обе стороны" },
+        { full: "walk on the pavement", masked: "walk on the pav_ment", ans1: "e", opts1: ["a", "e", "i", "o"], opts2: ["walk on the pavement", "walk on the pavment", "walk on the paveement"], translation: "идти по тротуару" },
+        { full: "run onto the road", masked: "r_n onto the road", ans1: "u", opts1: ["a", "e", "i", "u"], opts2: ["run onto the road", "run on to the road", "run onto the rode"], translation: "выбегать на дорогу" },
+        { full: "talk to the driver", masked: "talk to the dr_ver", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["talk to the driver", "talk to the drivor", "talk to the drivar"], translation: "разговаривать с водителем" },
+        { full: "lean out of the window", masked: "lean out of the w_ndow", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["lean out of the window", "lean out of the windo", "lean out of the windoe"], translation: "высовываться из окна" },
+        
+        // --- Image 3 ---
+        { full: "parking zone", masked: "parking z_ne", ans1: "o", opts1: ["a", "e", "i", "o"], opts2: ["parking zone", "parking zome", "parkin zone"], translation: "парковочная зона" },
+        { full: "pedestrian", masked: "pedestr_an", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["pedestrian", "pedestrain", "pedestrien"], translation: "пешеход" },
+        { full: "pavement", masked: "pavem_nt", ans1: "e", opts1: ["a", "e", "i", "o"], opts2: ["pavement", "pavemant", "pavementt"], translation: "тротуар" },
+        { full: "traffic lights", masked: "traffic l_ghts", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["traffic lights", "trafic lights", "traffic lites"], translation: "светофор" },
+        { full: "traffic sign", masked: "traffic s_gn", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["traffic sign", "trafic sign", "traffic sine"], translation: "дорожный знак" },
+        { full: "zebra crossing", masked: "zebra cross_ng", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["zebra crossing", "zebra crosing", "zebra crossin"], translation: "пешеходный переход" },
+        { full: "traffic warden", masked: "traffic w_rden", ans1: "a", opts1: ["a", "e", "i", "o"], opts2: ["traffic warden", "traffic wardon", "traffic wardan"], translation: "инспектор дорожного движения" },
+        { full: "yellow lines", masked: "yellow l_nes", ans1: "i", opts1: ["a", "e", "i", "o"], opts2: ["yellow lines", "yellow lins", "yellow lyines"], translation: "желтые линии" }
+    ];
+
+    let currentLevel = 1;
+    let currentIdx = 0;
+
+    function initTask() {
+        // --- STAGE JUMP LOGIC ---
+        if (currentIdx >= vocabulary.length) {
+            if (currentLevel < 3) {
+                currentLevel++;
+                currentIdx = 0;
+                const fb = document.getElementById('feedback');
+                fb.innerText = `🚀 ADVANCING TO LEVEL ${currentLevel}...`;
+                fb.style.color = "#1976D2";
+                fb.className = '';
+                setTimeout(initTask, 1500);
+                return;
+            } else {
+                showVictory();
+                return;
+            }
+        }
+
+        const data = vocabulary[currentIdx];
+        const area = document.getElementById('interaction-area');
+        const label = document.getElementById('level-label');
+        const desc = document.getElementById('task-desc');
+        const mainWord = document.getElementById('main-word');
+        const transHint = document.getElementById('translation-hint');
+
+        area.innerHTML = "";
+        area.className = 'btn-grid'; // Reset classes
+        const fb = document.getElementById('feedback');
+        fb.innerText = "";
+        fb.className = '';
+
+        mainWord.style.animation = 'none';
+        setTimeout(() => mainWord.style.animation = '', 10);
+
+        transHint.innerText = `Значение: ${data.translation}`;
+
+        /* ===== LEVEL 1: MISSING LETTER ===== */
+        if (currentLevel === 1) {
+            label.innerText = "🔤 LEVEL 1: MISSING LETTER";
+            desc.innerText = "Choose the missing letter:";
+            
+            mainWord.innerText = data.masked;
+
+            let choices = [...data.opts1].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.ans1) success();
+                    else {
+                        userMistakes.push(opt);
+                        error("Try another letter! 🔍");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 2: CORRECT SPELLING ===== */
+        else if (currentLevel === 2) {
+            label.innerText = "🔨 LEVEL 2: CORRECT SPELLING";
+            desc.innerText = "Choose the correctly spelled phrase:";
+            mainWord.innerText = data.masked.replace('_', '?');
+            area.className = 'btn-grid long-options'; // For longer text
+
+            let choices = [...data.opts2].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.full) success();
+                    else {
+                        userMistakes.push(opt);
+                        error("Wrong spelling! 🔧");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 3: TRANSLATION MATCH ===== */
+        else if (currentLevel === 3) {
+            label.innerText = "🌍 LEVEL 3: TRANSLATION";
+            desc.innerText = "Pick the correct translation:";
+            mainWord.innerText = data.full;
+            area.className = 'btn-grid long-options';
+
+            let options = [data.translation];
+            while (options.length < 3) {
+                let randTrans = vocabulary[Math.floor(Math.random() * vocabulary.length)].translation;
+                if (!options.includes(randTrans)) options.push(randTrans);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.translation) success();
+                    else {
+                        userMistakes.push(opt);
+                        error("Wrong translation! 🤔");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+    }
+
+    function success() {
+        const fb = document.getElementById('feedback');
+        fb.innerText = "✅ GREAT JOB!";
+        fb.className = 'feedback-correct';
+
+        totalScore++;
+        currentIdx++;
+        setTimeout(initTask, 1400);
+    }
+
+    function error(msg = "Incorrect! Try again!") {
+        const fb = document.getElementById('feedback');
+        fb.innerText = `❌ ${msg}`;
+        fb.className = 'feedback-wrong';
+    }
+
+    function showVictory() {
+        const card = document.getElementById('detective-card');
+        card.classList.add('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" style="background: linear-gradient(180deg, #66bb6a, #2e7d32); color: white; border-color: #1b5e20;">MISSION COMPLETE</div>
+            <span class="victory-emoji">🏆</span>
+            <h1 class="victory-title">YOU WIN, AGENT!</h1>
+            <p class="victory-text">You mastered all the Road Safety & Transport words! 🦸‍♂️</p>
+            <p style="font-size: 1.2rem; font-weight: bold; color: #1976d2; margin-bottom: 10px;">Final Score: ${totalScore} / ${vocabulary.length * 3}</p>
+            
+            <div id="send-status" class="status-msg"></div>
+            
+            <button class="replay-btn" onclick="replayQuest()">▶️ PLAY AGAIN</button>
+        `;
+        
+        sendResultsToGoogle();
+    }
+
+    function replayQuest() {
+        currentLevel = 1;
+        currentIdx = 0;
+        totalScore = 0;
+        userMistakes = [];
+        const card = document.getElementById('detective-card');
+        card.classList.remove('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" id="level-label">LEVEL 1</div>
+            <h1 id="task-desc">Letter Matcher!</h1>
+            <div class="word-display" id="main-word">Loading...</div>
+            <div class="translation-hint" id="translation-hint">Значение: Загрузка...</div>
+            <div id="interaction-area" class="btn-grid"></div>
+            <div id="feedback"></div>
+        `;
+        initTask();
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", totalScore);
+        formData.append("total", vocabulary.length * 3);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2e7d32'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#c62828'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    initTask();
+</script>
+
+</body>
+</html>
