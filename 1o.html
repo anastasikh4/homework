@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Reading: True, False, Not Stated (Starlight 2)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #a7f3d0 0%, #ecfdf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .app { max-width: 760px; width: 100%; position: relative; z-index: 1; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #10b981;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #047857; font-size: 1.9em; margin-bottom: 10px; font-weight: 900; }
+        .subtitle { color: #10b981; font-size: 1em; font-weight: 600; margin-bottom: 12px; }
+
+        .progress-bar {
+            width: 100%; height: 12px; background: #d1fae5;
+            border-radius: 6px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #34d399, #10b981); width: 0%; transition: 0.4s; }
+
+        .reading-text {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 22px;
+            font-size: 1.15em;
+            color: #065f46;
+            border: 2px dashed #6ee7b7;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .sentence-box {
+            background: #FFF9E6;
+            padding: 20px 22px;
+            border-radius: 16px;
+            margin-bottom: 22px;
+            font-size: 1.15em;
+            color: #444;
+            border-left: 5px solid #fbbf24;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+        .sentence-box .num {
+            display: inline-block;
+            background: #fbbf24;
+            color: #fff;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 900;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        .question-text { font-size: 1.15em; color: #047857; margin-bottom: 16px; font-weight: bold; text-align: center; }
+
+        .options { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+        .btn {
+            padding: 16px 20px;
+            border: 3px solid #e5e7eb;
+            border-radius: 14px;
+            background: #f9fafb;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 700;
+            transition: all 0.15s;
+            font-family: inherit;
+            color: #1f2937;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative; /* For heart animation reference */
+        }
+        .btn .letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px; height: 30px;
+            background: #10b981;
+            color: white;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+        .btn:hover:not(:disabled) { border-color: #10b981; background: #ecfdf5; transform: translateY(-2px); }
+        .btn:active:not(:disabled) { transform: translateY(1px); }
+        
+        .btn.correct {
+            background: #dcfce7 !important;
+            border-color: #16a34a !important;
+            color: #166534 !important;
+        }
+        .btn.correct .letter { background: #16a34a; }
+        
+        .btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b !important;
+            animation: shake 0.4s;
+        }
+        .btn.wrong .letter { background: #dc2626; }
+        .btn:disabled { cursor: default; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* 🌟 HEART ANIMATION CSS 🌟 */
+        .heart-particle {
+            position: fixed;
+            font-size: 1.8em;
+            pointer-events: none;
+            z-index: 9999;
+            animation: floatUpAndFade 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes floatUpAndFade {
+            0% { 
+                transform: translate(-50%, -50%) scale(0.5) rotate(0deg); 
+                opacity: 1; 
+            }
+            50% { 
+                transform: translate(-50%, -100px) scale(1.3) rotate(20deg); 
+                opacity: 0.8; 
+            }
+            100% { 
+                transform: translate(-50%, -150px) scale(0.8) rotate(-20deg); 
+                opacity: 0; 
+            }
+        }
+
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; animation: bounce 1.5s infinite; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .result-stat {
+            background: #ecfdf5;
+            border: 3px solid #a7f3d0;
+            border-radius: 14px;
+            padding: 12px 20px;
+            min-width: 100px;
+        }
+        .result-stat .val {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: #047857;
+        }
+        .result-stat .lbl {
+            font-size: 0.75em;
+            font-weight: 900;
+            color: #10b981;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .rule-hint {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px dashed #f59e0b;
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #92400e;
+            text-align: center;
+        }
+
+        .success-msg {
+            color: #16a34a;
+            font-weight: 900;
+            font-size: 1.1em;
+            margin-top: 15px;
+            display: none;
+        }
+
+        @media (max-width: 520px) {
+            .title { font-size: 1.4em; }
+            .btn { font-size: 0.95em; padding: 14px 14px; }
+            .sentence-box { font-size: 1em; padding: 16px; }
+            .reading-text { font-size: 0.95em; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">📖 Reading Practice</div>
+            <div class="subtitle">TRUE / FALSE / NOT STATED</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div class="rule-hint">
+                💡 <b>TRUE</b> — yes, it says this · <b>FALSE</b> — no, it is wrong · <b>NOT STATED</b> — the text doesn't say
+            </div>
+            
+            <div class="reading-text">
+                This is Ben. He is eight. He has got a big school bag. The bag is blue. Ben has got two books and a red pen in his bag. He likes to read. Ben has got a dog. The dog is black. It likes to run. Ben and his dog play in the park. 
+            </div>
+
+            <div class="sentence-box" id="sentenceBox"></div>
+            <div class="question-text" id="qText">Is it true or false?</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji" id="winEmoji">🏆</div>
+        <h1 style="color: #047857;" id="winTitle">EXCELLENT!</h1>
+        <div class="result-stats">
+            <div class="result-stat"><div class="val" id="winCorrect">0/8</div><div class="lbl">Correct</div></div>
+            <div class="result-stat"><div class="val" id="winXP">0</div><div class="lbl">XP</div></div>
+            <div class="result-stat"><div class="val" id="winPct">0%</div><div class="lbl">Accuracy</div></div>
+        </div>
+        <p style="font-size: 1.1em; margin: 15px 0; color: #047857; font-weight: 700;" id="winMsg"></p>
+        
+        <p id="success-msg" class="success-msg">Results sent successfully! ✅</p>
+        
+        <button class="btn" onclick="location.reload()" style="padding: 12px 30px; font-size: 1.1em; justify-content: center; display: inline-flex; margin-top: 20px;">🔄 Restart</button>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Reading: True False Not Stated (Starlight 2)";
+    let userMistakes = [];
+    let score = 0;
+    let xp = 0;
+    const letters = ['A','B','C'];
+
+    /* ============================================================
+       QUIZ DATA — Adapted for Starlight 2 (2nd Grade Level)
+       ============================================================ */
+    const questions = [
+        {
+            num: 1,
+            sentence: 'Ben is eight years old.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 0, // TRUE
+        },
+        {
+            num: 2,
+            sentence: 'Ben has got a red school bag.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 1, // FALSE
+        },
+        {
+            num: 3,
+            sentence: 'Ben has got a pen in his bag.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 0, // TRUE
+        },
+        {
+            num: 4,
+            sentence: 'Ben has got three books.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 1, // FALSE
+        },
+        {
+            num: 5,
+            sentence: 'The dog is black.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 0, // TRUE
+        },
+        {
+            num: 6,
+            sentence: 'The dog likes to sleep.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 2, // NOT STATED
+        },
+        {
+            num: 7,
+            sentence: 'Ben plays in the park with his dog.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 0, // TRUE
+        },
+        {
+            num: 8,
+            sentence: 'Ben has got a sister.',
+            options: ['TRUE', 'FALSE', 'NOT STATED'],
+            correct: 2, // NOT STATED
+        }
+    ];
+
+    let current = 0;
+
+    function load() {
+        if (current >= questions.length) {
+            showEnd();
+            return;
+        }
+
+        const data = questions[current];
+
+        document.getElementById('sentenceBox').innerHTML =
+            `<span class="num">${data.num}</span>${data.sentence}`;
+
+        document.getElementById('qText').textContent = 'Is it true or false?';
+
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+
+        data.options.forEach((opt, i) => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+            b.onclick = () => check(i, opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choiceIndex, choiceText, btn) {
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+        const data = questions[current];
+
+        if (choiceIndex === data.correct) {
+            btn.classList.add('correct');
+            score++;
+            xp += 10;
+            
+            // 🌟 Trigger Full Hearts for correct answer
+            createHeartAnimation(btn, true); 
+            
+        } else {
+            btn.classList.add('wrong');
+            userMistakes.push(choiceText);
+            
+            // 💔 Trigger Broken Hearts for wrong answer
+            createHeartAnimation(btn, false);
+
+            document.querySelectorAll('.btn').forEach((b, i) => {
+                if (i === data.correct) b.classList.add('correct');
+            });
+        }
+
+        document.getElementById('pFill').style.width = ((current + 1) / questions.length) * 100 + '%';
+
+        setTimeout(() => {
+            current++;
+            load();
+        }, 1500);
+    }
+
+    // ================================================================
+    // 🌟 HEART ANIMATION FUNCTION (Updated)
+    // ================================================================
+    function createHeartAnimation(buttonElement, isCorrect) {
+        const rect = buttonElement.getBoundingClientRect();
+        // Center of the clicked button
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+        
+        // Correct = 8 full hearts, Wrong = 5 broken hearts
+        const heartCount = isCorrect ? 8 : 5;
+        const heartEmoji = isCorrect ? '❤️' : '💔';
+
+        for (let i = 0; i < heartCount; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerText = heartEmoji;
+            
+            // Randomize starting position slightly to spread them out
+            const offsetX = (Math.random() - 0.5) * 100; 
+            const offsetY = (Math.random() - 0.5) * 30;
+
+            heart.style.left = `${startX + offsetX}px`;
+            heart.style.top = `${startY + offsetY}px`;
+            
+            // Randomize animation duration slightly for a natural effect
+            heart.style.animationDuration = `${1 + Math.random() * 0.5}s`;
+
+            document.body.appendChild(heart);
+
+            // Remove the element after animation ends to keep the DOM clean
+            setTimeout(() => {
+                heart.remove();
+            }, 1600);
+        }
+    }
+
+    function showEnd() {
+        document.getElementById('gameUI').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'block';
+
+        const total = questions.length;
+        const pct = Math.round((score / total) * 100);
+
+        let emoji = '💪', title = 'GOOD TRY!', msg = 'Read the text again and try one more time!';
+        if (pct === 100) {
+            emoji = '🏆'; title = 'PERFECT!'; msg = 'Amazing! You are a reading star! 🌟';
+        } else if (pct >= 70) {
+            emoji = '🎉'; title = 'GREAT JOB!'; msg = 'Almost perfect! Just a couple of mistakes.';
+        } else if (pct >= 50) {
+            emoji = '👍'; title = 'GOOD EFFORT!'; msg = 'Not bad! Be careful with the details.';
+        }
+
+        document.getElementById('winEmoji').textContent = emoji;
+        document.getElementById('winTitle').textContent = title;
+        document.getElementById('winMsg').textContent = msg;
+        document.getElementById('winCorrect').textContent = `${score}/${total}`;
+        document.getElementById('winXP').textContent = xp;
+        document.getElementById('winPct').textContent = pct + '%';
+
+        // --- SEND TO GOOGLE SHEETS ---
+        sendResultsToGoogle();
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: questions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            const msgEl = document.getElementById('success-msg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Start the quiz
+    load();
+</script>
+
+</body>
+</html>

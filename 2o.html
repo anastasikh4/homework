@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plural Nouns Grammar Garden 🌸</title>
+    <style>
+        :root {
+            --spring-mint: #e8f5e9;
+            --cherry-pink: #ffc1cc;
+            --leaf-green: #4caf50;
+            --sun-yellow: #fff59d;
+            --sky-blue: #b3e5fc;
+            --bark: #5d4037;
+            --error-red: #f44336;
+            --success-green: #4caf50;
+        }
+        body {
+            background: linear-gradient(135deg, var(--sky-blue), var(--spring-mint));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--bark);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .garden-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 35px;
+            border: 10px solid var(--cherry-pink);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: var(--cherry-pink);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .progress-container {
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        #progress-bar {
+            height: 100%;
+            background: var(--leaf-green);
+            width: 0%;
+            border-radius: 10px;
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stats { display: flex; justify-content: space-between; font-weight: bold; }
+        
+        .quiz-area { padding: 25px; text-align: center; flex-grow: 1; }
+        .emoji-vibe { font-size: 3.5em; margin-bottom: 10px; display: block; }
+        .question-text { font-size: 1.3em; font-weight: bold; margin-bottom: 25px; line-height: 1.4; }
+        
+        .btn-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        
+        button {
+            padding: 18px;
+            border: 3px solid var(--cherry-pink);
+            border-radius: 50px;
+            background: var(--sun-yellow);
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--bark);
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        
+        button:not(:disabled):hover {
+            background: var(--leaf-green);
+            color: white;
+            transform: scale(1.05);
+            border-color: var(--leaf-green);
+        }
+
+        button.correct-answer {
+            background-color: var(--success-green) !important;
+            color: white !important;
+            border-color: #388e3c !important;
+        }
+        button.wrong-answer {
+            background-color: var(--error-red) !important;
+            color: white !important;
+            border-color: #d32f2f !important;
+        }
+        button:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #continue-btn {
+            display: none;
+            background: var(--sky-blue);
+            border-color: #81d4fa;
+            margin-top: 20px;
+        }
+
+        #victory { display: none; padding: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="garden-card">
+    <div class="header">
+        <div class="stats">
+            <span id="rank-text">🌱 Seedling</span>
+            <span id="q-count">1 / 10</span>
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="quiz-content" class="quiz-area">
+        <span id="current-emoji" class="emoji-vibe">🌸</span>
+        <div id="question-text" class="question-text">Grammar is loading...</div>
+        <div id="options-container" class="btn-grid"></div>
+        <button id="continue-btn" onclick="nextQuestion()">CONTINUE 🌿</button>
+    </div>
+
+    <div id="victory">
+        <span class="emoji-vibe">🦋🐝👑</span>
+        <h1>GARDEN MASTERED!</h1>
+        <p id="final-score-text">You completed all 10 Plural Nouns missions.</p>
+        <div id="send-status" style="color: green; font-weight: bold; margin-bottom: 15px; font-size: 1.1em;"></div>
+        <button onclick="location.reload()" style="width:100%">Plant a New Garden 🌷</button>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION & TRACKING ---
+    const TEST_NAME = "Plural Nouns Quiz (Grammar Garden)";
+    let userMistakes = [];
+    let score = 0;
+
+    // 10 questions testing plural rules (s, es, y->ies)
+    const questionsData = [
+        { q: "What is the plural of 'city'?", opt: ["citys", "cities", "cityes"], ans: 1, em: "🏙️" },
+        { q: "What is the plural of 'watch'?", opt: ["watchs", "watches", "watchies"], ans: 1, em: "⌚" },
+        { q: "What is the plural of 'dog'?", opt: ["dogs", "doges", "dogies"], ans: 0, em: "🐶" },
+        { q: "What is the plural of 'glass'?", opt: ["glasss", "glasses", "glassies"], ans: 1, em: "🥛" },
+        { q: "What is the plural of 'baby'?", opt: ["babys", "babies", "babyes"], ans: 1, em: "👶" },
+        { q: "What is the plural of 'photo'?", opt: ["photos", "photoes", "photoies"], ans: 0, em: "📷" },
+        { q: "What is the plural of 'brush'?", opt: ["brushs", "brushes", "brushies"], ans: 1, em: "🖌️" },
+        { q: "What is the plural of 'story'?", opt: ["storys", "stories", "storyes"], ans: 1, em: "📖" },
+        { q: "What is the plural of 'bench'?", opt: ["benchs", "benches", "benchies"], ans: 1, em: "🪑" },
+        { q: "What is the plural of 'car'?", opt: ["cars", "cares", "caries"], ans: 0, em: "🚗" }
+    ];
+
+    let currentQ = 0;
+    let quizList = [];
+    const ranks = ["🌱 Seedling", "🌿 Sprout", "🌷 Blossom", "🦋 Butterfly", "🌳 Gardener", "👑 Master"];
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function initQuiz() {
+        quizList = [...questionsData];
+        shuffle(quizList);
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const data = quizList[currentQ];
+        document.getElementById('current-emoji').innerText = data.em;
+        document.getElementById('question-text').innerText = data.q;
+        document.getElementById('q-count').innerText = (currentQ + 1) + " / " + quizList.length;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        // Hide continue button
+        document.getElementById('continue-btn').style.display = 'none';
+
+        // Shuffle options
+        let shuffledOptions = data.opt.map((text, i) => ({ text, isCorrect: i === data.ans }));
+        shuffle(shuffledOptions);
+        
+        shuffledOptions.forEach((option) => {
+            const btn = document.createElement('button');
+            btn.innerText = option.text;
+            btn.dataset.correct = option.isCorrect;
+            btn.onclick = () => checkAnswer(btn, option.isCorrect, option.text);
+            container.appendChild(btn);
+        });
+
+        // Update Progress Bar and Rank
+        document.getElementById('progress-bar').style.width = (currentQ / quizList.length * 100) + "%";
+        let rankIndex = Math.floor(currentQ / 2);
+        document.getElementById('rank-text').innerText = ranks[rankIndex] || "👑 Master";
+    }
+
+    function checkAnswer(clickedBtn, isCorrect, optionText) {
+        const allBtns = document.querySelectorAll('#options-container button');
+        
+        // Disable all buttons so user can't click again
+        allBtns.forEach(btn => btn.disabled = true);
+
+        if (isCorrect) {
+            clickedBtn.classList.add('correct-answer');
+            score++;
+        } else {
+            clickedBtn.classList.add('wrong-answer');
+            // Track mistake
+            userMistakes.push(optionText);
+            
+            // Highlight the correct one
+            allBtns.forEach(btn => {
+                if (btn.dataset.correct === "true") {
+                    btn.classList.add('correct-answer');
+                }
+            });
+        }
+
+        // Show the continue button
+        document.getElementById('continue-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < quizList.length) {
+            renderQuestion();
+        } else {
+            // Victory
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('progress-bar').style.width = "100%";
+            document.getElementById('rank-text').innerText = "👑 Master";
+            document.getElementById('victory').style.display = 'block';
+            document.getElementById('final-score-text').innerText = `You got ${score} out of ${quizList.length} correct!`;
+            
+            // Send results
+            sendResultsToGoogle();
+        }
+    }
+
+    // --- GOOGLE SHEETS SENDING FUNCTION ---
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", quizList.length);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#4caf50'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#f44336'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    initQuiz();
+</script>
+
+</body>
+</html>
