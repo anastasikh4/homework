@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Road Safety & Transport Quest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+    .game-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 620px;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.7rem;
+      color: #1e3c72;
+    }
+    .subtitle {
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f0f4ff;
+      padding: 12px 18px;
+      border-radius: 14px;
+      margin-bottom: 22px;
+      font-weight: 700;
+      color: #1e3c72;
+    }
+    .hearts {
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+    }
+    .section-badge {
+      display: inline-block;
+      background: #ffecb3;
+      color: #8d6e00;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .emoji-banner {
+      font-size: 3.4rem;
+      margin: 10px 0;
+    }
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 14px 0 24px;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 480px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .option-btn {
+      background: #f7f9fc;
+      border: 2px solid #d0dcf5;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e3c72;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #e3ecff;
+      border-color: #2a5298;
+      transform: translateY(-2px);
+    }
+    .option-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+    .option-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+    .feedback {
+      margin-top: 18px;
+      font-weight: 700;
+      min-height: 24px;
+      font-size: 1rem;
+    }
+    .end-screen {
+      display: none;
+    }
+    .score-box {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1e3c72;
+      margin: 15px 0;
+    }
+    .status-msg {
+      margin: 16px 0;
+      font-weight: 700;
+      font-size: 1.05rem;
+      min-height: 26px;
+    }
+    .play-again-btn {
+      background: #2a5298;
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .play-again-btn:hover {
+      background: #1e3c72;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <h1>🚦 Road Safety & Transport Quest 🚦</h1>
+  <div class="subtitle">Progress Check • Grammar & Vocabulary Challenge</div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen">
+    <div class="top-bar">
+      <div id="progress-text">Question 1/15</div>
+      <div class="hearts" id="hearts-display">❤️❤️❤️</div>
+    </div>
+
+    <div class="section-badge" id="section-badge">Part 1: Can / Can't</div>
+    <div class="emoji-banner" id="emoji-banner">🚫🚲</div>
+    <div class="question-text" id="question-text">Loading...</div>
+
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <!-- End Screen -->
+  <div id="end-screen" class="end-screen">
+    <div class="emoji-banner" id="end-emoji">🏆</div>
+    <h2 id="end-title">EXCELLENT!</h2>
+    <p id="end-subtitle">You are a Road Safety Champion! 🛡️</p>
+    <div class="score-box" id="final-score">Score: 0 / 15</div>
+    <div id="send-status" class="status-msg">Sending results...</div>
+    <button class="play-again-btn" onclick="startQuiz()">Play Again 🔄</button>
+  </div>
+</div>
+
+<script>
+  const TEST_NAME = "Road Safety & Transport Quest";
+  let userMistakes = [];
+
+  const questions = [
+    // Part 1: Can / Can't (4 questions - rules & signs)
+    {
+      section: "Part 1: Complete with can or can't",
+      emoji: "🚫🚲",
+      question: "Look at the 'No Bicycles' sign. You _____ ride your bike on this path.",
+      options: ["can't", "can"],
+      answer: "can't"
+    },
+    {
+      section: "Part 1: Complete with can or can't",
+      emoji: "⬅️🔵",
+      question: "The blue arrow points left. Drivers _____ turn left at this corner.",
+      options: ["can", "can't"],
+      answer: "can"
+    },
+    {
+      section: "Part 1: Complete with can or can't",
+      emoji: "📵🚗",
+      question: "You _____ use your mobile phone while driving a car. It is dangerous!",
+      options: ["can't", "can"],
+      answer: "can't"
+    },
+    {
+      section: "Part 1: Complete with can or can't",
+      emoji: "🚶‍♂️🟢",
+      question: "The pedestrian light is green. We _____ cross the street safely now.",
+      options: ["can", "can't"],
+      answer: "can"
+    },
+
+    // Part 2: Guess the Road Safety Words (6 questions - compound nouns)
+    {
+      section: "Part 2: Guess the Road Safety Word",
+      emoji: "🚲🛣️",
+      question: "A special part of the road painted for cyclists only: bike _____",
+      options: ["lane", "belt", "stop", "crossing"],
+      answer: "lane"
+    },
+    {
+      section: "Part 2: Guess the Road Safety Word",
+      emoji: "🪖🏍️",
+      question: "You must wear this hard hat when riding a motorbike: crash _____",
+      options: ["helmet", "sign", "light", "zone"],
+      answer: "helmet"
+    },
+    {
+      section: "Part 2: Guess the Road Safety Word",
+      emoji: "🚏🚌",
+      question: "Passengers wait here for public transport to arrive: bus _____",
+      options: ["stop", "line", "belt", "path"],
+      answer: "stop"
+    },
+    {
+      section: "Part 2: Guess the Road Safety Word",
+      emoji: "3️⃣0️⃣🛑",
+      question: "The maximum speed you are allowed to drive on a road: speed _____",
+      options: ["limit", "warden", "crossing", "zone"],
+      answer: "limit"
+    },
+    {
+      section: "Part 2: Guess the Road Safety Word",
+      emoji: "🦺👮",
+      question: "A person who helps children cross the road near school: traffic _____",
+      options: ["warden", "lane", "helmet", "park"],
+      answer: "warden"
+    },
+    {
+      section: "Part 2: Guess the Road Safety Word",
+      emoji: "🚗🅿️",
+      question: "A large building or area where you leave your vehicle: car _____",
+      options: ["park", "stop", "belt", "sign"],
+      answer: "park"
+    },
+
+    // Part 3: Prepositions in, on, by, of (5 questions)
+    {
+      section: "Part 3: Complete with in, on, by, of",
+      emoji: "🚗💨",
+      question: "My uncle usually commutes to the city center _____ car.",
+      options: ["by", "on", "in", "of"],
+      answer: "by"
+    },
+    {
+      section: "Part 3: Complete with in, on, by, of",
+      emoji: "🚌⏰",
+      question: "They are travelling _____ the 9:30 express bus to Brighton.",
+      options: ["on", "by", "in", "of"],
+      answer: "on"
+    },
+    {
+      section: "Part 3: Complete with in, on, by, of",
+      emoji: "🪟⚠️",
+      question: "Never stick your arm out _____ the window when the bus is moving!",
+      options: ["of", "on", "by", "in"],
+      answer: "of"
+    },
+    {
+      section: "Part 3: Complete with in, on, by, of",
+      emoji: "👟🌳",
+      question: "The library is only five minutes away, so let's go _____ foot.",
+      options: ["on", "by", "in", "of"],
+      answer: "on"
+    },
+    {
+      section: "Part 3: Complete with in, on, by, of",
+      emoji: "🚕💺",
+      question: "Three passengers are sitting _____ the back of the yellow taxi.",
+      options: ["in", "by", "on", "of"],
+      answer: "in"
+    }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let lives = 3;
+  let questionAnswered = false;
+
+  const quizScreen = document.getElementById("quiz-screen");
+  const endScreen = document.getElementById("end-screen");
+  const progressText = document.getElementById("progress-text");
+  const heartsDisplay = document.getElementById("hearts-display");
+  const sectionBadge = document.getElementById("section-badge");
+  const emojiBanner = document.getElementById("emoji-banner");
+  const questionText = document.getElementById("question-text");
+  const optionsGrid = document.getElementById("options-grid");
+  const feedback = document.getElementById("feedback");
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    lives = 3;
+    userMistakes = [];
+    quizScreen.style.display = "block";
+    endScreen.style.display = "none";
+    updateHearts();
+    renderQuestion();
+  }
+
+  function updateHearts() {
+    const fullHearts = "❤️".repeat(Math.max(0, lives));
+    const emptyHearts = "🤍".repeat(Math.max(0, 3 - lives));
+    heartsDisplay.textContent = fullHearts + emptyHearts;
+  }
+
+  function renderQuestion() {
+    questionAnswered = false;
+    feedback.textContent = "";
+    const q = questions[currentIndex];
+
+    progressText.textContent = `Question ${currentIndex + 1}/${questions.length}`;
+    sectionBadge.textContent = q.section;
+    emojiBanner.textContent = q.emoji;
+    questionText.textContent = q.question;
+
+    optionsGrid.innerHTML = "";
+    q.options.forEach(optionWord => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.textContent = optionWord;
+      btn.onclick = () => handleOptionClick(btn, optionWord, q.answer);
+      optionsGrid.appendChild(btn);
+    });
+  }
+
+  function handleOptionClick(button, selectedWord, correctWord) {
+    if (questionAnswered) return;
+    
+    if (selectedWord === correctWord) {
+      questionAnswered = true;
+      button.classList.add("correct");
+      score++;
+      feedback.style.color = "#155724";
+      feedback.textContent = "Great job! ✅";
+      disableAllButtons();
+      setTimeout(() => {
+        currentIndex++;
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 900);
+    } else {
+      button.classList.add("wrong");
+      button.disabled = true;
+      userMistakes.push(selectedWord);
+      lives--;
+      updateHearts();
+      feedback.style.color = "#721c24";
+      feedback.textContent = "Oops! Try again! ❌";
+      
+      if (lives <= 0) {
+        questionAnswered = true;
+        disableAllButtons();
+        setTimeout(() => {
+          currentIndex++;
+          if (currentIndex < questions.length) {
+            lives = 3;
+            updateHearts();
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        }, 900);
+      }
+    }
+  }
+
+  function disableAllButtons() {
+    const buttons = optionsGrid.querySelectorAll(".option-btn");
+    buttons.forEach(b => (b.disabled = true));
+  }
+
+  function finishQuiz() {
+    quizScreen.style.display = "none";
+    endScreen.style.display = "block";
+    const endEmoji = document.getElementById("end-emoji");
+    const endTitle = document.getElementById("end-title");
+    const endSubtitle = document.getElementById("end-subtitle");
+    const finalScore = document.getElementById("final-score");
+    
+    finalScore.textContent = `Score: ${score} / ${questions.length}`;
+    
+    if (score >= 13) {
+      endEmoji.textContent = "🏆";
+      endTitle.textContent = "EXCELLENT!";
+      endSubtitle.textContent = "You are a Road Safety Champion! 🛡️";
+    } else if (score >= 9) {
+      endEmoji.textContent = "🌟";
+      endTitle.textContent = "WELL DONE!";
+      endSubtitle.textContent = "Keep practising your road rules! 🚦";
+    } else {
+      endEmoji.textContent = "💪";
+      endTitle.textContent = "GOOD TRY!";
+      endSubtitle.textContent = "Review the rules and play again! 📘";
+    }
+    sendResultsToGoogle();
+  }
+
+  function sendResultsToGoogle() {
+    const statusEl = document.getElementById("send-status");
+    statusEl.style.color = "#555";
+    statusEl.textContent = "Sending results...";
+    
+    // CORRECTED URL FOR GOOGLE APPS SCRIPT
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams();
+    params.append("name", TEST_NAME);
+    params.append("score", score);
+    params.append("total", questions.length);
+    params.append("mistakes", userMistakes.join(", "));
+    
+    fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: params.toString()
+    })
+    .then(() => {
+      statusEl.style.color = "green";
+      statusEl.textContent = "Results sent successfully! ✅";
+    })
+    .catch(error => {
+      console.error("Error sending results:", error);
+      statusEl.style.color = "red";
+      statusEl.textContent = "Failed to send results.";
+    });
+  }
+
+  // Initialize quiz on load
+  startQuiz();
+</script>
+
+</body>
+</html>

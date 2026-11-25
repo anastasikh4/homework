@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grammar Quest: Present Simple & Frequency</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2b1055 0%, #7597de 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+
+    .quest-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 650px;
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: 1.65rem;
+      color: #2b1055;
+    }
+
+    .info-box {
+      background: #f4f6ff;
+      border-left: 5px solid #5c6bc0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.92rem;
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+
+    .tip-box {
+      background: #fff8e1;
+      border-left: 5px solid #ffb300;
+      border-radius: 12px;
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      color: #5d4037;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #eef2ff;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      color: #2b1055;
+      margin-bottom: 18px;
+    }
+
+    .topic-pill {
+      display: inline-block;
+      background: #e8eaf6;
+      color: #3949ab;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .emoji-art {
+      font-size: 3rem;
+      margin: 8px 0;
+    }
+
+    .question-prompt {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 12px 0 22px;
+      line-height: 1.5;
+      color: #1a1a2e;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 500px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-btn {
+      background: #f8f9fe;
+      border: 2px solid #cfd8f3;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #2b1055;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #e4e9fc;
+      border-color: #5c6bc0;
+      transform: translateY(-2px);
+    }
+
+    .option-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .option-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .feedback-msg {
+      margin-top: 16px;
+      font-weight: 700;
+      min-height: 24px;
+      font-size: 1rem;
+    }
+
+    .end-screen {
+      display: none;
+    }
+
+    .end-emojis {
+      font-size: 3.4rem;
+      margin: 10px 0;
+    }
+
+    .end-screen h2 {
+      color: #2b1055;
+      font-size: 2rem;
+      margin: 8px 0;
+    }
+
+    .score-display {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #3949ab;
+      margin: 12px 0;
+    }
+
+    .send-status {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin: 16px 0;
+      min-height: 26px;
+    }
+
+    .restart-btn {
+      background: #3949ab;
+      color: #ffffff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .restart-btn:hover {
+      background: #2b1055;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="quest-card">
+  <h1>🌟 Grammar Quest: Space Academy 🌟</h1>
+
+  <div id="quiz-screen">
+    <div class="info-box">
+      <strong>📋 Instructions:</strong><br>
+      1. Choose the right 3rd-person verb ending (<em>-s, -es, -ies</em>).<br>
+      2. Complete Present Simple questions and place adverbs of frequency correctly.
+    </div>
+
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> Adverbs of frequency (<em>always, usually, often, sometimes, rarely, never</em>) go <strong>before</strong> main verbs, but <strong>after</strong> the verb <em>to be</em> (<em>am / is / are</em>)!
+    </div>
+
+    <div class="status-bar">
+      <div id="progress-label">Question 1/16</div>
+      <div id="score-label">Score: 0</div>
+    </div>
+
+    <div class="topic-pill" id="topic-pill">Part 1: 3rd Person Singular</div>
+    <div class="emoji-art" id="emoji-art">🚀👩‍🚀</div>
+    <div class="question-prompt" id="question-prompt">Loading...</div>
+
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback-msg" id="feedback-msg"></div>
+  </div>
+
+  <div id="end-screen" class="end-screen">
+    <div class="end-emojis">🏆📚🎉</div>
+    <h2>EXCELLENT!</h2>
+    <p>You've mastered Present Simple & Adverbs of Frequency!</p>
+    <div class="score-display" id="final-score">Final Score: 0 / 16</div>
+    <div class="send-status" id="send-status">Sending results...</div>
+    <button class="restart-btn" onclick="startQuiz()">Restart</button>
+  </div>
+</div>
+
+<script>
+  const TEST_NAME = "Grammar Quest: Present Simple & Frequency";
+  const GOOGLE_FORM_URL = "YOUR_GOOGLE_FORM_ACTION_URL_HERE";
+
+  let userMistakes = [];
+
+  const questions = [
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "🛸👩‍🚀",
+      prompt: "I do spacewalks on Mondays.  Commander Nova _____ spacewalks on Mondays.",
+      options: ["do", "dos", "does", "doing"],
+      answer: "does"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "📖🪐",
+      prompt: "I read star maps every evening.  Cadet Leo _____ star maps every evening.",
+      options: ["reads", "reades", "readies", "read"],
+      answer: "reads"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "🧪🔬",
+      prompt: "I try new gravity experiments.  Doctor Zara _____ new gravity experiments.",
+      options: ["tries", "trys", "tryes", "try"],
+      answer: "tries"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "🛰️🌙",
+      prompt: "I stay in the lunar base on weekends.  Engineer Max _____ in the lunar base on weekends.",
+      options: ["stays", "staies", "stayes", "stay"],
+      answer: "stays"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "🔭☄️",
+      prompt: "I watch passing comets through the telescope.  Maya _____ passing comets through the telescope.",
+      options: ["watches", "watchs", "watchies", "watch"],
+      answer: "watches"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "⚗️🔋",
+      prompt: "I mix rocket fuel in the lab.  Robot Bolt _____ rocket fuel in the lab.",
+      options: ["mixes", "mixs", "mixies", "mix"],
+      answer: "mixes"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "🪥✨",
+      prompt: "I brush my space helmet after landing.  Pilot Sam _____ his space helmet after landing.",
+      options: ["brush", "brushs", "brushies", "brushes"],
+      answer: "brushes"
+    },
+    {
+      topic: "Part 1: Third Person Singular",
+      emoji: "✈️🌌",
+      prompt: "I fly the shuttle to Mars.  Captain Orion _____ the shuttle to Mars.",
+      options: ["flyes", "flys", "flies", "fly"],
+      answer: "flies"
+    },
+    {
+      topic: "Part 2: Present Simple Questions",
+      emoji: "⏰🚀",
+      prompt: "Wh-question: What time _____ (rocket training / begin)?",
+      options: [
+        "does rocket training begin",
+        "do rocket training begins",
+        "does rocket training begins",
+        "is rocket training begin"
+      ],
+      answer: "does rocket training begin"
+    },
+    {
+      topic: "Part 2: Present Simple Questions",
+      emoji: "🥗🪐",
+      prompt: "Yes/No question: _____ (astronauts / eat) dehydrated ice cream on the station?",
+      options: [
+        "Do astronauts eat",
+        "Does astronauts eat",
+        "Do astronauts eats",
+        "Are astronauts eat"
+      ],
+      answer: "Do astronauts eat"
+    },
+    {
+      topic: "Part 2: Present Simple Questions",
+      emoji: "🤖💬",
+      prompt: "Tag-question: He speaks three alien languages, _____ he?",
+      options: ["doesn't", "don't", "isn't", "does"],
+      answer: "doesn't"
+    },
+    {
+      topic: "Part 2: Present Simple Questions",
+      emoji: "🛏️🏠",
+      prompt: "Alternative question: _____ she _____ in a sleeping pod or in a cabin?",
+      options: [
+        "Does / sleep",
+        "Do / sleeps",
+        "Does / sleeps",
+        "Is / sleep"
+      ],
+      answer: "Does / sleep"
+    },
+    {
+      topic: "Part 3: Adverbs of Frequency",
+      emoji: "📊✅",
+      prompt: "70% of the time: The crew _____ checks the oxygen levels before breakfast.",
+      options: ["usually", "never", "rarely", "sometimes"],
+      answer: "usually"
+    },
+    {
+      topic: "Part 3: Adverbs of Frequency",
+      emoji: "📊🚫",
+      prompt: "0% of the time: Commander Nova _____ forgets to lock the airlock door.",
+      options: ["never", "always", "often", "usually"],
+      answer: "never"
+    },
+    {
+      topic: "Part 3: Adverbs of Frequency",
+      emoji: "🧩📝",
+      prompt: "Choose the correct word order (after 'to be'):",
+      options: [
+        "Cadet Leo is always ready for launch.",
+        "Cadet Leo always is ready for launch.",
+        "Always Cadet Leo is ready for launch.",
+        "Cadet Leo is ready always for launch."
+      ],
+      answer: "Cadet Leo is always ready for launch."
+    },
+    {
+      topic: "Part 3: Adverbs of Frequency",
+      emoji: "🧩🌠",
+      prompt: "Choose the correct word order (before main verb):",
+      options: [
+        "They often observe shooting stars at night.",
+        "They observe often shooting stars at night.",
+        "They observe shooting stars oftenly at night.",
+        "Often they are observe shooting stars at night."
+      ],
+      answer: "They often observe shooting stars at night."
+    }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  const quizScreen = document.getElementById("quiz-screen");
+  const endScreen = document.getElementById("end-screen");
+  const progressLabel = document.getElementById("progress-label");
+  const scoreLabel = document.getElementById("score-label");
+  const topicPill = document.getElementById("topic-pill");
+  const emojiArt = document.getElementById("emoji-art");
+  const questionPrompt = document.getElementById("question-prompt");
+  const optionsGrid = document.getElementById("options-grid");
+  const feedbackMsg = document.getElementById("feedback-msg");
+
+  function shuffleOptions(options) {
+    const mixedOptions = [...options];
+
+    for (let i = mixedOptions.length - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+
+      const temporaryValue = mixedOptions[i];
+      mixedOptions[i] = mixedOptions[randomIndex];
+      mixedOptions[randomIndex] = temporaryValue;
+    }
+
+    return mixedOptions;
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    userMistakes = [];
+
+    quizScreen.style.display = "block";
+    endScreen.style.display = "none";
+
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    answered = false;
+    feedbackMsg.textContent = "";
+
+    const currentQuestion = questions[currentIndex];
+    const mixedOptions = shuffleOptions(currentQuestion.options);
+
+    progressLabel.textContent = `Question ${currentIndex + 1}/${questions.length}`;
+    scoreLabel.textContent = `Score: ${score}`;
+    topicPill.textContent = currentQuestion.topic;
+    emojiArt.textContent = currentQuestion.emoji;
+    questionPrompt.textContent = currentQuestion.prompt;
+
+    optionsGrid.innerHTML = "";
+
+    mixedOptions.forEach(function(optionText) {
+      const button = document.createElement("button");
+      button.className = "option-btn";
+      button.textContent = optionText;
+      button.onclick = function() {
+        checkAnswer(button, optionText, currentQuestion.answer);
+      };
+
+      optionsGrid.appendChild(button);
+    });
+  }
+
+  function checkAnswer(button, selectedWord, correctWord) {
+    if (answered) {
+      return;
+    }
+
+    if (selectedWord === correctWord) {
+      answered = true;
+      button.classList.add("correct");
+      score++;
+      scoreLabel.textContent = `Score: ${score}`;
+
+      feedbackMsg.style.color = "#155724";
+      feedbackMsg.textContent = "Correct! 🌟";
+
+      const allButtons = optionsGrid.querySelectorAll(".option-btn");
+      allButtons.forEach(function(item) {
+        item.disabled = true;
+      });
+
+      setTimeout(function() {
+        currentIndex++;
+
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          showEndScreen();
+        }
+      }, 850);
+    } else {
+      button.classList.add("wrong");
+      button.disabled = true;
+
+      userMistakes.push(selectedWord);
+
+      feedbackMsg.style.color = "#721c24";
+      feedbackMsg.textContent = "Not quite — try again! ❌";
+    }
+  }
+
+  function showEndScreen() {
+    quizScreen.style.display = "none";
+    endScreen.style.display = "block";
+
+    document.getElementById("final-score").textContent = `Final Score: ${score} / ${questions.length}`;
+
+    sendResultsToGoogle();
+  }
+
+  function sendResultsToGoogle() {
+    const statusElement = document.getElementById("send-status");
+
+    statusElement.style.color = "#555";
+    statusElement.textContent = "Sending results...";
+
+    const params = new URLSearchParams();
+    params.append("name", TEST_NAME);
+    params.append("score", score);
+    params.append("total", questions.length);
+    params.append("mistakes", userMistakes.join(", "));
+
+    fetch(GOOGLE_FORM_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: params
+    })
+    .then(function() {
+      statusElement.style.color = "green";
+      statusElement.textContent = "Results sent successfully! ✅";
+    })
+    .catch(function(error) {
+      console.error("Failed to send results:", error);
+
+      statusElement.style.color = "red";
+      statusElement.textContent = "Error sending results.";
+    });
+  }
+
+  startQuiz();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Shops & Comparisons Quest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+
+    .quest-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 640px;
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: 1.65rem;
+      color: #134e5e;
+    }
+
+    .story-box {
+      background: #f1f8f5;
+      border-left: 5px solid #2e8b57;
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    .story-box strong {
+      color: #134e5e;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e8f4f0;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      color: #134e5e;
+      margin-bottom: 18px;
+    }
+
+    .part-badge {
+      display: inline-block;
+      background: #fff3cd;
+      color: #856404;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .emoji-clue {
+      font-size: 3.2rem;
+      margin: 8px 0;
+    }
+
+    .question-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 12px 0 22px;
+      line-height: 1.5;
+      color: #1a252f;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 500px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-btn {
+      background: #f7fbf9;
+      border: 2px solid #c5e1d4;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #134e5e;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #e1f2eb;
+      border-color: #2e8b57;
+      transform: translateY(-2px);
+    }
+
+    .option-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .option-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .feedback {
+      margin-top: 16px;
+      font-weight: 700;
+      min-height: 24px;
+      font-size: 1rem;
+    }
+
+    .end-screen {
+      display: none;
+    }
+
+    .end-emojis {
+      font-size: 3.4rem;
+      margin: 10px 0;
+    }
+
+    .end-screen h2 {
+      color: #134e5e;
+      font-size: 2rem;
+      margin: 8px 0;
+    }
+
+    .final-score {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #2e8b57;
+      margin: 12px 0;
+    }
+
+    .send-status {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin: 16px 0;
+      min-height: 26px;
+    }
+
+    .restart-btn {
+      background: #134e5e;
+      color: #ffffff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .restart-btn:hover {
+      background: #0d3642;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="quest-container">
+  <h1>🌟 City Shops & Comparisons Quest 🌟</h1>
+
+  <div id="quiz-screen">
+    <div class="story-box">
+      🛍️ <strong>Weekend Shopping Quest:</strong> On Saturday, Maya visited the <strong>bakery</strong> and the <strong>bookshop</strong> downtown. The new comic was <strong>thicker than</strong> her notebook, and the chocolate cake was <strong>the sweetest</strong> treat in the window! Ready to test your skills?
+    </div>
+
+    <div class="top-bar">
+      <div id="progress-text">Question 1/10</div>
+      <div id="score-text">Score: 0</div>
+    </div>
+
+    <div class="part-badge" id="part-badge">Vocabulary: Shops</div>
+    <div class="emoji-clue" id="emoji-clue">🥖🥐</div>
+    <div class="question-text" id="question-text">Loading...</div>
+
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div id="end-screen" class="end-screen">
+    <div class="end-emojis">🏆📚🌟🕒</div>
+    <h2>EXCELLENT!</h2>
+    <p>You've mastered shops vocabulary and comparative/superlative adjectives!</p>
+    <div class="final-score" id="final-score">Score: 0 / 10</div>
+    <div class="send-status" id="send-status">Sending results...</div>
+    <button class="restart-btn" onclick="startQuiz()">Restart</button>
+  </div>
+</div>
+
+<script>
+  const TEST_NAME = "City Shops & Comparisons Quest";
+  const GOOGLE_FORM_URL = "YOUR_GOOGLE_FORM_ACTION_URL_HERE";
+
+  let userMistakes = [];
+
+  const questions = [
+    {
+      part: "Vocabulary: Name the Shop",
+      emoji: "🥖🥐🍰",
+      question: "Look at the picture clues. You can buy fresh bread, rolls, and cakes at a _____.",
+      options: ["bakery", "butcher's", "chemist's", "newsagent's"],
+      answer: "bakery"
+    },
+    {
+      part: "Vocabulary: Name the Shop",
+      emoji: "📚📖🔖",
+      question: "Look at the picture clues. You go to a _____ when you want to buy a new novel or dictionary.",
+      options: ["bookshop", "florist's", "greengrocer's", "toy shop"],
+      answer: "bookshop"
+    },
+    {
+      part: "Vocabulary: Name the Shop",
+      emoji: "🥩🍗🥓",
+      question: "Look at the picture clues. People buy fresh meat and sausages at a _____.",
+      options: ["butcher's", "baker's", "music shop", "shoe shop"],
+      answer: "butcher's"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "🧣📏",
+      question: "1. This red scarf is _____ (short) that woollen one.",
+      options: ["shorter than", "the shortest", "more short than", "shortest than"],
+      answer: "shorter than"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "🥶❄️",
+      question: "2. Yesterday was _____ (wet) day of the autumn. It rained non-stop!",
+      options: ["the wettest", "wetter than", "the wetest", "more wet"],
+      answer: "the wettest"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "🎨🖌️",
+      question: "3. I'm a bad painter, but my little sister is _____ (bad) me.",
+      options: ["worse than", "badder than", "the worst", "more bad than"],
+      answer: "worse than"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "🎒🏋️",
+      question: "4. My green backpack was _____ (heavy) my blue schoolbag.",
+      options: ["heavier than", "heavyer than", "the heaviest", "more heavy than"],
+      answer: "heavier than"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "🎬🍿",
+      question: "5. I think adventure films are _____ (exciting) movies in the cinema.",
+      options: ["the most exciting", "more exciting than", "the excitingest", "most exciting"],
+      answer: "the most exciting"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "📱💻",
+      question: "6. Her new laptop is _____ (expensive) my old tablet.",
+      options: ["more expensive than", "the most expensive", "expensiver than", "most expensive than"],
+      answer: "more expensive than"
+    },
+    {
+      part: "Grammar: Comparative or Superlative",
+      emoji: "⚽🏆",
+      question: "7. Who is _____ (good) football player in your school team?",
+      options: ["the best", "better than", "the goodest", "more good"],
+      answer: "the best"
+    }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  const quizScreen = document.getElementById("quiz-screen");
+  const endScreen = document.getElementById("end-screen");
+  const progressText = document.getElementById("progress-text");
+  const scoreText = document.getElementById("score-text");
+  const partBadge = document.getElementById("part-badge");
+  const emojiClue = document.getElementById("emoji-clue");
+  const questionText = document.getElementById("question-text");
+  const optionsGrid = document.getElementById("options-grid");
+  const feedback = document.getElementById("feedback");
+
+  function shuffleOptions(options) {
+    const mixedOptions = [...options];
+
+    for (let i = mixedOptions.length - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+
+      const temporaryValue = mixedOptions[i];
+      mixedOptions[i] = mixedOptions[randomIndex];
+      mixedOptions[randomIndex] = temporaryValue;
+    }
+
+    return mixedOptions;
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    userMistakes = [];
+
+    quizScreen.style.display = "block";
+    endScreen.style.display = "none";
+
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    answered = false;
+    feedback.textContent = "";
+
+    const currentQuestion = questions[currentIndex];
+    const mixedOptions = shuffleOptions(currentQuestion.options);
+
+    progressText.textContent = `Question ${currentIndex + 1}/${questions.length}`;
+    scoreText.textContent = `Score: ${score}`;
+    partBadge.textContent = currentQuestion.part;
+    emojiClue.textContent = currentQuestion.emoji;
+    questionText.textContent = currentQuestion.question;
+
+    optionsGrid.innerHTML = "";
+
+    mixedOptions.forEach(function(optionWord) {
+      const button = document.createElement("button");
+      button.className = "option-btn";
+      button.textContent = optionWord;
+      button.onclick = function() {
+        checkAnswer(button, optionWord, currentQuestion.answer);
+      };
+
+      optionsGrid.appendChild(button);
+    });
+  }
+
+  function checkAnswer(button, selectedWord, correctWord) {
+    if (answered) {
+      return;
+    }
+
+    if (selectedWord === correctWord) {
+      answered = true;
+      button.classList.add("correct");
+      score++;
+      scoreText.textContent = `Score: ${score}`;
+
+      feedback.style.color = "#155724";
+      feedback.textContent = "Awesome! ✅";
+
+      const allButtons = optionsGrid.querySelectorAll(".option-btn");
+      allButtons.forEach(function(item) {
+        item.disabled = true;
+      });
+
+      setTimeout(function() {
+        currentIndex++;
+
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 850);
+    } else {
+      button.classList.add("wrong");
+      button.disabled = true;
+
+      userMistakes.push(selectedWord);
+
+      feedback.style.color = "#721c24";
+      feedback.textContent = "Try again! ❌";
+    }
+  }
+
+  function finishQuiz() {
+    quizScreen.style.display = "none";
+    endScreen.style.display = "block";
+
+    document.getElementById("final-score").textContent = `Score: ${score} / ${questions.length}`;
+
+    sendResultsToGoogle();
+  }
+
+  function sendResultsToGoogle() {
+    const statusElement = document.getElementById("send-status");
+
+    statusElement.style.color = "#555";
+    statusElement.textContent = "Sending results...";
+
+    const params = new URLSearchParams();
+    params.append("name", TEST_NAME);
+    params.append("score", score);
+    params.append("total", questions.length);
+    params.append("mistakes", userMistakes.join(", "));
+
+    fetch(GOOGLE_FORM_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: params
+    })
+    .then(function() {
+      statusElement.style.color = "green";
+      statusElement.textContent = "Results sent successfully! ✅";
+    })
+    .catch(function(error) {
+      console.error("Error sending results:", error);
+
+      statusElement.style.color = "red";
+      statusElement.textContent = "Failed to send results.";
+    });
+  }
+
+  startQuiz();
+</script>
+
+</body>
+</html>
