@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Communication Quest: Receptionist Dialogue</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+    .quest-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 640px;
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 1.7rem;
+      color: #1565c0;
+    }
+    .rules-box {
+      background: #f0f7ff;
+      border-left: 5px solid #2193b0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: left;
+      margin-bottom: 18px;
+    }
+    .rules-box h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: #1565c0;
+    }
+    .rules-box ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+      color: #333;
+    }
+    .progress-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e8f4f8;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      color: #1565c0;
+      margin-bottom: 18px;
+    }
+    .emoji-banner {
+      font-size: 3.1rem;
+      margin: 8px 0;
+    }
+    .question-text {
+      font-size: 1.18rem;
+      font-weight: 600;
+      margin: 12px 0 22px;
+      line-height: 1.5;
+      color: #1a252f;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .option-btn {
+      background: #f7fbff;
+      border: 2px solid #c6e2f7;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #1565c0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #e1f1fd;
+      border-color: #2193b0;
+      transform: translateY(-2px);
+    }
+    .option-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+    .option-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+    .feedback {
+      margin-top: 16px;
+      font-weight: 700;
+      min-height: 24px;
+      font-size: 1rem;
+    }
+    .end-screen {
+      display: none;
+    }
+    .end-screen h2 {
+      color: #1565c0;
+      font-size: 1.95rem;
+      margin: 10px 0;
+    }
+    .final-score {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #2193b0;
+      margin: 12px 0;
+    }
+    .send-status {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin: 16px 0;
+      min-height: 26px;
+    }
+    .restart-btn {
+      background: #1565c0;
+      color: #ffffff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .restart-btn:hover {
+      background: #0d47a1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quest-container">
+  <h1>🌟 Communication Quest 🌟</h1>
+
+  <div id="quiz-screen">
+    <div class="rules-box">
+      <h3>⏰ Receptionist Rules:</h3>
+      <ul>
+        <li>Use <strong>What's your...</strong> to ask for names, numbers, and email addresses.</li>
+        <li>Use <strong>How do you spell that?</strong> to check difficult surnames.</li>
+        <li>Use <strong>Where do you live?</strong> to ask for someone's home address.</li>
+      </ul>
+    </div>
+
+    <div class="progress-bar">
+      <div id="progress-text">Question 1 of 10</div>
+      <div id="score-text">Score: 0</div>
+    </div>
+
+    <div class="emoji-banner" id="emoji-banner">🪪👋</div>
+    <div class="question-text" id="question-text">Loading question...</div>
+
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div id="end-screen" class="end-screen">
+    <h2>🏆 EXCELLENT! 🗣📋</h2>
+    <p>You've mastered the receptionist dialogue!</p>
+    <div class="final-score" id="final-score">Score: 0 / 10</div>
+    <div class="send-status" id="send-status">Sending results...</div>
+    <button class="restart-btn" onclick="startQuiz()">Restart Quest</button>
+  </div>
+</div>
+
+<script>
+  const TEST_NAME = "Receptionist Dialogue: 10 Qs";
+  let userMistakes = [];
+
+  const questions = [
+    {
+      emoji: "🪪👋",
+      question: ": '_____ your name?' — Visitor: 'Oliver Vance.'",
+      options: ["What's", "Who's", "Where's", "How's"],
+      answer: "What's"
+    },
+    {
+      emoji: "🔤✍️",
+      question: ": 'How do you _____ that?' — Visitor: 'V-A-N-C-E.'",
+      options: ["say", "spell", "tell", "read"],
+      answer: "spell"
+    },
+    {
+      emoji: "📱🔢",
+      question: ": 'What's your phone _____?' — Visitor: '07912 348765.'",
+      options: ["name", "address", "number", "email"],
+      answer: "number"
+    },
+    {
+      emoji: "📧💻",
+      question: ": 'What's your _____ address?' — Visitor: 'oliver.v@fastmail.com'",
+      options: ["email", "street", "home", "phone"],
+      answer: "email"
+    },
+    {
+      emoji: "🏠📍",
+      question: ": 'Where do you _____?' — Visitor: '18 Maple Avenue, Leeds.'",
+      options: ["live", "stay", "come", "go"],
+      answer: "live"
+    },
+    {
+      emoji: "🎂🎈",
+      question: ": 'How _____ are you?' — Student: 'I'm twelve years old.'",
+      options: ["long", "many", "much", "old"],
+      answer: "old"
+    },
+    {
+      emoji: "📮🗺️",
+      question: ": 'What's your _____?' — Member: 'LS6 2AB.'",
+      options: ["postcode", "surname", "birthday", "number"],
+      answer: "postcode"
+    },
+    {
+      emoji: "🗣️👂",
+      question: ": 'Sorry, can you _____ that again, please?' — Guest: 'Yes, it's 07912 348765.'",
+      options: ["repeat", "spell", "say", "write"],
+      answer: "say"
+    },
+    {
+      emoji: "🤝😊",
+      question: " 'Good morning! How can I _____ you?' —  'I'd like to join the library.'",
+      options: ["say", "ask", "help", "meet"],
+      answer: "help"
+    },
+    {
+      emoji: "🎟️✅",
+      question: " 'Here is your new  card.' —  '_____ very much!'",
+      options: ["Thank you", "You're welcome", "Excuse me", "Goodbye"],
+      answer: "Thank you"
+    }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  const quizScreen = document.getElementById("quiz-screen");
+  const endScreen = document.getElementById("end-screen");
+  const progressText = document.getElementById("progress-text");
+  const scoreText = document.getElementById("score-text");
+  const emojiBanner = document.getElementById("emoji-banner");
+  const questionText = document.getElementById("question-text");
+  const optionsGrid = document.getElementById("options-grid");
+  const feedback = document.getElementById("feedback");
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    userMistakes = [];
+    quizScreen.style.display = "block";
+    endScreen.style.display = "none";
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    answered = false;
+    feedback.textContent = "";
+    const q = questions[currentIndex];
+
+    progressText.textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+    scoreText.textContent = `Score: ${score}`;
+    emojiBanner.textContent = q.emoji;
+    questionText.textContent = q.question;
+
+    optionsGrid.innerHTML = "";
+    q.options.forEach(optionWord => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.textContent = optionWord;
+      btn.onclick = () => checkAnswer(btn, optionWord, q.answer);
+      optionsGrid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(button, selectedWord, correctWord) {
+    if (answered) return;
+
+    if (selectedWord === correctWord) {
+      answered = true;
+      button.classList.add("correct");
+      score++;
+      scoreText.textContent = `Score: ${score}`;
+      feedback.style.color = "#155724";
+      feedback.textContent = "Great job! ✅";
+
+      const allButtons = optionsGrid.querySelectorAll(".option-btn");
+      allButtons.forEach(b => (b.disabled = true));
+
+      setTimeout(() => {
+        currentIndex++;
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 850);
+    } else {
+      button.classList.add("wrong");
+      button.disabled = true;
+      userMistakes.push(selectedWord);
+      feedback.style.color = "#721c24";
+      feedback.textContent = "Oops! Try again! ❌";
+    }
+  }
+
+  function finishQuiz() {
+    quizScreen.style.display = "none";
+    endScreen.style.display = "block";
+    document.getElementById("final-score").textContent = `Score: ${score} / ${questions.length}`;
+    sendResultsToGoogle();
+  }
+
+  function sendResultsToGoogle() {
+    const statusEl = document.getElementById("send-status");
+    statusEl.style.color = "#555";
+    statusEl.textContent = "Sending results...";
+
+    // FIXED: Replaced "https://google.com" with your actual Google Apps Script URL
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams();
+    params.append("name", TEST_NAME);
+    params.append("score", score);
+    params.append("total", questions.length);
+    params.append("mistakes", userMistakes.join(", "));
+
+    fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      body: params
+    })
+    .then(() => {
+      statusEl.style.color = "green";
+      statusEl.textContent = "Results sent successfully! ✅";
+    })
+    .catch(error => {
+      console.error("Error sending results:", error);
+      statusEl.style.color = "red";
+      statusEl.textContent = "Failed to send results.";
+    });
+  }
+
+  // FIXED: Moved startQuiz() call inside the script tag
+  startQuiz();
+</script>
+
+</body>
+</html>

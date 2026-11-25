@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Fill in the Blank — Duolingo Style</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  :root {
+    --green:#58CC02; --green-dark:#4CA802; --green-light:#D7FFB8;
+    --red:#FF4B4B;   --red-dark:#EA2B2B;   --red-light:#FFDFE0;
+    --blue:#1CB0F6;  --yellow:#FFC800;
+    --ink:#3C3C3C; --muted:#AFAFAF; --bg:#FFFFFF; --line:#E5E5E5;
+  }
+
+  body {
+    font-family:'Nunito','Segoe UI',system-ui,sans-serif;
+    background:#FFF; color:var(--ink);
+    min-height:100vh; display:flex; flex-direction:column;
+  }
+
+  /* ── Прогресс-бар ── */
+  #progressWrap { height:14px; background:var(--line); border-radius:0 0 8px 8px; overflow:hidden; }
+  #progressBar { height:100%; width:0%; background:var(--green); border-radius:0 8px 8px 0;
+                 transition:width .45s cubic-bezier(.22,1,.36,1); }
+  #topBar { display:flex; align-items:center; gap:12px; padding:12px 16px 0; }
+  #closeBtn { border:none; background:none; font-size:22px; color:var(--muted); cursor:pointer; font-weight:800; }
+  #lives { color:var(--red); font-size:20px; font-weight:800; margin-left:auto; }
+
+  #app { flex:1; display:flex; flex-direction:column; width:100%; max-width:520px; margin:0 auto; padding:0 20px 24px; }
+
+  /* ── Карточка вопроса ── */
+  .card { animation:pop .35s ease; display:flex; flex-direction:column; flex:1; }
+  @keyframes pop { from{opacity:0; transform:translateY(14px) scale(.98);} to{opacity:1; transform:none;} }
+
+  .hint {
+    display:inline-block; align-self:flex-start;
+    background:var(--blue); color:#fff; font-weight:800; font-size:14px;
+    padding:8px 14px; border-radius:14px; margin:22px 0 8px;
+  }
+  .task { font-size:15px; font-weight:700; color:var(--muted); margin-bottom:28px; }
+
+  .sentence { font-size:30px; font-weight:800; line-height:1.35; letter-spacing:-.3px; }
+  .blank {
+    display:inline-block; min-width:110px; text-align:center;
+    border-bottom:4px solid var(--line); color:var(--muted);
+    transition:.2s; padding:0 6px;
+  }
+  .blank.filled { color:var(--green); border-color:var(--green); }
+  .blank.correct { color:var(--green); border-color:var(--green); }
+  .blank.wrong   { color:var(--red);   border-color:var(--red);   }
+
+  /* ── Кнопки-варианты (3D тактильные) ── */
+  .options { margin-top:auto; display:grid; gap:14px; padding-top:32px; }
+  .opt {
+    font-family:inherit; font-size:19px; font-weight:800; color:var(--ink);
+    background:#FFF; border:2px solid var(--line); border-bottom-width:5px;
+    border-radius:16px; padding:16px; cursor:pointer;
+    transition:transform .08s, background .15s, border-color .15s, color .15s;
+    text-transform:none; letter-spacing:.3px;
+  }
+  .opt:active:not(:disabled) { transform:translateY(4px); border-bottom-width:1px; }
+  .opt:disabled { cursor:default; }
+  .opt.correct-now { background:var(--green-light); border-color:var(--green); color:var(--green-dark); }
+  .opt.wrong-now   { background:var(--red-light);   border-color:var(--red);   color:var(--red-dark); opacity:.85; }
+  .opt.faded { opacity:.35; }
+
+  /* ── Панель фидбека ── */
+  #feedback {
+    margin-top:18px; border-radius:16px; padding:16px;
+    display:none; align-items:center; gap:12px;
+    font-weight:800; font-size:17px;
+    animation:slideUp .25s ease;
+  }
+  @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:none;} }
+  #feedback.good { background:var(--green-light); color:var(--green-dark); }
+  #feedback.bad  { background:var(--red-light);   color:var(--red-dark);   }
+  #feedback .icon { font-size:26px; }
+  #feedback small { display:block; font-weight:700; font-size:14px; margin-top:2px; }
+
+  #nextBtn {
+    margin-top:14px; font-family:inherit; font-size:18px; font-weight:800;
+    text-transform:uppercase; letter-spacing:1px; color:#fff;
+    background:var(--green); border:none; border-radius:16px;
+    padding:16px; cursor:pointer;
+    box-shadow:0 5px 0 var(--green-dark);
+    transition:transform .08s, box-shadow .08s;
+    display:none;
+  }
+  #nextBtn:active { transform:translateY(5px); box-shadow:0 0 0 var(--green-dark); }
+
+  /* ── Флэши и тряска ── */
+  .flash-green { animation:flashG .5s ease; }
+  .flash-red   { animation:flashR .5s ease; }
+  @keyframes flashG { 0%,100%{background:#FFF;} 30%{background:#D7FFB8;} }
+  @keyframes flashR { 0%,100%{background:#FFF;} 30%{background:#FFDFE0;} }
+  .shake { animation:shake .45s ease; }
+  @keyframes shake {
+    10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(4px);}
+    30%,50%,70%{transform:translateX(-7px);} 40%,60%{transform:translateX(7px);}
+  }
+
+  /* ── Финальный экран ── */
+  #final { text-align:center; padding-top:8vh; animation:pop .4s ease; display:none; flex-direction:column; align-items:center; }
+  #final .emoji { font-size:72px; }
+  #final h1 { font-size:34px; font-weight:900; margin:14px 0 6px; }
+  #final .score { font-size:20px; color:var(--muted); font-weight:700; margin-bottom:8px; }
+  #final .score b { color:var(--green); font-size:28px; }
+  #final .msg { font-size:16px; font-weight:700; margin-bottom:36px; }
+  #retryBtn {
+    font-family:inherit; font-size:18px; font-weight:800; text-transform:uppercase; letter-spacing:1px;
+    color:#fff; background:var(--green); border:none; border-radius:16px; padding:16px 48px; cursor:pointer;
+    box-shadow:0 5px 0 var(--green-dark); transition:transform .08s, box-shadow .08s;
+  }
+  #retryBtn:active { transform:translateY(5px); box-shadow:0 0 0 var(--green-dark); }
+</style>
+</head>
+<body>
+
+<div id="progressWrap"><div id="progressBar"></div></div>
+<div id="topBar">
+  <button id="closeBtn" title="Заново">✕</button>
+  <div id="lives"></div>
+</div>
+
+<div id="app">
+  <!-- Экран вопроса -->
+  <div class="card" id="quiz">
+    <span class="hint" id="hint"></span>
+    <div class="task">Выбери пропущенное слово</div>
+    <div class="sentence" id="sentence"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback"><span class="icon"></span><span><span id="fbText"></span><small id="fbSub"></small></span></div>
+    <button id="nextBtn">Продолжить</button>
+  </div>
+
+  <!-- Финальный экран -->
+  <div id="final">
+    <div class="emoji" id="finalEmoji"></div>
+    <h1 id="finalTitle"></h1>
+    <div class="score">Результат: <b id="finalScore"></b></div>
+    <div class="msg" id="finalMsg"></div>
+    <button id="retryBtn">Try Again</button>
+  </div>
+</div>
+
+<script>
+const PHRASES = [
+  { ru:"Слишком много пробок.",    template:"Too much ___.",        answer:"traffic"    },
+  { ru:"Я хочу летающую машину.",  template:"I want a ___ car.",    answer:"flying"     },
+  { ru:"В будущем.",               template:"In the ___.",          answer:"future"     },
+  { ru:"Беспилотный автомобиль.",  template:"___ car.",             answer:"driverless" },
+  { ru:"Я мечтал об этом.",        template:"I ___ of this.",       answer:"dreamed"    },
+  { ru:"Мечты сбываются.",         template:"Dreams ___ true.",     answer:"come"       },
+  { ru:"Роботы в нашей жизни.",    template:"___ in our life.",     answer:"robots"     },
+  { ru:"Новые планеты.",           template:"New ___.",             answer:"planets"    },
+  { ru:"Встретить инопланетянина.",template:"Meet an ___.",         answer:"alien"      },
+  { ru:"Скоро.",                   template:"___.",                 answer:"soon"       }
+];
+
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let order = [], idx = 0, score = 0, locked = false;
+
+const $ = id => document.getElementById(id);
+
+function startGame() {
+  order = shuffle(PHRASES);
+  idx = 0; score = 0;
+  $("final").style.display = "none";
+  $("quiz").style.display = "flex";
+  showQuestion();
+}
+
+function showQuestion() {
+  locked = false;
+  const q = order[idx];
+  $("progressBar").style.width = (idx / order.length * 100) + "%";
+  $("hint").textContent = q.ru;
+
+  // Разбиваем шаблон и вставляем пустую строку на месте пропуска
+  $("sentence").innerHTML = q.template.split("___")
+    .map((part, i) => i === 0 ? "" : "")
+    .reduce((html, _, i, arr) => html, "");
+  // Проще: собираем через части
+  const parts = q.template.split("___");
+  $("sentence").innerHTML = `${parts[0]}<span class="blank" id="blank">&nbsp;?&nbsp;</span>${parts[1] ?? ""}`;
+
+  // 1 правильный + 3 случайных дистрактора из слов других фраз
+  const pool = PHRASES.map(p => p.answer).filter(w => w !== q.answer);
+  const distractors = shuffle(pool).slice(0, 3);
+  const options = shuffle([q.answer, ...distractors]);
+
+  const box = $("options");
+  box.innerHTML = "";
+  options.forEach(word => {
+    const btn = document.createElement("button");
+    btn.className = "opt";
+    btn.textContent = word;
+    btn.onclick = () => choose(word, btn);
+    box.appendChild(btn);
+  });
+
+  $("feedback").style.display = "none";
+  $("nextBtn").style.display = "none";
+}
+
+function choose(word, btn) {
+  if (locked) return;
+  locked = true;
+  const q = order[idx];
+  const ok = word === q.answer;
+  const blank = $("blank");
+  blank.textContent = word;
+  blank.classList.add(ok ? "correct" : "wrong");
+
+  document.querySelectorAll(".opt").forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.answer) b.classList.add("correct-now");
+    else if (b !== btn) b.classList.add("faded");
+  });
+  if (!ok) btn.classList.add("wrong-now");
+
+  const fb = $("feedback");
+  fb.style.display = "flex";
+  fb.className = ok ? "good" : "bad";
+  $("fbText").textContent = ok ? "Отлично! ✓" : "Правильный ответ:";
+  $("fbSub").textContent = ok ? q.en : q.en;
+
+  // Флэш + тряска + вибрация
+  if (ok) {
+    score++;
+    document.body.classList.add("flash-green");
+    $("fbText").textContent = "Отлично! ✓";
+  } else {
+    document.body.classList.add("flash-red");
+    $("quiz").classList.add("shake");
+    if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+  }
+  setTimeout(() => document.body.classList.remove("flash-green", "flash-red"), 550);
+  setTimeout(() => $("quiz").classList.remove("shake"), 500);
+
+  const nb = $("nextBtn");
+  nb.style.display = "block";
+  nb.textContent = idx === order.length - 1 ? "Результат" : "Продолжить";
+}
+
+$("nextBtn").onclick = () => {
+  idx++;
+  if (idx < order.length) showQuestion();
+  else showFinal();
+};
+
+function showFinal() {
+  $("progressBar").style.width = "100%";
+  $("quiz").style.display = "none";
+  const f = $("final");
+  f.style.display = "flex";
+  const pct = score / order.length;
+  $("finalScore").textContent = `${score} / ${order.length}`;
+  if (pct === 1)      { $("finalEmoji").textContent = "🏆"; $("finalTitle").textContent = "Безупречно!"; $("finalMsg").textContent = "Все фразы как по маслу!"; }
+  else if (pct >= .7) { $("finalEmoji").textContent = "🎉"; $("finalTitle").textContent = "Здорово!";      $("finalMsg").textContent = "Почти идеально — ещё чуть-чуть!"; }
+  else if (pct >= .4) { $("finalEmoji").textContent = "💪"; $("finalTitle").textContent = "Хороший старт!"; $("finalMsg").textContent = "Повтори и попробуй снова."; }
+  else                { $("finalEmoji").textContent = "🌱"; $("finalTitle").textContent = "Продолжай!";    $("finalMsg").textContent = "Практика решает всё."; }
+}
+
+$("retryBtn").onclick = startGame;
+$("closeBtn").onclick = startGame;
+
+startGame();
+</script>
+</body>
+</html>

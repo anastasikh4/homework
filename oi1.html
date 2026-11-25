@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Life & Present Simple Quest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+
+    .game-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 630px;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.22);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.65rem;
+      color: #d9534f;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff3ee;
+      padding: 12px 18px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #c9302c;
+    }
+
+    .hearts {
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+    }
+
+    .section-badge {
+      display: inline-block;
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .emoji-banner {
+      font-size: 3.3rem;
+      margin: 10px 0;
+    }
+
+    .question-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 14px 0 22px;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-btn {
+      background: #fff9f6;
+      border: 2px solid #f5c6b8;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #b52b27;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #ffe8e0;
+      border-color: #d9534f;
+      transform: translateY(-2px);
+    }
+
+    .option-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .option-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .feedback {
+      margin-top: 16px;
+      font-weight: 700;
+      min-height: 24px;
+      font-size: 1rem;
+    }
+
+    .end-screen {
+      display: none;
+    }
+
+    .score-box {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #d9534f;
+      margin: 14px 0;
+    }
+
+    .status-msg {
+      margin: 16px 0;
+      font-weight: 700;
+      font-size: 1.05rem;
+      min-height: 26px;
+    }
+
+    .play-again-btn {
+      background: #d9534f;
+      color: #fff;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 14px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .play-again-btn:hover {
+      background: #b52b27;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="game-container">
+  <h1>🌟 School Life & Present Simple Quest 🌟</h1>
+  <div class="subtitle">Vocabulary, Grammar & Pronunciation Challenge</div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen">
+    <div class="top-bar">
+      <div id="progress-text">Question 1/14</div>
+      <div class="hearts" id="hearts-display">❤️❤️❤️</div>
+    </div>
+
+    <div class="section-badge" id="section-badge">Part 1: School Subjects</div>
+    <div class="emoji-banner" id="emoji-banner">🌍🗺️</div>
+    <div class="question-text" id="question-text">Loading...</div>
+
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <!-- End Screen -->
+  <div id="end-screen" class="end-screen">
+    <div class="emoji-banner" id="end-emoji">🏆</div>
+    <h2 id="end-title">EXCELLENT!</h2>
+    <p id="end-subtitle">You are a School Quest Star! 🎒</p>
+    <div class="score-box" id="final-score">Score: 0 / 14</div>
+    <div id="send-status" class="status-msg">Sending results...</div>
+    <button class="play-again-btn" onclick="startQuiz()">Play Again</button>
+  </div>
+</div>
+
+<script>
+  const TEST_NAME = "School Life & Present Simple Quest";
+  const GOOGLE_FORM_URL = "YOUR_GOOGLE_FORM_ACTION_URL_HERE";
+
+  let userMistakes = [];
+
+  const questions = [
+    {
+      section: "Part 1: Guess the School Subject",
+      emoji: "🌍🧭🗺️",
+      question: "We learn about countries, rivers, and mountains in G_____.",
+      options: ["Geography", "History", "Science", "Music"],
+      answer: "Geography"
+    },
+    {
+      section: "Part 1: Guess the School Subject",
+      emoji: "🧪🔬🌱",
+      question: "Students do experiments with plants and chemicals in S_____.",
+      options: ["Science", "Art", "Maths", "English"],
+      answer: "Science"
+    },
+    {
+      section: "Part 1: Guess the School Subject",
+      emoji: "🏛️👑📜",
+      question: "We read about old kings, castles, and past events in H_____.",
+      options: ["History", "Geography", "Computing", "Drama"],
+      answer: "History"
+    },
+    {
+      section: "Part 2: Places in a School",
+      emoji: "📚🤫📖",
+      question: "Students borrow books and read quietly in the _____.",
+      options: ["library", "canteen", "playground", "gym"],
+      answer: "library"
+    },
+    {
+      section: "Part 2: Places in a School",
+      emoji: "🍎🥪🧃",
+      question: "Everyone eats lunch together at 12:30 in the _____.",
+      options: ["canteen", "classroom", "hall", "office"],
+      answer: "canteen"
+    },
+    {
+      section: "Part 3: Weekend Routines & Frequency",
+      emoji: "🍕🎬👫",
+      question: "Choose the correct sentence about Sunday routines:",
+      options: [
+        "Mia often meets her friends at the cinema on Sundays.",
+        "Mia meets often her friends at the cinema on Sundays.",
+        "Often Mia meets her friends at the cinema on Sundays.",
+        "Mia meets her friends at the cinema oftenly on Sundays."
+      ],
+      answer: "Mia often meets her friends at the cinema on Sundays."
+    },
+    {
+      section: "Part 3: Weekend Routines & Frequency",
+      emoji: "⏰🛌☀️",
+      question: "Choose the correct word order:",
+      options: [
+        "We never wake up before 9 a.m. on Saturdays.",
+        "We wake never up before 9 a.m. on Saturdays.",
+        "Never we wake up before 9 a.m. on Saturdays.",
+        "We wake up before 9 a.m. never on Saturdays."
+      ],
+      answer: "We never wake up before 9 a.m. on Saturdays."
+    },
+    {
+      section: "Part 3: Weekend Routines & Frequency",
+      emoji: "📓✏️🏠",
+      question: "Leo _____ his homework on Sunday afternoon before dinner.",
+      options: ["usually does", "does usually", "usually do", "do usually"],
+      answer: "usually does"
+    },
+    {
+      section: "Part 4: Complete with do, don't, does, doesn't",
+      emoji: "🎸🎤💬",
+      question: "Reporter: “_____ you practise the guitar every afternoon?” — Ruby: “Yes, I do!”",
+      options: ["Do", "Does", "Don't", "Doesn't"],
+      answer: "Do"
+    },
+    {
+      section: "Part 4: Complete with do, don't, does, doesn't",
+      emoji: "🌙🎶🚫",
+      question: "Ruby: “I practise after school, but I _____ play loud music at night.”",
+      options: ["don't", "doesn't", "do", "does"],
+      answer: "don't"
+    },
+    {
+      section: "Part 4: Complete with do, don't, does, doesn't",
+      emoji: "🥁👦❓",
+      question: "Reporter: “_____ your brother Toby play the guitar too?”",
+      options: ["Does", "Do", "Doesn't", "Don't"],
+      answer: "Does"
+    },
+    {
+      section: "Part 4: Complete with do, don't, does, doesn't",
+      emoji: "🎹🙅‍♂️✨",
+      question: "Ruby: “No, he _____. He plays the keyboard in our band!”",
+      options: ["doesn't", "don't", "does", "do"],
+      answer: "doesn't"
+    },
+    {
+      section: "Part 5: Pronunciation (/s/, /z/ or /ɪz/)",
+      emoji: "🗣️👂🔔",
+      question: "How do we pronounce the ending in “She watches cartoons after tea”?",
+      options: ["/ɪz/", "/s/", "/z/", "/t/"],
+      answer: "/ɪz/"
+    },
+    {
+      section: "Part 5: Pronunciation (/s/, /z/ or /ɪz/)",
+      emoji: "🗣️👂🏃‍♂️",
+      question: "How do we pronounce the ending in “Tom walks his dog every morning”?",
+      options: ["/s/", "/z/", "/ɪz/", "/d/"],
+      answer: "/s/"
+    }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let lives = 3;
+  let questionAnswered = false;
+
+  const quizScreen = document.getElementById("quiz-screen");
+  const endScreen = document.getElementById("end-screen");
+  const progressText = document.getElementById("progress-text");
+  const heartsDisplay = document.getElementById("hearts-display");
+  const sectionBadge = document.getElementById("section-badge");
+  const emojiBanner = document.getElementById("emoji-banner");
+  const questionText = document.getElementById("question-text");
+  const optionsGrid = document.getElementById("options-grid");
+  const feedback = document.getElementById("feedback");
+
+  function shuffleOptions(options) {
+    const mixedOptions = [...options];
+
+    for (let i = mixedOptions.length - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+
+      const temporaryValue = mixedOptions[i];
+      mixedOptions[i] = mixedOptions[randomIndex];
+      mixedOptions[randomIndex] = temporaryValue;
+    }
+
+    return mixedOptions;
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    lives = 3;
+    userMistakes = [];
+
+    quizScreen.style.display = "block";
+    endScreen.style.display = "none";
+
+    updateHearts();
+    renderQuestion();
+  }
+
+  function updateHearts() {
+    const fullHearts = "❤️".repeat(Math.max(0, lives));
+    const emptyHearts = "🤍".repeat(Math.max(0, 3 - lives));
+
+    heartsDisplay.textContent = fullHearts + emptyHearts;
+  }
+
+  function renderQuestion() {
+    questionAnswered = false;
+    feedback.textContent = "";
+
+    const currentQuestion = questions[currentIndex];
+    const mixedOptions = shuffleOptions(currentQuestion.options);
+
+    progressText.textContent = `Question ${currentIndex + 1}/${questions.length}`;
+    sectionBadge.textContent = currentQuestion.section;
+    emojiBanner.textContent = currentQuestion.emoji;
+    questionText.textContent = currentQuestion.question;
+
+    optionsGrid.innerHTML = "";
+
+    mixedOptions.forEach(function(optionWord) {
+      const button = document.createElement("button");
+      button.className = "option-btn";
+      button.textContent = optionWord;
+      button.onclick = function() {
+        handleOptionClick(button, optionWord, currentQuestion.answer);
+      };
+
+      optionsGrid.appendChild(button);
+    });
+  }
+
+  function handleOptionClick(button, selectedWord, correctWord) {
+    if (questionAnswered) {
+      return;
+    }
+
+    if (selectedWord === correctWord) {
+      questionAnswered = true;
+      button.classList.add("correct");
+      score++;
+
+      feedback.style.color = "#155724";
+      feedback.textContent = "Awesome! ✅";
+
+      disableAllButtons();
+
+      setTimeout(function() {
+        currentIndex++;
+
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 900);
+    } else {
+      button.classList.add("wrong");
+      button.disabled = true;
+
+      userMistakes.push(selectedWord);
+      lives--;
+
+      updateHearts();
+
+      feedback.style.color = "#721c24";
+      feedback.textContent = "Oops! Try again! ❌";
+
+      if (lives <= 0) {
+        questionAnswered = true;
+        disableAllButtons();
+
+        setTimeout(function() {
+          currentIndex++;
+
+          if (currentIndex < questions.length) {
+            lives = 3;
+            updateHearts();
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        }, 900);
+      }
+    }
+  }
+
+  function disableAllButtons() {
+    const buttons = optionsGrid.querySelectorAll(".option-btn");
+
+    buttons.forEach(function(button) {
+      button.disabled = true;
+    });
+  }
+
+  function finishQuiz() {
+    quizScreen.style.display = "none";
+    endScreen.style.display = "block";
+
+    const endEmoji = document.getElementById("end-emoji");
+    const endTitle = document.getElementById("end-title");
+    const endSubtitle = document.getElementById("end-subtitle");
+    const finalScore = document.getElementById("final-score");
+
+    finalScore.textContent = `Score: ${score} / ${questions.length}`;
+
+    if (score >= 12) {
+      endEmoji.textContent = "🏆";
+      endTitle.textContent = "EXCELLENT!";
+      endSubtitle.textContent = "You are a School Quest Star! 🎒";
+    } else if (score >= 8) {
+      endEmoji.textContent = "🌟";
+      endTitle.textContent = "GREAT JOB!";
+      endSubtitle.textContent = "Keep practising your Present Simple! 📚";
+    } else {
+      endEmoji.textContent = "💪";
+      endTitle.textContent = "GOOD TRY!";
+      endSubtitle.textContent = "Review the rules and play again! ✏️";
+    }
+
+    sendResultsToGoogle();
+  }
+
+  function sendResultsToGoogle() {
+    const statusElement = document.getElementById("send-status");
+
+    statusElement.style.color = "#555";
+    statusElement.textContent = "Sending results...";
+
+    const params = new URLSearchParams();
+    params.append("name", TEST_NAME);
+    params.append("score", score);
+    params.append("total", questions.length);
+    params.append("mistakes", userMistakes.join(", "));
+
+    fetch(GOOGLE_FORM_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: params
+    })
+    .then(function() {
+      statusElement.style.color = "green";
+      statusElement.textContent = "Results sent successfully! ✅";
+    })
+    .catch(function(error) {
+      console.error("Error sending results:", error);
+
+      statusElement.style.color = "red";
+      statusElement.textContent = "Failed to send results.";
+    });
+  }
+
+  startQuiz();
+</script>
+
+</body>
+</html>
