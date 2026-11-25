@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Relationships and Problem-Solving — Homework</title>
+<style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-color: #f4f6f9;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 850px;
+  margin: auto;
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+h1 {
+  color: #0056b3;
+  border-bottom: 3px solid #0056b3;
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 15px;
+  margin-bottom: 25px;
+  font-style: italic;
+}
+
+/* READING TEXT */
+.reading-text {
+  background: #f8fafc;
+  border-left: 6px solid #0056b3;
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin-bottom: 30px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1e293b;
+}
+
+.tense-section {
+  margin-bottom: 18px;
+}
+
+.tense-section:last-child {
+  margin-bottom: 0;
+}
+
+.tense-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 4px;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.label-business {
+  background: #0284c7;
+}
+
+.label-technical {
+  background: #d97706;
+}
+
+.label-communication {
+  background: #16a34a;
+}
+
+.reading-text b {
+  color: #0056b3;
+  background: #e0f2fe;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+/* QUIZ SECTION */
+h2 {
+  color: #0056b3;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-top: 30px;
+}
+
+.quiz-section form {
+  margin-top: 10px;
+}
+
+.question-block {
+  margin-bottom: 18px;
+  background: #fdfdfd;
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.question-block.correct-q {
+  background: #f0fdf4;
+  border-color: #16a34a;
+}
+
+.question-block.wrong-q {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+.question-block h3 {
+  color: #1e293b;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.question-block h3 .qnum {
+  display: inline-block;
+  background: #0056b3;
+  color: white;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 13px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+li:hover {
+  background: #f1f5f9;
+}
+
+input[type="radio"] {
+  margin-right: 10px;
+  cursor: pointer;
+  transform: scale(1.15);
+}
+
+li label {
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.feedback {
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 8px;
+  display: none;
+}
+
+.feedback.show {
+  display: block;
+}
+
+.feedback.correct {
+  color: #16a34a;
+}
+
+.feedback.incorrect {
+  color: #dc2626;
+}
+
+/* GAP-FILL TEXT */
+.gap-text {
+  background: #f8fafc;
+  border-left: 6px solid #16a34a;
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 2;
+  color: #1e293b;
+}
+
+.gap-text select {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border: 2px solid #0056b3;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #0c4a6e;
+  cursor: pointer;
+}
+
+.gap-text select:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+.gap-text select.correct {
+  border-color: #16a34a;
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+.gap-text select.incorrect {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+/* BUTTONS */
+.btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+button {
+  background-color: #0056b3;
+  color: white;
+  padding: 13px 28px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: 0.2s;
+  box-shadow: 0 3px 0 #003d82;
+  font-family: inherit;
+}
+
+button:hover {
+  background-color: #004494;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #003d82;
+}
+
+button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #003d82;
+}
+
+button.secondary {
+  background-color: #64748b;
+  box-shadow: 0 3px 0 #475569;
+}
+
+button.secondary:hover {
+  background-color: #475569;
+}
+
+/* SCORE */
+.score-board {
+  margin-top: 25px;
+  padding: 18px;
+  background: #e0f2fe;
+  border: 2px solid #0284c7;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0c4a6e;
+  display: none;
+}
+
+.score-board.show {
+  display: block;
+}
+
+.score-board .score-value {
+  color: #0056b3;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.score-board.perfect {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #f59e0b;
+  color: #78350f;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .reading-text,
+  .gap-text {
+    padding: 16px;
+  }
+
+  .gap-text select {
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .question-block {
+    padding: 14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Professional Relationships and Problem-Solving</h1>
+
+  <p class="subtitle">
+    Homework · Business and Technical English · Level B1
+  </p>
+
+  <!-- READING TEXT -->
+  <div class="reading-text">
+
+    <div class="tense-section">
+      <span class="tense-label label-business">Business Relationships</span>
+
+      <p>
+        <b>Maria Petrova</b> is a project manager at a technology company in
+        <b>Kazakhstan</b>. She has worked with the same team for five years, so she has
+        several <b>long-term colleagues</b>. One of them is <b>Arman</b>, an engineer who
+        always helps her when there is a problem with the equipment. Maria trusts him because
+        he explains technical problems clearly and gives useful <b>directions</b>.
+      </p>
+
+      <p>
+        Last month, Maria met <b>Daniel</b>, a new business partner from a software company.
+        They discussed a possible <b>business relationship</b> and the <b>profit potential</b>
+        of a new project. Daniel was polite and professional, and he asked good questions.
+        Maria thinks that he could be a valuable contact for the company in the future.
+      </p>
+    </div>
+
+    <div class="tense-section">
+      <span class="tense-label label-technical">Problem-Solving</span>
+
+      <p>
+        Yesterday, the team had a problem with a printer in the office. The printer did not
+        work, and the team needed to print important documents for a client meeting. Maria
+        called the technical support team. The engineer asked her to describe the problem
+        clearly. Then he checked the equipment and found a simple <b>solution</b>.
+      </p>
+
+      <p>
+        Maria wanted to solve the problem quickly because the meeting was very important.
+        She asked the engineer, “Is this a <b>convenient</b> time to talk?” He replied
+        politely and explained that the printer needed a small repair. The team made a
+        <b>decision</b> to buy new equipment because the old printer was not reliable.
+      </p>
+    </div>
+
+    <div class="tense-section">
+      <span class="tense-label label-communication">Soft Skills</span>
+
+      <p>
+        Maria believes that <b>soft skills</b> are as important as technical knowledge.
+        Good colleagues listen carefully, ask questions, and communicate politely. They can
+        disagree without arguing. For example, when team members have different ideas, Maria
+        says, “I understand your opinion, but let’s compare the costs first.” This helps the
+        team find the best solution.
+      </p>
+
+      <p>
+        The company also uses <b>advertisements</b> to find new clients and business partners.
+        Maria thinks that strong professional relationships can help a company grow, improve
+        communication, and solve problems more effectively.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- COMPREHENSION QUIZ -->
+  <h2>Comprehension Quiz</h2>
+
+  <div class="quiz-section">
+    <form id="quizForm">
+
+      <div class="question-block" data-q="1">
+        <h3><span class="qnum">1</span>What is Maria’s job?</h3>
+        <ul>
+          <li><label><input type="radio" name="q1" value="a"> (a) She is an engineer.</label></li>
+          <li><label><input type="radio" name="q1" value="b"> (b) She is a project manager.</label></li>
+          <li><label><input type="radio" name="q1" value="c"> (c) She is a technical support worker.</label></li>
+        </ul>
+        <div class="feedback" id="f1"></div>
+      </div>
+
+      <div class="question-block" data-q="2">
+        <h3><span class="qnum">2</span>Why does Maria trust Arman?</h3>
+        <ul>
+          <li><label><input type="radio" name="q2" value="a"> (a) Because he gives her money.</label></li>
+          <li><label><input type="radio" name="q2" value="b"> (b) Because he explains technical problems clearly.</label></li>
+          <li><label><input type="radio" name="q2" value="c"> (c) Because he works in another country.</label></li>
+        </ul>
+        <div class="feedback" id="f2"></div>
+      </div>
+
+      <div class="question-block" data-q="3">
+        <h3><span class="qnum">3</span>Who is Daniel?</h3>
+        <ul>
+          <li><label><input type="radio" name="q3" value="a"> (a) A new business partner.</label></li>
+          <li><label><input type="radio" name="q3" value="b"> (b) A printer engineer.</label></li>
+          <li><label><input type="radio" name="q3" value="c"> (c) Maria’s manager.</label></li>
+        </ul>
+        <div class="feedback" id="f3"></div>
+      </div>
+
+      <div class="question-block" data-q="4">
+        <h3><span class="qnum">4</span>What did Maria and Daniel discuss?</h3>
+        <ul>
+          <li><label><input type="radio" name="q4" value="a"> (a) A possible business relationship and profit potential.</label></li>
+          <li><label><input type="radio" name="q4" value="b"> (b) A problem with the printer.</label></li>
+          <li><label><input type="radio" name="q4" value="c"> (c) A music project.</label></li>
+        </ul>
+        <div class="feedback" id="f4"></div>
+      </div>
+
+      <div class="question-block" data-q="5">
+        <h3><span class="qnum">5</span>What problem did the team have yesterday?</h3>
+        <ul>
+          <li><label><input type="radio" name="q5" value="a"> (a) They could not find a client.</label></li>
+          <li><label><input type="radio" name="q5" value="b"> (b) The printer did not work.</label></li>
+          <li><label><input type="radio" name="q5" value="c"> (c) They lost an important document.</label></li>
+        </ul>
+        <div class="feedback" id="f5"></div>
+      </div>
+
+      <div class="question-block" data-q="6">
+        <h3><span class="qnum">6</span>What did the technical support engineer do?</h3>
+        <ul>
+          <li><label><input type="radio" name="q6" value="a"> (a) He bought a new printer immediately.</label></li>
+          <li><label><input type="radio" name="q6" value="b"> (b) He checked the equipment and found a solution.</label></li>
+          <li><label><input type="radio" name="q6" value="c"> (c) He cancelled the client meeting.</label></li>
+        </ul>
+        <div class="feedback" id="f6"></div>
+      </div>
+
+      <div class="question-block" data-q="7">
+        <h3><span class="qnum">7</span>What decision did the team make?</h3>
+        <ul>
+          <li><label><input type="radio" name="q7" value="a"> (a) To repair the old printer.</label></li>
+          <li><label><input type="radio" name="q7" value="b"> (b) To buy new equipment.</label></li>
+          <li><label><input type="radio" name="q7" value="c"> (c) To stop using printers.</label></li>
+        </ul>
+        <div class="feedback" id="f7"></div>
+      </div>
+
+      <div class="question-block" data-q="8">
+        <h3><span class="qnum">8</span>According to Maria, why are soft skills important?</h3>
+        <ul>
+          <li><label><input type="radio" name="q8" value="a"> (a) Because they help people communicate and solve problems well.</label></li>
+          <li><label><input type="radio" name="q8" value="b"> (b) Because they help people work alone.</label></li>
+          <li><label><input type="radio" name="q8" value="c"> (c) Because they help people avoid technical equipment.</label></li>
+        </ul>
+        <div class="feedback" id="f8"></div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- BUTTONS AND SCORE -->
+  <div class="btn-group">
+    <button onclick="checkAnswers()">✓ Check Answers</button>
+    <button class="secondary" onclick="showAnswers()">👁 Show Answers</button>
+    <button class="secondary" onclick="resetAll()">🔄 Reset</button>
+  </div>
+
+  <div class="score-board" id="scoreBoard">
+    Your score: <span class="score-value" id="scoreValue">0</span> / <span id="totalValue">8</span>
+  </div>
+
+  <!-- FILL IN THE GAPS -->
+  <h2>Fill in the Gaps</h2>
+
+  <p class="subtitle">
+    Read the short summary. Choose the correct word for each gap.
+  </p>
+
+  <div class="gap-text">
+    <p>
+      Maria is a <b>project manager</b> at a technology company. She has good relationships
+      with her colleagues. One colleague, Arman, helps her when there is a problem with the
+
+      <select id="gap1" data-answer="equipment">
+        <option value="">Choose…</option>
+        <option value="equipment">equipment</option>
+        <option value="advertisement">advertisement</option>
+        <option value="decision">decision</option>
+      </select>.
+
+      Last month, Maria met Daniel, a new business partner. They discussed a possible
+
+      <select id="gap2" data-answer="business relationship">
+        <option value="">Choose…</option>
+        <option value="business relationship">business relationship</option>
+        <option value="printer problem">printer problem</option>
+        <option value="music project">music project</option>
+      </select>
+
+      and the profit potential of a new project.
+    </p>
+
+    <p>
+      Yesterday, the printer in the office did not work. Maria called technical support.
+      The engineer checked the printer and found a
+
+      <select id="gap3" data-answer="solution">
+        <option value="">Choose…</option>
+        <option value="solution">solution</option>
+        <option value="tender">tender</option>
+        <option value="skill">skill</option>
+      </select>.
+
+      The team made a
+
+      <select id="gap4" data-answer="decision">
+        <option value="">Choose…</option>
+        <option value="decision">decision</option>
+        <option value="relationship">relationship</option>
+        <option value="direction">direction</option>
+      </select>
+
+      to buy new equipment. Maria believes that
+
+      <select id="gap5" data-answer="soft skills">
+        <option value="">Choose…</option>
+        <option value="soft skills">soft skills</option>
+        <option value="advertisements">advertisements</option>
+        <option value="tenders">tenders</option>
+      </select>
+
+      are important because good colleagues communicate politely and solve problems together.
+    </p>
+  </div>
+
+  <div class="btn-group">
+    <button onclick="checkGaps()">✓ Check Answers</button>
+    <button class="secondary" onclick="showGapAnswers()">👁 Show Answers</button>
+    <button class="secondary" onclick="resetGaps()">🔄 Reset</button>
+  </div>
+
+  <div class="score-board" id="gapScoreBoard">
+    Your score: <span class="score-value" id="gapScoreValue">0</span> / <span id="gapTotalValue">5</span>
+  </div>
+
+</div>
+
+<script>
+const CORRECT = {
+  q1: 'b',
+  q2: 'b',
+  q3: 'a',
+  q4: 'a',
+  q5: 'b',
+  q6: 'b',
+  q7: 'b',
+  q8: 'a'
+};
+
+const TOTAL = Object.keys(CORRECT).length;
+
+function checkAnswers() {
+  let score = 0;
+
+  Object.keys(CORRECT).forEach(function(question, index) {
+    const block = document.querySelector('.question-block[data-q="' + (index + 1) + '"]');
+    const feedback = document.getElementById('f' + (index + 1));
+    const selected = document.querySelector('input[name="' + question + '"]:checked');
+
+    block.classList.remove('correct-q', 'wrong-q');
+    feedback.classList.remove('show', 'correct', 'incorrect');
+    feedback.textContent = '';
+
+    if (selected && selected.value === CORRECT[question]) {
+      block.classList.add('correct-q');
+      feedback.textContent = '✓ Correct!';
+      feedback.classList.add('show', 'correct');
+      score++;
+    } else {
+      block.classList.add('wrong-q');
+      feedback.textContent = '✗ Incorrect. Correct answer: (' + CORRECT[question] + ')';
+      feedback.classList.add('show', 'incorrect');
+    }
+  });
+
+  const scoreBoard = document.getElementById('scoreBoard');
+  const scoreValue = document.getElementById('scoreValue');
+
+  scoreBoard.classList.add('show');
+  scoreValue.textContent = score;
+
+  if (score === TOTAL) {
+    scoreBoard.classList.add('perfect');
+    scoreBoard.innerHTML = '🏆 Perfect! You got all ' + TOTAL + ' answers correct!';
+  } else {
+    scoreBoard.classList.remove('perfect');
+    scoreBoard.innerHTML = 'Your score: <span class="score-value">' + score + '</span> / ' + TOTAL;
+  }
+
+  scoreBoard.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+}
+
+function showAnswers() {
+  Object.keys(CORRECT).forEach(function(question, index) {
+    const correctRadio = document.querySelector('input[name="' + question + '"][value="' + CORRECT[question] + '"]');
+
+    if (correctRadio) {
+      correctRadio.checked = true;
+    }
+
+    const block = document.querySelector('.question-block[data-q="' + (index + 1) + '"]');
+    const feedback = document.getElementById('f' + (index + 1));
+
+    block.classList.remove('correct-q', 'wrong-q');
+    feedback.classList.remove('show', 'correct', 'incorrect');
+    feedback.textContent = '👁 Answer revealed.';
+    feedback.classList.add('show');
+    feedback.style.color = '#64748b';
+  });
+
+  document.getElementById('scoreBoard').classList.remove('show');
+}
+
+function resetAll() {
+  document.getElementById('quizForm').reset();
+
+  document.querySelectorAll('.question-block').forEach(function(block) {
+    block.classList.remove('correct-q', 'wrong-q');
+  });
+
+  for (let i = 1; i <= TOTAL; i++) {
+    const feedback = document.getElementById('f' + i);
+
+    if (feedback) {
+      feedback.classList.remove('show', 'correct', 'incorrect');
+      feedback.textContent = '';
+      feedback.style.color = '';
+    }
+  }
+
+  const scoreBoard = document.getElementById('scoreBoard');
+  scoreBoard.classList.remove('show', 'perfect');
+  document.getElementById('scoreValue').textContent = '0';
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+const GAP_IDS = ['gap1', 'gap2', 'gap3', 'gap4', 'gap5'];
+const GAP_TOTAL = GAP_IDS.length;
+
+function checkGaps() {
+  let score = 0;
+
+  GAP_IDS.forEach(function(id) {
+    const select = document.getElementById(id);
+    const correctAnswer = select.getAttribute('data-answer');
+
+    select.classList.remove('correct', 'incorrect');
+
+    if (select.value === correctAnswer) {
+      select.classList.add('correct');
+      score++;
+    } else {
+      select.classList.add('incorrect');
+    }
+  });
+
+  const scoreBoard = document.getElementById('gapScoreBoard');
+  const scoreValue = document.getElementById('gapScoreValue');
+
+  scoreBoard.classList.add('show');
+  scoreValue.textContent = score;
+
+  if (score === GAP_TOTAL) {
+    scoreBoard.classList.add('perfect');
+    scoreBoard.innerHTML = '🏆 Perfect! You got all ' + GAP_TOTAL + ' answers correct!';
+  } else {
+    scoreBoard.classList.remove('perfect');
+    scoreBoard.innerHTML = 'Your score: <span class="score-value">' + score + '</span> / ' + GAP_TOTAL;
+  }
+
+  scoreBoard.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+}
+
+function showGapAnswers() {
+  GAP_IDS.forEach(function(id) {
+    const select = document.getElementById(id);
+    const correctAnswer = select.getAttribute('data-answer');
+
+    select.value = correctAnswer;
+    select.classList.remove('incorrect');
+    select.classList.add('correct');
+  });
+
+  document.getElementById('gapScoreBoard').classList.remove('show');
+}
+
+function resetGaps() {
+  GAP_IDS.forEach(function(id) {
+    const select = document.getElementById(id);
+
+    select.value = '';
+    select.classList.remove('correct', 'incorrect');
+  });
+
+  const scoreBoard = document.getElementById('gapScoreBoard');
+  scoreBoard.classList.remove('show', 'perfect');
+  document.getElementById('gapScoreValue').textContent = '0';
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+</script>
+
+</body>
+</html>

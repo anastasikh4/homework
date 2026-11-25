@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business English: Problem Solving & Relationships</title>
+    <style>
+        :root {
+            --ww-blue: #0071ba;
+            --ww-light-blue: #e8f4fd;
+            --ww-dark: #2d3e50;
+            --ww-correct: #46a049;
+            --ww-wrong: #e91e63;
+        }
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--ww-light-blue);
+            color: var(--ww-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .game-container {
+            max-width: 850px;
+            width: 100%;
+            background: white;
+            border: 3px solid var(--ww-blue);
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--ww-blue);
+            text-align: center;
+            text-transform: uppercase;
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+        }
+
+        /* ── WORD BANK ── */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            background: #f0f0f0;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            border: 2px dashed #ccc;
+        }
+        .word-item {
+            padding: 8px 16px;
+            background: var(--ww-blue);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            user-select: none;
+            font-size: 0.95rem;
+            transition: 0.15s;
+        }
+        .word-item:hover {
+            transform: scale(1.05);
+            background: #005a96;
+        }
+        .word-item.used {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .word-item.active {
+            outline: 3px solid #ffcc00;
+            background: #005a96;
+            transform: scale(1.05);
+        }
+
+        /* ── DESCRIPTIONS ── */
+        .descriptions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .description {
+            background: #fafcff;
+            border-left: 4px solid var(--ww-blue);
+            border-radius: 8px;
+            padding: 14px 16px;
+            line-height: 1.9;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .description .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            background: var(--ww-blue);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        /* ── DROP ZONES ── */
+        .drop-zone {
+            display: inline-block;
+            min-width: 150px;
+            border-bottom: 2.5px solid var(--ww-blue);
+            text-align: center;
+            color: var(--ww-blue);
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 6px;
+            transition: 0.3s;
+            vertical-align: middle;
+        }
+        .drop-zone.filled {
+            background: #eaf4fd;
+            border-radius: 4px 4px 0 0;
+        }
+        .drop-zone:empty::before {
+            content: "...................";
+            color: #ccc;
+            letter-spacing: 1px;
+        }
+        .drop-zone:hover {
+            background: #f5faff;
+        }
+
+        /* ── CONTROLS ── */
+        .controls {
+            margin-top: 26px;
+            text-align: center;
+        }
+        .btn-check {
+            background: var(--ww-blue);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #005a96;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.1s;
+        }
+        .btn-check:hover { background: #0085d6; }
+        .btn-check:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.15rem;
+            text-align: center;
+            min-height: 30px;
+        }
+        
+        #send-status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* ── LANGUAGE NOTE ── */
+        .lang-note {
+            background: #fff8e1;
+            border-left: 5px solid #f9a825;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 22px;
+            font-size: 0.95rem;
+            color: #78350f;
+            line-height: 1.5;
+        }
+        .lang-note strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.2rem; }
+            .description { font-size: 0.92rem; padding: 12px; }
+            .word-item { padding: 6px 12px; font-size: 0.85rem; }
+            .drop-zone { min-width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>💼 Business English</h1>
+    <p class="subtitle">Click a phrase from the word bank, then click the correct blank space.</p>
+
+    <!-- ═════════ WORD BANK ═════════ -->
+    <div class="word-bank" id="wordBank">
+        <!-- Order here doesn't matter, JS will shuffle them on load -->
+        <div class="word-item" onclick="selectWord(this)">a solution</div>
+        <div class="word-item" onclick="selectWord(this)">a technical problem</div>
+        <div class="word-item" onclick="selectWord(this)">equipment</div>
+        <div class="word-item" onclick="selectWord(this)">profit</div>
+        <div class="word-item" onclick="selectWord(this)">a business relationship</div>
+        <div class="word-item" onclick="selectWord(this)">a tender</div>
+        <div class="word-item" onclick="selectWord(this)">soft skills</div>
+        <div class="word-item" onclick="selectWord(this)">a decision</div>
+    </div>
+
+    <!-- ═════════ DESCRIPTIONS ═════════ -->
+    <div class="descriptions">
+
+        <div class="description">
+            <span class="num">1</span>
+            In business, when there is a difficulty, the team needs to find <span class="drop-zone" data-ans="a solution"></span>. They discuss the options and compare the costs to fix the issue.
+        </div>
+
+        <div class="description">
+            <span class="num">2</span>
+            When a machine breaks down, an engineer must explain <span class="drop-zone" data-ans="a technical problem"></span> to the manager clearly. They must give clear directions on how to repair it.
+        </div>
+
+        <div class="description">
+            <span class="num">3</span>
+            We use <span class="drop-zone" data-ans="equipment"></span> like computers and machines to do our work. Sometimes it is expensive, so we need to plan our budget.
+        </div>
+
+        <div class="description">
+            <span class="num">4</span>
+            To grow and make <span class="drop-zone" data-ans="profit"></span>, a company needs to sell products or services. Good advertisements can help attract more customers.
+        </div>
+
+        <div class="description">
+            <span class="num">5</span>
+            Building <span class="drop-zone" data-ans="a business relationship"></span> takes time. You need to communicate politely and find a convenient time to talk.
+        </div>
+
+        <div class="description">
+            <span class="num">6</span>
+            When a company wants to win a big contract for a new project, they prepare <span class="drop-zone" data-ans="a tender"></span>. It is a formal offer that includes the price and the plan.
+        </div>
+
+        <div class="description">
+            <span class="num">7</span>
+            People who work in technical teams need good <span class="drop-zone" data-ans="soft skills"></span> as well as technical knowledge. They need to ask politely and work well with others.
+        </div>
+
+        <div class="description">
+            <span class="num">8</span>
+            Before starting a new project, the manager and the team must make <span class="drop-zone" data-ans="a decision"></span>. They discuss the potential and the risks together.
+        </div>
+
+    </div>
+
+    <!-- ═════════ LANGUAGE NOTE ═════════ -->
+    <div class="lang-note">
+        <strong>📌 Language note</strong>
+        In business communication, it is important to be polite. Use phrases like <b>"Could you explain that again?"</b> or <b>"Let's find a solution together."</b>
+    </div>
+
+    <!-- ═════════ CONTROLS ═════════ -->
+    <div class="controls">
+        <button class="btn-check" onclick="checkAnswers()">CHECK ANSWERS</button>
+        <div id="result" class="feedback"></div>
+        <div id="send-status"></div>
+    </div>
+</div>
+
+<script>
+    // ======== MANDATORY TRACKING DATA ======
+    const TEST_NAME = "Professional Relationships & Problem Solving (Vocabulary)";
+    let userMistakes = [];
+    let isChecked = false;
+
+    let selectedWord = null;
+
+    /* ═══════ SHUFFLE WORD BANK ON LOAD ═══════ */
+    function shuffleWordBank() {
+        const wordBank = document.getElementById('wordBank');
+        const words = Array.from(wordBank.children);
+        
+        // Fisher-Yates shuffle algorithm
+        for (let i = words.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [words[i], words[j]] = [words[j], words[i]];
+        }
+        
+        // Empty the container and re-append in the new shuffled order
+        wordBank.innerHTML = '';
+        words.forEach(word => wordBank.appendChild(word));
+    }
+
+    // Call shuffle immediately
+    shuffleWordBank();
+
+    /* ═══════ SELECT WORD ═══════ */
+    function selectWord(el) {
+        if (el.classList.contains('used') || isChecked) return;
+
+        // Remove highlight from all
+        document.querySelectorAll('.word-item').forEach(w => w.classList.remove('active'));
+
+        // If clicking the same word again — deselect
+        if (selectedWord === el.innerText) {
+            selectedWord = null;
+            return;
+        }
+
+        selectedWord = el.innerText;
+        el.classList.add('active');
+    }
+
+    /* ═══════ DROP ZONES ═══════ */
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.onclick = function () {
+            if (isChecked) return;
+
+            if (selectedWord) {
+                // If zone already has a word — return it to bank
+                if (this.innerText.trim() !== '') {
+                    returnWordToBank(this.innerText.trim());
+                }
+
+                // Fill zone
+                this.innerText = selectedWord;
+                this.classList.add('filled');
+
+                // MANDATORY: Track mistake immediately if wrong
+                if (selectedWord.toLowerCase() !== this.getAttribute('data-ans').toLowerCase()) {
+                    userMistakes.push(selectedWord);
+                }
+
+                // Mark word in bank as used
+                document.querySelectorAll('.word-item').forEach(w => {
+                    if (w.innerText === selectedWord) {
+                        w.classList.add('used');
+                        w.classList.remove('active');
+                    }
+                });
+
+                selectedWord = null;
+            } else {
+                // Click empty zone with no word selected — clear it
+                if (this.innerText.trim() !== '') {
+                    returnWordToBank(this.innerText.trim());
+                    this.innerText = '';
+                    this.classList.remove('filled');
+                }
+            }
+        };
+    });
+
+    /* ═══════ RETURN WORD TO BANK ═══════ */
+    function returnWordToBank(word) {
+        document.querySelectorAll('.word-item').forEach(w => {
+            if (w.innerText === word) {
+                w.classList.remove('used');
+            }
+        });
+    }
+
+    /* ═══════ CHECK ANSWERS ═══════ */
+    function checkAnswers() {
+        if (isChecked) return;
+        isChecked = true;
+
+        let correctCount = 0;
+        const zones = document.querySelectorAll('.drop-zone');
+        const resultDiv = document.getElementById('result');
+
+        zones.forEach(zone => {
+            if (zone.innerText.toLowerCase().trim() === zone.getAttribute('data-ans').toLowerCase()) {
+                zone.style.color = 'var(--ww-correct)';
+                zone.style.borderBottomColor = 'var(--ww-correct)';
+                correctCount++;
+            } else {
+                zone.style.color = 'var(--ww-wrong)';
+                zone.style.borderBottomColor = 'var(--ww-wrong)';
+            }
+        });
+
+        if (correctCount === zones.length) {
+            resultDiv.innerText = "🎉 Perfect! You know the business vocabulary!";
+            resultDiv.style.color = "var(--ww-correct)";
+        } else {
+            resultDiv.innerText = `Score: ${correctCount} / ${zones.length}. Try again!`;
+            resultDiv.style.color = "var(--ww-wrong)";
+        }
+
+        // MANDATORY: Send results
+        sendResultsToGoogle(correctCount, zones.length);
+    }
+
+    // ========== MANDATORY GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle(score, total) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", total);
+        // Remove duplicates from mistakes array for cleaner reporting
+        const uniqueMistakes = [...new Set(userMistakes)]; 
+        formData.append("mistakes", uniqueMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending results...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#46a049'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch(error => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e91e63'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+</script>
+
+</body>
+</html>

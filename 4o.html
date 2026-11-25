@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business English Grammar Test</title>
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-red: #ff4b4b;
+            --duo-red-dark: #d33;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-gray-dark: #afafaf;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: "din-round", "Montserrat", -apple-system, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--duo-text);
+            background: white;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--duo-gray-dark);
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            transition: color 0.15s;
+            font-weight: bold;
+        }
+        .close-btn:hover { color: var(--duo-text); }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--duo-gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--duo-green);
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        .counter {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--duo-gray-dark);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* ============ CONTENT ============ */
+        .content {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding-bottom: 170px;
+            flex-grow: 1;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: var(--duo-text);
+            font-weight: 800;
+        }
+
+        .question-box {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        .question-box.active { display: block; }
+
+        .sentence {
+            font-size: 21px;
+            margin-bottom: 30px;
+            line-height: 1.55;
+            font-weight: 600;
+        }
+
+        .sentence .blank {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 3px solid var(--duo-blue);
+            text-align: center;
+            color: var(--duo-blue);
+            font-weight: 800;
+            padding: 0 6px;
+            transition: 0.2s;
+        }
+
+        /* ============ OPTIONS ============ */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-card {
+            padding: 18px 15px;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray);
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.1s;
+            user-select: none;
+            font-family: inherit;
+            background: white;
+            color: var(--duo-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 62px;
+        }
+
+        .option-card:hover:not(.disabled) {
+            background: #f7f7f7;
+        }
+
+        .option-card.selected {
+            background: #ddf4ff;
+            border-color: #84d8ff;
+            border-bottom-color: var(--duo-blue);
+            color: var(--duo-blue);
+        }
+
+        .option-card.correct-choice {
+            background: #d7ffb8;
+            border-color: #a5ed6e;
+            border-bottom-color: var(--duo-green);
+            color: var(--duo-green-dark);
+        }
+
+        .option-card.wrong-choice {
+            background: #ffdfe0;
+            border-color: #ffb8bb;
+            border-bottom-color: var(--duo-red);
+            color: var(--duo-red-dark);
+        }
+
+        .option-card.disabled { cursor: default; }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 22px 0;
+            display: flex;
+            justify-content: center;
+            border-top: 2px solid var(--duo-gray);
+            background: white;
+            transition: background 0.3s, border-color 0.3s;
+            z-index: 100;
+        }
+
+        .footer.correct {
+            background: #d7ffb8;
+            border-top-color: #b8f28b;
+        }
+        .footer.wrong {
+            background: #ffdfe0;
+            border-top-color: #ffb8bb;
+        }
+
+        .footer-content {
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .result-msg {
+            visibility: hidden;
+            font-weight: 800;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer.correct .result-msg,
+        .footer.wrong .result-msg { visibility: visible; }
+
+        .footer.correct .result-msg { color: #58a700; }
+        .footer.wrong .result-msg { color: #ea2b2b; }
+
+        .msg-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: white;
+            flex-shrink: 0;
+            font-weight: 900;
+        }
+
+        .check-btn {
+            background: var(--duo-green);
+            color: white;
+            border: none;
+            padding: 14px 42px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 17px;
+            border-bottom: 4px solid var(--duo-green-dark);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.1s;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+
+        .check-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+        }
+
+        .check-btn:disabled {
+            background: var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray-dark);
+            color: var(--duo-gray-dark);
+            cursor: default;
+        }
+
+        .check-btn.wrong-state {
+            background: var(--duo-red);
+            border-bottom-color: var(--duo-red-dark);
+        }
+
+        /* ============ FINISH SCREEN ============ */
+        .finish-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s;
+        }
+        .finish-screen .emoji {
+            font-size: 80px;
+            line-height: 1;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+        .finish-screen h2 {
+            font-size: 28px;
+            color: var(--duo-green-dark);
+            margin-bottom: 12px;
+        }
+        .finish-screen .score-big {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--duo-blue);
+            margin: 20px 0;
+        }
+        .finish-screen .score-big .of {
+            font-size: 24px;
+            color: var(--duo-gray-dark);
+        }
+        
+        #send-status {
+            margin-top: 20px;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @media (max-width: 480px) {
+            .sentence { font-size: 18px; }
+            .option-card { font-size: 14px; padding: 14px 10px; min-height: 56px; }
+            .options-grid { gap: 10px; }
+            .check-btn { padding: 13px 26px; font-size: 15px; }
+            .result-msg { font-size: 15px; }
+            h1 { font-size: 19px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <button class="close-btn" onclick="location.reload()">✕</button>
+    <div class="progress-container"><div id="progress-bar"></div></div>
+    <div class="counter" id="counter">1 / 15</div>
+</div>
+
+<div class="content">
+    <h1 id="task-title">Choose the correct form of the verb.</h1>
+
+    <div id="quiz-container">
+        <!-- Questions will be generated here -->
+    </div>
+</div>
+
+<div class="footer" id="footer">
+    <div class="footer-content">
+        <div class="result-msg" id="result-msg">
+            <span class="msg-icon" id="msg-icon"></span>
+            <span id="msg-text">Correct!</span>
+        </div>
+        <button class="check-btn" id="main-btn" disabled onclick="handleButtonClick()">Check</button>
+    </div>
+</div>
+
+<script>
+/* =====================================================
+   MANDATORY TRACKING & CONFIG
+   ===================================================== */
+const TEST_NAME = "Professional Relationships & Problem Solving (Grammar)";
+let userMistakes = [];
+
+/* =====================================================
+   QUIZ DATA — 15 questions adapted for Business English
+   ===================================================== */
+const questions = [
+    {
+        q: "Our company ___ a lot of profit every year.",
+        a: "makes",
+        options: ["'s making", "make", "makes"]
+    },
+    {
+        q: "'Do you want to sign the tender?' 'No, thanks. I ___ it yet.'",
+        a: "haven't read",
+        options: ["haven't read", "don't read", "'m not reading"]
+    },
+    {
+        q: "We ___ a new business relationship with them last week.",
+        a: "established",
+        options: ["establish", "were establishing", "established"]
+    },
+    {
+        q: "Where ___ the equipment for the new office?",
+        a: "did you buy",
+        options: ["you bought", "did you buy", "you buy"]
+    },
+    {
+        q: "The manager ___ anything about the technical problem yesterday.",
+        a: "didn't say",
+        options: ["didn't say", "didn't", "not say"]
+    },
+    {
+        q: "Look! The team ___ a solution to the equipment issue right now.",
+        a: "is finding",
+        options: ["finds", "finding", "is finding"]
+    },
+    {
+        q: "'What ___ at the moment?' 'They are discussing the new advertisements.'",
+        a: "are they doing",
+        options: ["are they doing", "they do", "do they do"]
+    },
+    {
+        q: "I don't understand this word. What ___ exactly?",
+        a: "does it mean",
+        options: ["does it mean", "means it", "does mean"]
+    },
+    {
+        q: "Next month, we ___ a decision about the new tender.",
+        a: "are going to make",
+        options: ["go to make", "are going to make", "going to make"]
+    },
+    {
+        q: "The technician ___ the old equipment at the moment.",
+        a: "is repairing",
+        options: ["repairs", "is repairing", "repair"]
+    },
+    {
+        q: "We usually ___ our business partners on Monday mornings.",
+        a: "call",
+        options: ["call", "calling", "calls"]
+    },
+    {
+        q: "'Where is the boss?' 'He ___ to the factory.'",
+        a: "has gone",
+        options: ["goes", "has gone", "go"]
+    },
+    {
+        q: "I ___ the clear directions two hours ago.",
+        a: "received",
+        options: ["receive", "receiving", "received"]
+    },
+    {
+        q: "'How often ___ for help with equipment?' 'When there is a problem.'",
+        a: "do you ask",
+        options: ["do you ask", "you ask", "are you ask"]
+    },
+    {
+        q: "Look at those numbers! The company ___ grow soon.",
+        a: "is going to",
+        options: ["goes to", "is going to", "going to"]
+    }
+];
+
+/* =====================================================
+   STATE
+   ===================================================== */
+let currentIdx = 0;
+let selectedOption = null;
+let isChecked = false;
+let correctCount = 0;
+
+/* =====================================================
+   ELEMENTS
+   ===================================================== */
+const quizContainer = document.getElementById('quiz-container');
+const progressBar = document.getElementById('progress-bar');
+const mainBtn = document.getElementById('main-btn');
+const footer = document.getElementById('footer');
+const msgText = document.getElementById('msg-text');
+const msgIcon = document.getElementById('msg-icon');
+const counter = document.getElementById('counter');
+
+/* =====================================================
+   RENDER QUESTION
+   ===================================================== */
+function initQuestion() {
+    const q = questions[currentIdx];
+
+    // Build sentence with a visible blank
+    const sentenceHtml = q.q.replace(
+        "___",
+        '<span class="blank">?</span>'
+    );
+
+    quizContainer.innerHTML = `
+        <div class="question-box active">
+            <div class="sentence">${sentenceHtml}</div>
+            <div class="options-grid">
+                ${q.options.map(opt =>
+                    `<div class="option-card" data-value="${opt}" onclick="selectOption(this, '${opt.replace(/'/g, "\\'")}')">${opt}</div>`
+                ).join('')}
+            </div>
+        </div>
+    `;
+
+    mainBtn.disabled = true;
+    mainBtn.innerText = "Check";
+    mainBtn.classList.remove('wrong-state');
+    footer.className = "footer";
+    isChecked = false;
+    selectedOption = null;
+
+    counter.textContent = (currentIdx + 1) + " / " + questions.length;
+    progressBar.style.width = (currentIdx / questions.length) * 100 + "%";
+}
+
+/* =====================================================
+   SELECT OPTION
+   ===================================================== */
+function selectOption(el, val) {
+    if (isChecked) return;
+    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedOption = val;
+    mainBtn.disabled = false;
+}
+
+/* =====================================================
+   BUTTON HANDLER
+   ===================================================== */
+function handleButtonClick() {
+    if (!isChecked) {
+        checkAnswer();
+    } else {
+        nextQuestion();
+    }
+}
+
+/* =====================================================
+   CHECK ANSWER
+   ===================================================== */
+function checkAnswer() {
+    isChecked = true;
+    const correct = questions[currentIdx].a;
+    const allCards = document.querySelectorAll('.option-card');
+
+    allCards.forEach(card => {
+        card.classList.add('disabled');
+        card.style.cursor = 'default';
+
+        const val = card.dataset.value;
+
+        if (val === correct) {
+            card.classList.remove('selected');
+            card.classList.add('correct-choice');
+        } else if (val === selectedOption) {
+            card.classList.remove('selected');
+            card.classList.add('wrong-choice');
+        }
+    });
+
+    if (selectedOption === correct) {
+        footer.classList.add('correct');
+        msgIcon.innerText = '✓';
+        msgText.innerText = 'Excellent!';
+        correctCount++;
+    } else {
+        footer.classList.add('wrong');
+        msgIcon.innerText = '✗';
+        msgText.innerText = 'Correct: ' + correct;
+        mainBtn.classList.add('wrong-state');
+        // MANDATORY: Track mistake
+        userMistakes.push(selectedOption);
+    }
+
+    mainBtn.innerText = (currentIdx === questions.length - 1) ? "Finish" : "Next";
+}
+
+/* =====================================================
+   NEXT QUESTION
+   ===================================================== */
+function nextQuestion() {
+    currentIdx++;
+
+    if (currentIdx < questions.length) {
+        initQuestion();
+    } else {
+        showFinish();
+    }
+}
+
+/* =====================================================
+   FINISH SCREEN
+   ===================================================== */
+function showFinish() {
+    progressBar.style.width = "100%";
+    counter.textContent = questions.length + " / " + questions.length;
+
+    const pct = Math.round((correctCount / questions.length) * 100);
+    let emoji = '💼';
+    let title = 'Lesson complete!';
+    let sub = 'Well done!';
+
+    if (pct === 100)     { emoji = '🏆'; title = 'PERFECT!';   sub = 'You are a business master!'; }
+    else if (pct >= 80)  { emoji = '🌟'; title = 'Great job!'; sub = 'Almost perfect!'; }
+    else if (pct >= 60)  { emoji = '💪'; title = 'Good work!'; sub = 'Keep practicing!'; }
+    else if (pct >= 40)  { emoji = '📚'; title = 'Nice try!';  sub = 'Review the grammar rules.'; }
+    else                 { emoji = '🦉'; title = 'Keep going!'; sub = 'Study a bit more.'; }
+
+    quizContainer.innerHTML = `
+        <div class="finish-screen">
+            <span class="emoji">${emoji}</span>
+            <h2>${title}</h2>
+            <p style="color: var(--duo-gray-dark); font-weight: 600; font-size: 16px; margin-bottom: 10px;">${sub}</p>
+            <div class="score-big">${correctCount}<span class="of"> / ${questions.length}</span></div>
+            <div id="send-status"></div>
+        </div>
+    `;
+
+    footer.className = "footer";
+    footer.style.background = "white";
+    mainBtn.innerText = "Restart";
+    mainBtn.disabled = false;
+    mainBtn.onclick = () => location.reload();
+
+    // MANDATORY: Send results
+    sendResultsToGoogle();
+}
+
+/* =====================================================
+   GOOGLE SHEETS INTEGRATION
+   ===================================================== */
+function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const formData = new URLSearchParams();
+    formData.append("name", TEST_NAME);
+    formData.append("score", correctCount);
+    formData.append("total", questions.length);
+    formData.append("mistakes", userMistakes.join(', '));
+
+    const statusEl = document.getElementById('send-status');
+    if (statusEl) {
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending results...";
+    }
+
+    fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+    })
+    .then(() => {
+        if (statusEl) {
+            statusEl.style.color = '#58a700'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        }
+    })
+    .catch(error => {
+        console.error("Error sending results:", error);
+        if (statusEl) {
+            statusEl.style.color = '#ea2b2b'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        }
+    });
+}
+
+/* =====================================================
+   INIT
+   ===================================================== */
+initQuestion();
+</script>
+
+</body>
+</html>
