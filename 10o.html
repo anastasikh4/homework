@@ -199,12 +199,12 @@
   <div id="quiz-screen">
     <div class="info-box">
       <strong>📋 Instructions:</strong><br>
-      1. Choose the right 3rd-person verb ending (<em>-s, -es, -ies</em>).<br>
-      2. Complete Present Simple questions and place adverbs of frequency correctly.
+      1. Choose the right verb form for he, she, or it.<br>
+      2. Complete Present Simple questions and put frequency words in the right place.
     </div>
 
     <div class="tip-box">
-      <strong>💡 Tip:</strong> Adverbs of frequency (<em>always, usually, often, sometimes, rarely, never</em>) go <strong>before</strong> main verbs, but <strong>after</strong> the verb <em>to be</em> (<em>am / is / are</em>)!
+      <strong>💡 Tip:</strong> <em>Always, usually, often, sometimes, rarely, never</em> go <strong>before</strong> main verbs, but <strong>after</strong> <em>am, is, are</em>.
     </div>
 
     <div class="status-bar">
@@ -212,7 +212,7 @@
       <div id="score-label">Score: 0</div>
     </div>
 
-    <div class="topic-pill" id="topic-pill">Part 1: 3rd Person Singular</div>
+    <div class="topic-pill" id="topic-pill">Part 1: He / She / It</div>
     <div class="emoji-art" id="emoji-art">🚀👩‍🚀</div>
     <div class="question-prompt" id="question-prompt">Loading...</div>
 
@@ -238,141 +238,156 @@
 
   const questions = [
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "🛸👩‍🚀",
-      prompt: "I do spacewalks on Mondays.  Commander Nova _____ spacewalks on Mondays.",
-      options: ["do", "dos", "does", "doing"],
+      prompt: "I do spacewalks on Mondays. — Nova _____ spacewalks on Mondays.",
+      options: ["does", "dos", "do", "doing"],
       answer: "does"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "📖🪐",
-      prompt: "I read star maps every evening.  Cadet Leo _____ star maps every evening.",
+      prompt: "I read star maps every evening. — Leo _____ star maps every evening.",
       options: ["reads", "reades", "readies", "read"],
       answer: "reads"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "🧪🔬",
-      prompt: "I try new gravity experiments.  Doctor Zara _____ new gravity experiments.",
+      prompt: "I try new experiments. — Zara _____ new experiments.",
       options: ["tries", "trys", "tryes", "try"],
       answer: "tries"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "🛰️🌙",
-      prompt: "I stay in the lunar base on weekends.  Engineer Max _____ in the lunar base on weekends.",
+      prompt: "I stay on the Moon base at weekends. — Max _____ on the Moon base at weekends.",
       options: ["stays", "staies", "stayes", "stay"],
       answer: "stays"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "🔭☄️",
-      prompt: "I watch passing comets through the telescope.  Maya _____ passing comets through the telescope.",
+      prompt: "I watch comets through the telescope. — Maya _____ comets through the telescope.",
       options: ["watches", "watchs", "watchies", "watch"],
       answer: "watches"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "⚗️🔋",
-      prompt: "I mix rocket fuel in the lab.  Robot Bolt _____ rocket fuel in the lab.",
+      prompt: "I mix rocket fuel in the lab. — Bolt _____ rocket fuel in the lab.",
       options: ["mixes", "mixs", "mixies", "mix"],
       answer: "mixes"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "🪥✨",
-      prompt: "I brush my space helmet after landing.  Pilot Sam _____ his space helmet after landing.",
-      options: ["brush", "brushs", "brushies", "brushes"],
+      prompt: "I brush my space helmet after landing. — Sam _____ his space helmet after landing.",
+      options: ["brushes", "brushs", "brushies", "brush"],
       answer: "brushes"
     },
     {
-      topic: "Part 1: Third Person Singular",
+      topic: "Part 1: He / She / It",
       emoji: "✈️🌌",
-      prompt: "I fly the shuttle to Mars.  Captain Orion _____ the shuttle to Mars.",
-      options: ["flyes", "flys", "flies", "fly"],
+      prompt: "I fly the rocket to Mars. — Orion _____ the rocket to Mars.",
+      options: ["flies", "flys", "flyes", "fly"],
       answer: "flies"
     },
     {
       topic: "Part 2: Present Simple Questions",
       emoji: "⏰🚀",
-      prompt: "Wh-question: What time _____ (rocket training / begin)?",
+      prompt: "What time _____ rocket training begin?",
       options: [
-        "does rocket training begin",
-        "do rocket training begins",
-        "does rocket training begins",
-        "is rocket training begin"
+        "does",
+        "do",
+        "is",
+        "are"
       ],
-      answer: "does rocket training begin"
+      answer: "does"
     },
     {
       topic: "Part 2: Present Simple Questions",
       emoji: "🥗🪐",
-      prompt: "Yes/No question: _____ (astronauts / eat) dehydrated ice cream on the station?",
+      prompt: "_____ astronauts eat ice cream on the space station?",
       options: [
-        "Do astronauts eat",
-        "Does astronauts eat",
-        "Do astronauts eats",
-        "Are astronauts eat"
+        "Do",
+        "Does",
+        "Is",
+        "Are"
       ],
-      answer: "Do astronauts eat"
+      answer: "Do"
     },
     {
       topic: "Part 2: Present Simple Questions",
       emoji: "🤖💬",
-      prompt: "Tag-question: He speaks three alien languages, _____ he?",
-      options: ["doesn't", "don't", "isn't", "does"],
+      prompt: "He speaks three languages, _____ he?",
+      options: [
+        "doesn't",
+        "don't",
+        "isn't",
+        "does"
+      ],
       answer: "doesn't"
     },
     {
       topic: "Part 2: Present Simple Questions",
       emoji: "🛏️🏠",
-      prompt: "Alternative question: _____ she _____ in a sleeping pod or in a cabin?",
+      prompt: "_____ she sleep in a pod or in a room?",
       options: [
-        "Does / sleep",
-        "Do / sleeps",
-        "Does / sleeps",
-        "Is / sleep"
+        "Does",
+        "Do",
+        "Is",
+        "Are"
       ],
-      answer: "Does / sleep"
+      answer: "Does"
     },
     {
       topic: "Part 3: Adverbs of Frequency",
       emoji: "📊✅",
-      prompt: "70% of the time: The crew _____ checks the oxygen levels before breakfast.",
-      options: ["usually", "never", "rarely", "sometimes"],
+      prompt: "70% of the time: The crew _____ checks the oxygen levels.",
+      options: [
+        "usually",
+        "never",
+        "rarely",
+        "sometimes"
+      ],
       answer: "usually"
     },
     {
       topic: "Part 3: Adverbs of Frequency",
       emoji: "📊🚫",
-      prompt: "0% of the time: Commander Nova _____ forgets to lock the airlock door.",
-      options: ["never", "always", "often", "usually"],
+      prompt: "0% of the time: Nova _____ forgets to close the door.",
+      options: [
+        "never",
+        "always",
+        "often",
+        "usually"
+      ],
       answer: "never"
     },
     {
       topic: "Part 3: Adverbs of Frequency",
       emoji: "🧩📝",
-      prompt: "Choose the correct word order (after 'to be'):",
+      prompt: "Choose the correct sentence:",
       options: [
-        "Cadet Leo is always ready for launch.",
-        "Cadet Leo always is ready for launch.",
-        "Always Cadet Leo is ready for launch.",
-        "Cadet Leo is ready always for launch."
+        "Leo is always ready.",
+        "Leo always is ready.",
+        "Always Leo is ready.",
+        "Leo is ready always."
       ],
-      answer: "Cadet Leo is always ready for launch."
+      answer: "Leo is always ready."
     },
     {
       topic: "Part 3: Adverbs of Frequency",
       emoji: "🧩🌠",
-      prompt: "Choose the correct word order (before main verb):",
+      prompt: "Choose the correct sentence:",
       options: [
-        "They often observe shooting stars at night.",
-        "They observe often shooting stars at night.",
-        "They observe shooting stars oftenly at night.",
-        "Often they are observe shooting stars at night."
+        "They often see stars at night.",
+        "They see often stars at night.",
+        "Often they see are stars at night.",
+        "They see stars oftenly at night."
       ],
-      answer: "They often observe shooting stars at night."
+      answer: "They often see stars at night."
     }
   ];
 
