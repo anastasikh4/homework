@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta charset=UTF-8>
+<meta name=viewport content=width=device-width, initial-scale=1.0>
+<title>Prepositions Quest A1+: Teen Career (3 Levels)</title>
+<style>
+:root{--hero-blue:#2980b9;--hero-purple:#8e44ad;--hero-yellow:#f1c40f;--comic-black:#2c3e50;--success:#27ae60;--error:#e74c3c}
+body{font-family:Arial Black,sans-serif;background:var(--hero-blue);color:var(--comic-black);margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;user-select:none}
+#academy-card{background:#fff;width:95%;max-width:760px;padding:22px;border:6px solid var(--comic-black);border-radius:15px;box-shadow:10px 10px 0 var(--hero-purple)}
+.header{text-align:center;border-bottom:4px solid var(--comic-black);margin-bottom:14px;padding-bottom:8px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.lvl-badge{background:var(--hero-purple);color:#fff;padding:5px 15px;display:inline-block;transform:rotate(-2deg);font-size:0.9rem;border:3px solid var(--comic-black);border-radius:10px}
+.xp-pill{background:var(--hero-yellow);color:var(--comic-black);border:3px solid var(--comic-black);padding:5px 14px;border-radius:999px;font-weight:900;font-size:0.95rem;display:inline-flex;align-items:center;gap:5px}
+.progress-bar{height:12px;background:#eee;border:2px solid #333;margin:14px 0 16px;border-radius:6px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--success);width:0%;transition:width 0.3s}
+.stage-meta{display:flex;justify-content:space-between;font-size:0.85rem;color:#566573;font-weight:800;margin-bottom:6px}
+.prompt-heading{font-size:1.1rem;font-weight:900;margin-bottom:10px;text-align:center}
+.note-line{text-align:center;font-size:0.8rem;font-weight:700;color:#7d5bae;margin:2px 0 10px;padding-bottom:6px;border-bottom:2px dashed #d5b8f0;line-height:1.45;white-space:normal}
+.quest-card{background:#fff;border:3px solid var(--comic-black);border-radius:10px;padding:20px;font-size:1.25rem;line-height:1.6;font-weight:700;margin-bottom:18px;box-shadow:4px 4px 0 rgba(44,62,80,0.25)}
+.gap-box{display:inline-block;min-width:70px;padding:2px 12px;margin:0 4px;text-align:center;border-bottom:4px dashed var(--hero-purple);color:var(--hero-purple);font-weight:800;border-radius:8px;font-size:1.2rem;font-family:monospace}
+.gap-box.solved{border-bottom-style:solid;color:var(--success)}
+.choices-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.choices-grid.single-col{grid-template-columns:1fr}
+.choice-btn{background:var(--hero-yellow);border:3px solid var(--comic-black);color:var(--comic-black);font-size:1.05rem;font-weight:900;padding:14px 16px;border-radius:10px;cursor:pointer;text-align:left;font-family:inherit;box-shadow:0 4px 0 #333;transition:transform 0.1s ease}
+.choice-btn.center-text{text-align:center;font-size:1.15rem}
+.choice-btn:hover:not(:disabled){transform:translateY(-3px)}
+.choice-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 #333}
+.choice-btn.correct{background:var(--success) !important;border-color:#1e8449 !important;color:#fff !important;box-shadow:0 4px 0 #1e8449 !important}
+.choice-btn.wrong{background:var(--error) !important;border-color:#922b21 !important;color:#fff !important;box-shadow:0 4px 0 #922b21 !important;animation:shake 0.4s ease}
+.choice-btn:disabled{cursor:default;opacity:0.8}
+.feedback-banner{margin-top:14px;padding:12px 16px;border:3px solid var(--comic-black);border-radius:10px;font-weight:800;font-size:0.95rem;display:none}
+.feedback-banner.ok{display:block;background:rgba(39,174,96,0.18);border-color:var(--success);color:#1e8449}
+.feedback-banner.err{display:block;background:rgba(231,76,60,0.18);border-color:var(--error);color:#922b21}
+.next-btn{margin-top:18px;width:100%;padding:16px;border:3px solid var(--comic-black);border-radius:10px;background:var(--hero-yellow);color:var(--comic-black);font-size:1.15rem;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #333;transition:transform 0.1s ease;font-family:inherit}
+.next-btn:hover{transform:translateY(-2px)}
+.final-screen{display:none;text-align:center}
+.hidden{display:none}
+.trophy-icon{font-size:4rem;margin-bottom:8px;display:inline-block;animation:bounce 1.5s infinite}
+.final-title{font-size:1.9rem;font-weight:900;margin-bottom:8px}
+.stats-grid{display:flex;justify-content:space-around;gap:12px;background:#fff;border:3px solid var(--comic-black);border-radius:14px;padding:20px;margin:16px 0;flex-wrap:wrap}
+.stat-box h3{font-size:1.8rem;font-weight:900;color:var(--hero-blue)}
+.stat-box p{font-size:0.85rem;color:#566573;font-weight:800;margin-top:4px}
+.send-status{font-size:1rem;font-weight:800;margin-top:10px;min-height:24px}
+.restart-btn{margin-top:14px;width:100%;padding:16px;border:3px solid var(--comic-black);border-radius:10px;background:var(--hero-blue);color:#fff;font-size:1.15rem;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #1b4f91;font-family:inherit;transition:transform 0.15s ease}
+.restart-btn:hover{transform:scale(1.03)}
+.xp-float{position:fixed;top:20%;left:50%;transform:translateX(-50%);font-size:1.8rem;font-weight:900;color:var(--success);text-shadow:0 4px 12px rgba(39,174,96,0.6);pointer-events:none;animation:floatUp 0.9s ease-out forwards;z-index:999}
+.confetti-piece{position:fixed;font-size:1.7rem;pointer-events:none;z-index:998;animation:fallDown 1.3s ease-out forwards}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%,0) scale(0.85)}100%{opacity:0;transform:translate(-50%,-70px) scale(1.25)}}
+@keyframes fallDown{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(250px) rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+</style>
+</head>
+<body>
+<div id=academy-card>
+<div class=header><div id=levelBadge class=lvl-badge>Level 1: Prepositions</div></div>
+<div class=top-bar><div class=xp-pill id=xpPill>XP: <span id=xpValue>0</span></div></div>
+<div class=progress-bar><div class=progress-bar-fill id=progressFill></div></div>
+<div class=stage-meta><span id=stepLabel>Challenge 1 of 10</span><span>+10 XP per win</span></div>
+<div class=prompt-heading id=promptHeading>Complete the gap with the correct preposition:</div>
+<div class=note-line id=noteLine>Note: in a cafe — в кафе</div>
+<div class=quest-card id=questCard></div>
+<div class=choices-grid id=choicesGrid></div>
+<div class=feedback-banner id=feedbackBanner></div>
+<button class=next-btn id=nextBtn onclick=goNext()>Next Challenge</button>
+<div id=finalScreen class=final-screen>
+<div class=trophy-icon></div>
+<div class=final-title>Mission Accomplished!</div>
+<p>You finished 3 easy levels! Well done!</p>
+<div class=stats-grid>
+<div class=stat-box><h3 id=finalScore>0 / 10</h3><p>First-Try Wins</p></div>
+<div class=stat-box><h3 id=finalXP>0 XP</h3><p>Total XP Earned</p></div>
+</div>
+<div class=send-status id=googleStatus>Sending results...</div>
+<button class=restart-btn onclick=restartGame()>Play Again</button>
+</div>
+</div>
+<script>
+const TEST_NAME=`Prepositions Quest A1+ 3 Levels`;
+let userMistakes=[];
+const tasks=[
+{type:`gap`,level:`Level 1: Prepositions`,prompt:`Complete the gap with the correct preposition:`,note:`in — в месте , at — в точке (at home), on — на столе, under — под столом`,before:`My brother works `,after:` a cafe after school.`,correct:`in`,options:[`in`,`at`,`on`,`under`],tip:`work IN a place or a field`},
+{type:`gap`,level:`Level 1: Prepositions`,prompt:`Complete the gap with the correct preposition:`,note:`in charge of — отвечать за, on — на, by — рядом или к сроку, at — в точке`,before:`My mom is `,after:` charge of dinner tonight.`,correct:`in`,options:[`in`,`on`,`by`,`at`],tip:`be IN charge of = be responsible for`},
+{type:`gap`,level:`Level 1: Prepositions`,prompt:`Complete the gap with the correct preposition:`,note:`under — под , in — в, at — в точке, by — к сроку`,before:`We are `,after:` pressure before the game.`,correct:`under`,options:[`under`,`in`,`at`,`by`],tip:`be UNDER pressure = feel stressed before a game`},
+{type:`gap`,level:`Level 1: Prepositions`,prompt:`Complete the gap with the correct preposition:`,note:`at — в начале , in — в месяце, by — к сроку, under — под`,before:`We start `,after:` the beginning of the lesson.`,correct:`at`,options:[`at`,`in`,`by`,`under`],tip:`AT the beginning of a lesson`},
+{type:`match`,level:`Level 2: Dialogue Match`,prompt:`Pick the best reply to complete the chat:`,note:`how is your job — как работа, easy and fun — легко и весело, shop assistant — продавец, earn euros — получать евро`,statement:`Alex: How is your weekend job at the store?`,correct:`It is easy and fun.`,options:[`It is easy and fun.`,`She is a shop assistant.`,`I get 9 euros an hour.`],tip:`The question asks about your job.`},
+{type:`match`,level:`Level 2: Dialogue Match`,prompt:`Pick the best reply to complete the chat:`,note:`what does your mom do — кем работает мама, UX designer — дизайнер, congrats — поздравляю, help customers — помогать покупателям`,statement:`Mia: What does your mom do for a living?`,correct:`She is a UX designer.`,options:[`She is a UX designer.`,`Congrats, that is great!`,`I help customers at work.`],tip:`The question asks about a job.`},
+{type:`match`,level:`Level 2: Dialogue Match`,prompt:`Pick the best reply to complete the chat:`,note:`what is the pay like — сколько платят, make 400 euros — получаю 400 евро, fun — весело, engineer — инженер`,statement:`Sam: What is the pay like at the camp?`,correct:`I make about 400 euros a month.`,options:[`I make about 400 euros a month.`,`It is fun and friendly.`,`He is an engineer.`],tip:`The question asks about money.`},
+{type:`gap`,level:`Level 3: Adjective + Prep`,prompt:`Complete the gap with the correct preposition:`,note:`good at — хорошо получается (at), in — в, on — на, about — про`,before:`I am good `,after:` drawing.`,correct:`at`,options:[`at`,`in`,`on`,`about`],tip:`good AT drawing or sports`},
+{type:`gap`,level:`Level 3: Adjective + Prep`,prompt:`Complete the gap with the correct preposition:`,note:`interested in — интересоваться (in), at — в точке, about — о, on — на`,before:`Leo is interested `,after:` games.`,correct:`in`,options:[`in`,`at`,`about`,`on`],tip:`interested IN games or music`},
+{type:`gap`,level:`Level 3: Adjective + Prep`,prompt:`Complete the gap with the correct preposition:`,note:`worried about — переживать (about), in — в, at — в, for — для или за`,before:`Dana is worried `,after:` the test.`,correct:`about`,options:[`about`,`in`,`at`,`for`],tip:`worried ABOUT a test or a friend`},
+];
+let currentIdx=0,firstTryScore=0,xp=0,madeMistakeOnCurrent=false,solvedCurrent=false;
+const levelBadge=document.getElementById(`levelBadge`);
+const xpValue=document.getElementById(`xpValue`);
+const xpPill=document.getElementById(`xpPill`);
+const progressFill=document.getElementById(`progressFill`);
+const stepLabel=document.getElementById(`stepLabel`);
+const promptHeading=document.getElementById(`promptHeading`);
+const noteLine=document.getElementById(`noteLine`);
+const questCard=document.getElementById(`questCard`);
+const choicesGrid=document.getElementById(`choicesGrid`);
+const feedbackBanner=document.getElementById(`feedbackBanner`);
+const nextBtn=document.getElementById(`nextBtn`);
+function shuffle(list){return list.slice().sort(function(){return Math.random()-0.5;});}
+function renderTask(){
+const item=tasks[currentIdx];
+madeMistakeOnCurrent=false;
+solvedCurrent=false;
+levelBadge.textContent=item.level;
+stepLabel.textContent=`Challenge ${currentIdx + 1} of ${tasks.length}`;
+progressFill.style.width=`${(currentIdx / tasks.length) * 100}%`;
+promptHeading.textContent=item.prompt;
+noteLine.textContent=`Note: ${item.note}`;
+feedbackBanner.className=`feedback-banner`;
+feedbackBanner.style.display=`none`;
+nextBtn.style.display=`none`;
+if(item.type===`gap`){
+questCard.innerHTML=`${item.before}<span class=gap-box id=gapSlot>___</span>${item.after}`;
+choicesGrid.className=`choices-grid`;
+}else{
+questCard.innerHTML=`${item.statement}`;
+choicesGrid.className=`choices-grid single-col`;
+}
+choicesGrid.innerHTML=``;
+shuffle(item.options).forEach(function(opt){
+const btn=document.createElement(`button`);
+btn.className= item.type===`gap` ? `choice-btn center-text` : `choice-btn`;
+btn.textContent=opt;
+btn.onclick=function(){handleChoice(opt,btn);};
+choicesGrid.appendChild(btn);
+});
+}
+function handleChoice(selected,btn){
+if(solvedCurrent)return;
+const item=tasks[currentIdx];
+if(selected===item.correct){
+solvedCurrent=true;
+btn.classList.add(`correct`);
+if(!madeMistakeOnCurrent){firstTryScore++;}
+xp+=10;
+xpValue.textContent=xp;
+xpPill.classList.add(`bump`);
+setTimeout(function(){xpPill.classList.remove(`bump`);},300);
+if(item.type===`gap`){
+const gapSlot=document.getElementById(`gapSlot`);
+gapSlot.textContent=selected;
+gapSlot.classList.add(`solved`);
+}
+feedbackBanner.className=`feedback-banner ok`;
+feedbackBanner.innerHTML=`<span>Spot on! <b>${item.correct}</b> — ${item.tip}</span>`;
+feedbackBanner.style.display=`block`;
+document.querySelectorAll(`.choice-btn`).forEach(function(b){b.disabled=true;});
+triggerCelebration(btn);
+nextBtn.textContent= currentIdx === tasks.length - 1 ? `Finish and View Score` : `Next Challenge`;
+nextBtn.style.display=`block`;
+}else{
+madeMistakeOnCurrent=true;
+btn.classList.add(`wrong`);
+btn.disabled=true;
+userMistakes.push(selected);
+feedbackBanner.className=`feedback-banner err`;
+feedbackBanner.textContent=`Not quite! Give another option a shot.`;
+feedbackBanner.style.display=`block`;
+}
+}
+function triggerCelebration(targetBtn){
+const floatEl=document.createElement(`div`);
+floatEl.className=`xp-float`;
+floatEl.textContent=`+10 XP!`;
+document.body.appendChild(floatEl);
+setTimeout(function(){floatEl.remove();},900);
+const icons=[`✨`,`🔥`,`🎉`,`💎`,`🚀`];
+const rect=targetBtn.getBoundingClientRect();
+for(let i=0;i<8;i++){
+const conf=document.createElement(`div`);
+conf.className=`confetti-piece`;
+conf.textContent=icons[Math.floor(Math.random()*icons.length)];
+conf.style.left=`${rect.left + rect.width / 2 + (Math.random() * 160 - 80)}px`;
+conf.style.top=`${rect.top}px`;
+document.body.appendChild(conf);
+setTimeout(function(){conf.remove();},1350);
+}
+}
+function goNext(){
+currentIdx++;
+if(currentIdx<tasks.length){renderTask();}else{showResults();}
+}
+function showResults(){
+progressFill.style.width=`100%`;
+document.getElementById(`quizScreen`).style.display=`none`;
+document.getElementById(`finalScreen`).style.display=`block`;
+document.getElementById(`finalScore`).textContent=`${firstTryScore} / ${tasks.length}`;
+document.getElementById(`finalXP`).textContent=`${xp} XP`;
+sendResultsToGoogle();
+}
+function sendResultsToGoogle(){
+const url=`https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec`;
+const params=new URLSearchParams();
+params.append(`name`,TEST_NAME);
+params.append(`score`,firstTryScore);
+params.append(`total`,tasks.length);
+params.append(`mistakes`,userMistakes.join(`, `));
+fetch(url,{method:`POST`,mode:`no-cors`,body:params})
+.then(function(){
+const statusEl=document.getElementById(`googleStatus`);
+statusEl.textContent=`Results sent successfully!`;
+statusEl.style.color=`#16a34a`;
+})
+.catch(function(){
+const statusEl=document.getElementById(`googleStatus`);
+statusEl.textContent=`Offline mode: results saved locally.`;
+statusEl.style.color=`#facc15`;
+});
+}
+function restartGame(){
+currentIdx=0;
+firstTryScore=0;
+xp=0;
+userMistakes=[];
+xpValue.textContent=`0`;
+document.getElementById(`finalScreen`).style.display=`none`;
+document.getElementById(`quizScreen`).style.display=`block`;
+renderTask();
+}
+renderTask();
+</script>
+</body>
+</html>
