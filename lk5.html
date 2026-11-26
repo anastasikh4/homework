@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta charset=UTF-8>
+<meta name=viewport content=width=device-width, initial-scale=1.0>
+<title>Missing Letters Safari: Body Words</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Comic Sans MS,Chalkboard SE,Segoe UI,Roboto,sans-serif}
+body{min-height:100vh;background:linear-gradient(135deg,#fde047 0%,#fb923c 35%,#f472b6 70%,#60a5fa 100%);color:#1e293b;display:flex;justify-content:center;align-items:center;padding:16px;overflow-x:hidden}
+.game-card{width:100%;max-width:680px;background:#ffffff;border:5px solid #38bdf8;border-radius:34px;padding:26px;box-shadow:0 22px 45px rgba(2,132,199,0.25),0 10px 0 #0284c7;position:relative}
+.top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.level-pill{background:linear-gradient(90deg,#ec4899,#8b5cf6);color:#fff;padding:9px 18px;border-radius:999px;font-weight:900;font-size:0.95rem;letter-spacing:0.5px;box-shadow:0 4px 0 #6d28d9}
+.xp-pill{background:#fef08a;border:3px solid #eab308;color:#a16207;padding:7px 18px;border-radius:999px;font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:6px;transition:transform 0.25s ease}
+.xp-pill.bump{transform:scale(1.18) rotate(-3deg)}
+.progress-track{width:100%;height:16px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:18px;border:2px solid #cbd5e1}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#06b6d4,#f59e0b,#ec4899);border-radius:999px;transition:width 0.45s cubic-bezier(0.34,1.56,0.64,1)}
+.meta-row{display:flex;justify-content:space-between;font-size:0.95rem;font-weight:800;color:#64748b;margin-bottom:8px}
+.prompt-title{font-size:1.3rem;font-weight:900;color:#0f172a;margin-bottom:16px;text-align:center}
+.word-stage{background:linear-gradient(135deg,#f0fdf4,#e0f2fe);border:4px dashed #22c55e;border-radius:26px;padding:24px 18px;text-align:center;margin-bottom:22px;box-shadow:inset 0 4px 12px rgba(34,197,94,0.12)}
+.picture-emoji{font-size:4.5rem;margin-bottom:8px;display:inline-block;animation:floatEmoji 2.5s ease-in-out infinite}
+.hint-label{font-size:1rem;font-weight:800;color:#475569;margin-bottom:12px}
+.word-display{font-size:2.8rem;font-weight:900;letter-spacing:6px;color:#1e293b;display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap}
+.letter-gap{display:inline-flex;justify-content:center;align-items:center;min-width:58px;height:62px;padding:0 10px;background:#fff1f2;border:4px dashed #f43f5e;border-radius:16px;color:#f43f5e;font-size:2.4rem;letter-spacing:0;transition:all 0.3s ease}
+.letter-gap.solved{background:#dcfce7;border:4px solid #16a34a;color:#15803d;transform:scale(1.08)}
+.tiles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.tile-btn{background:linear-gradient(180deg,#ffffff,#f8fafc);border:3px solid #94a3b8;color:#1e293b;font-size:1.9rem;font-weight:900;padding:16px;border-radius:22px;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 6px 0 #94a3b8}
+.tile-btn:hover:not(:disabled){transform:translateY(-3px);border-color:#f59e0b;background:linear-gradient(180deg,#fef9c3,#fde047);color:#92400e;box-shadow:0 9px 0 #d97706}
+.tile-btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 3px 0 #d97706}
+.tile-btn.correct{background:linear-gradient(180deg,#4ade80,#16a34a) !important;border-color:#14532d !important;color:#fff !important;box-shadow:0 6px 0 #14532d !important}
+.tile-btn.wrong{background:linear-gradient(180deg,#fb7185,#e11d48) !important;border-color:#881337 !important;color:#fff !important;box-shadow:0 6px 0 #881337 !important;animation:wobble 0.4s ease}
+.tile-btn:disabled{cursor:default;opacity:0.8}
+.feedback-box{margin-top:18px;padding:14px 18px;border-radius:18px;font-size:1.1rem;font-weight:800;display:none;text-align:center}
+.feedback-box.ok{display:block;background:#dcfce7;border:3px solid #22c55e;color:#166534}
+.feedback-box.err{display:block;background:#ffe4e6;border:3px solid #f43f5e;color:#9f1239}
+.next-btn{margin-top:18px;width:100%;padding:17px;border:none;border-radius:22px;background:linear-gradient(90deg,#f59e0b,#ec4899,#8b5cf6);color:#fff;font-size:1.25rem;font-weight:900;cursor:pointer;display:none;box-shadow:0 7px 0 #6d28d9;transition:transform 0.2s ease}
+.next-btn:hover{transform:translateY(-2px)}
+.xp-pop{position:fixed;top:18%;left:50%;transform:translateX(-50%);font-size:2.3rem;font-weight:900;color:#16a34a;text-shadow:0 3px 0 #ffffff,0 6px 15px rgba(22,163,74,0.5);pointer-events:none;animation:popUp 0.9s ease-out forwards;z-index:999}
+.confetti-item{position:fixed;font-size:2rem;pointer-events:none;z-index:998;animation:dropDown 1.35s ease-out forwards}
+.final-screen{display:none;text-align:center}
+.hidden{display:none}
+.trophy-icon{font-size:5rem;display:inline-block;animation:bounce 1.3s infinite}
+.win-title{font-size:2.2rem;font-weight:900;color:#ec4899;text-shadow:2px 2px 0 #fde047;margin:8px 0}
+.stats-card{display:flex;justify-content:space-around;gap:12px;background:#f0f9ff;border:3px solid #38bdf8;border-radius:22px;padding:18px;margin:18px 0;flex-wrap:wrap}
+.stats-card h3{font-size:1.9rem;color:#0284c7;font-weight:900}
+.stats-card p{font-size:0.95rem;color:#475569;font-weight:800}
+.status-banner{font-size:1.05rem;font-weight:900;min-height:26px;margin-top:8px}
+.restart-btn{margin-top:18px;padding:16px 36px;border:none;border-radius:22px;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 7px 0 #1d4ed8;transition:transform 0.2s ease}
+.restart-btn:hover{transform:scale(1.05)}
+@keyframes wobble{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-2deg)}50%{transform:translateX(8px) rotate(2deg)}75%{transform:translateX(-5px)}}
+@keyframes popUp{0%{opacity:1;transform:translate(-50%,0) scale(0.8)}100%{opacity:0;transform:translate(-50%,-75px) scale(1.3)}}
+@keyframes dropDown{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(250px) rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+</style>
+</head>
+<body>
+<div class=game-card>
+<div id=quizScreen>
+<div class=top-bar>
+<div class=level-pill>🔤 Missing Letters Safari</div>
+<div class=xp-pill id=xpPill>⭐ XP: <span id=xpVal>0</span></div>
+</div>
+<div class=progress-track><div class=progress-fill id=progressFill></div></div>
+<div class=meta-row><span id=stepCounter>Word 1 / 8 (A)</span><span>+10 XP</span></div>
+<div class=prompt-title>🔍 Which letters are missing?</div>
+<div class=word-stage>
+<div class=picture-emoji id=emojiPic>👃</div>
+<div class=hint-label id=wordHint>You smell with it!</div>
+<div class=word-display id=wordDisplay></div>
+</div>
+<div class=tiles-grid id=tilesGrid></div>
+<div class=feedback-box id=feedbackBox></div>
+<button class=next-btn id=nextBtn onclick=nextWord()>NEXT WORD! 🚀</button>
+</div>
+<div id=finalScreen class=final-screen>
+<div class=trophy-icon>🏆</div>
+<div class=win-title>SPELLING HERO!</div>
+<p>You found all the missing letters! 🌟</p>
+<div class=stats-card>
+<div class=stat-box><h3 id=finalScore>0 / 8</h3><p>First-Try Stars</p></div>
+<div class=stat-box><h3 id=finalXP>0 XP</h3><p>Total XP</p></div>
+</div>
+<div class=status-banner id=googleStatus>Sending results... ⏳</div>
+<button class=restart-btn onclick=restartGame()>PLAY AGAIN 🔄</button>
+</div>
+</div>
+<script>
+const TEST_NAME=`Missing Letters Safari: Body Words (A1)`;
+let userMistakes=[];
+const words=[
+{letter:`A`,emoji:`👃`,hint:`You smell with it!`,parts:[`n`,``,`s`,``],correct:`o, e`,options:[`o, e`,`a, i`,`u, a`,`e, i`],fullWord:`n o s e`},
+{letter:`B`,emoji:`💇`,hint:`It grows on your head!`,parts:[``,`air`],correct:`h`,options:[`h`,`b`,`c`,`m`],fullWord:`h a i r`},
+{letter:`C`,emoji:`🙂`,hint:`Your eyes and nose are on it!`,parts:[`fa_`,`e`],correct:`c`,options:[`c`,`k`,`s`,`t`],fullWord:`f a c e`},
+{letter:`D`,emoji:`👂`,hint:`You hear with it!`,parts:[``,`_ar`],correct:`e`,options:[`e`,`a`,`o`,`u`],fullWord:`e a r`},
+{letter:`E`,emoji:`👄`,hint:`You eat and talk with it!`,parts:[`m_ _`,``,`th`],correct:`ou`,options:[`ou`,`ai`,`ee`,`oo`],fullWord:`m o u t h`},
+{letter:`F`,emoji:`🧠`,hint:`You think with it!`,parts:[`h_ _ _`,``],correct:`ead`,options:[`ead`,`and`,`air`,`ood`],fullWord:`h e a d`},
+{letter:`G`,emoji:`✋`,hint:`You hold things with it!`,parts:[`h _ _ _`,``],correct:`and`,options:[`and`,`ead`,`air`,`ood`],fullWord:`h a n d`},
+{letter:`H`,emoji:`👁️`,hint:`You see with it!`,parts:[``,`_y_`,``],correct:`e, e`,options:[`e, e`,`a, a`,`o, o`,`i, e`],fullWord:`e y e`},
+];
+let currentIdx=0,firstTryWins=0,totalXP=0,wrongAttempt=false,solvedCurrent=false;
+const xpVal=document.getElementById(`xpVal`);
+const xpPill=document.getElementById(`xpPill`);
+const progressFill=document.getElementById(`progressFill`);
+const stepCounter=document.getElementById(`stepCounter`);
+const emojiPic=document.getElementById(`emojiPic`);
+const wordHint=document.getElementById(`wordHint`);
+const wordDisplay=document.getElementById(`wordDisplay`);
+const tilesGrid=document.getElementById(`tilesGrid`);
+const feedbackBox=document.getElementById(`feedbackBox`);
+const nextBtn=document.getElementById(`nextBtn`);
+function shuffle(list){
+const arr=list.slice();
+for(let i=arr.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
+return arr;
+}
+function renderWord(){
+const item=words[currentIdx];
+wrongAttempt=false;
+solvedCurrent=false;
+stepCounter.textContent=`Word ${currentIdx + 1} / ${words.length} (${item.letter})`;
+progressFill.style.width=`${(currentIdx / words.length) * 100}%`;
+emojiPic.textContent=item.emoji;
+wordHint.textContent=item.hint;
+wordDisplay.innerHTML=``;
+item.parts.forEach(function(part){
+if(part===``){
+const gap=document.createElement(`span`);
+gap.className=`letter-gap`;
+gap.textContent=`?`;
+wordDisplay.appendChild(gap);
+}else{
+const txt=document.createElement(`span`);
+txt.textContent=part;
+wordDisplay.appendChild(txt);
+}
+});
+feedbackBox.className=`feedback-box`;
+feedbackBox.style.display=`none`;
+nextBtn.style.display=`none`;
+tilesGrid.innerHTML=``;
+shuffle(item.options).forEach(function(opt){
+const btn=document.createElement(`button`);
+btn.className=`tile-btn`;
+btn.textContent=opt;
+btn.onclick=function(){checkTile(opt,btn);};
+tilesGrid.appendChild(btn);
+});
+}
+function checkTile(selected,btn){
+if(solvedCurrent)return;
+const item=words[currentIdx];
+if(selected===item.correct){
+solvedCurrent=true;
+btn.classList.add(`correct`);
+if(!wrongAttempt){firstTryWins++;}
+totalXP+=10;
+xpVal.textContent=totalXP;
+xpPill.classList.add(`bump`);
+setTimeout(function(){xpPill.classList.remove(`bump`);},300);
+const pieces=selected.split(`, `);
+const gaps=document.querySelectorAll(`.letter-gap`);
+gaps.forEach(function(g,idx){
+g.textContent=pieces[idx] || pieces[0];
+g.classList.add(`solved`);
+});
+feedbackBox.className=`feedback-box ok`;
+feedbackBox.innerHTML=`<span>Awesome! The word is <b>${item.fullWord.replace(/\s+/g, ``)}</b>! ⭐</span>`;
+feedbackBox.style.display=`block`;
+document.querySelectorAll(`.tile-btn`).forEach(function(b){b.disabled=true;});
+celebrate(btn);
+nextBtn.textContent= currentIdx === words.length - 1 ? `Finish the Game! 🏆` : `Next Word! 🚀`;
+nextBtn.style.display=`block`;
+}else{
+wrongAttempt=true;
+btn.classList.add(`wrong`);
+btn.disabled=true;
+userMistakes.push(selected);
+feedbackBox.className=`feedback-box err`;
+feedbackBox.textContent=`Not quite! Try another letter tile!`;
+feedbackBox.style.display=`block`;
+}
+}
+function celebrate(anchor){
+const pop=document.createElement(`div`);
+pop.className=`xp-pop`;
+pop.textContent=`+10 XP! 🌟`;
+document.body.appendChild(pop);
+setTimeout(function(){pop.remove();},900);
+const icons=[`⭐`,`🎉`,`🔤`,`✨`,`🎈`];
+const rect=anchor.getBoundingClientRect();
+for(let i=0;i<8;i++){
+const conf=document.createElement(`div`);
+conf.className=`confetti-item`;
+conf.textContent=icons[Math.floor(Math.random()*icons.length)];
+conf.style.left=`${rect.left + rect.width / 2 + (Math.random() * 150 - 75)}px`;
+conf.style.top=`${rect.top}px`;
+document.body.appendChild(conf);
+setTimeout(function(){conf.remove();},1350);
+}
+}
+function nextWord(){
+currentIdx++;
+if(currentIdx<words.length){renderWord();}else{showVictory();}
+}
+function showVictory(){
+progressFill.style.width=`100%`;
+document.getElementById(`quizScreen`).style.display=`none`;
+document.getElementById(`finalScreen`).style.display=`block`;
+document.getElementById(`finalScore`).textContent=`${firstTryWins} / ${words.length}`;
+document.getElementById(`finalXP`).textContent=`${totalXP} XP`;
+sendResultsToGoogle();
+}
+function sendResultsToGoogle(){
+const url=`https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec`;
+const params=new URLSearchParams();
+params.append(`name`,TEST_NAME);
+params.append(`score`,firstTryWins);
+params.append(`total`,words.length);
+params.append(`mistakes`,userMistakes.join(`, `));
+fetch(url,{method:`POST`,mode:`no-cors`,body:params})
+.then(function(){
+const st=document.getElementById(`googleStatus`);
+st.textContent=`Results sent successfully!`;
+st.style.color=`#16a34a`;
+})
+.catch(function(){
+const st=document.getElementById(`googleStatus`);
+st.textContent=`Offline mode: results saved locally.`;
+st.style.color=`#facc15`;
+});
+}
+function restartGame(){
+currentIdx=0;
+firstTryWins=0;
+totalXP=0;
+userMistakes=[];
+xpVal.textContent=`0`;
+document.getElementById(`finalScreen`).style.display=`none`;
+document.getElementById(`quizScreen`).style.display=`block`;
+renderWord();
+}
+renderWord();
+</script>
+</body>
+</html>

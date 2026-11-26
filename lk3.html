@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Body Parts & Cute Alien · Sentence Builder 👾</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 35%, #fbc2eb 70%, #fde047 100%);
+      color: #1e293b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .app-card {
+      width: 100%;
+      max-width: 700px;
+      background: #ffffff;
+      border: 5px solid #8b5cf6;
+      border-radius: 34px;
+      padding: 26px;
+      box-shadow: 0 22px 45px rgba(139, 92, 246, 0.25), 0 10px 0 #6d28d9;
+      position: relative;
+    }
+
+    /* Header Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .badge-pill {
+      background: linear-gradient(90deg, #8b5cf6, #ec4899);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 0.4px;
+      box-shadow: 0 4px 0 #5b21b6;
+    }
+
+    .xp-pill {
+      background: #fef08a;
+      border: 3px solid #eab308;
+      color: #a16207;
+      padding: 7px 18px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.25s ease;
+    }
+
+    .xp-pill.bump {
+      transform: scale(1.18) rotate(-3deg);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 16px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 2px solid #cbd5e1;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #3b82f6, #f59e0b, #ec4899);
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .title-heading {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* Visual Clue Card */
+    .clue-stage {
+      background: linear-gradient(135deg, #f3e8ff, #e0f2fe);
+      border: 4px dashed #8b5cf6;
+      border-radius: 24px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 18px;
+      box-shadow: inset 0 4px 12px rgba(139, 92, 246, 0.1);
+    }
+
+    .clue-emoji {
+      font-size: 3.8rem;
+      margin-bottom: 6px;
+      display: inline-block;
+      animation: bounceSlow 2.2s ease-in-out infinite;
+    }
+
+    .clue-caption {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #4c1d95;
+    }
+
+    .speak-btn {
+      margin-top: 10px;
+      background: #ffffff;
+      border: 2px solid #38bdf8;
+      color: #0284c7;
+      font-size: 0.92rem;
+      font-weight: 900;
+      padding: 5px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #38bdf8;
+      transition: transform 0.15s ease;
+    }
+
+    .speak-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Answer Tray */
+    .answer-tray {
+      min-height: 74px;
+      background: #f8fafc;
+      border: 3px solid #38bdf8;
+      border-radius: 22px;
+      padding: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      box-shadow: inset 0 3px 8px rgba(56, 189, 248, 0.14);
+      transition: all 0.25s ease;
+    }
+
+    .answer-tray.correct-tray {
+      background: #dcfce7;
+      border-color: #16a34a;
+    }
+
+    .answer-tray.wrong-tray {
+      background: #ffe4e6;
+      border-color: #e11d48;
+      animation: wobble 0.4s ease;
+    }
+
+    .placeholder-hint {
+      color: #94a3b8;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    /* Word Bank */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      min-height: 56px;
+    }
+
+    .word-tile {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border: 3px solid #f59e0b;
+      color: #78350f;
+      font-size: 1.2rem;
+      font-weight: 900;
+      padding: 11px 20px;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #d97706;
+      transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .word-tile:hover:not(:disabled) {
+      transform: translateY(-3px);
+      background: #fef3c7;
+    }
+
+    .word-tile:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #d97706;
+    }
+
+    .word-tile.in-tray {
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+      border-color: #0284c7;
+      color: #0c4a6e;
+      box-shadow: 0 4px 0 #0369a1;
+    }
+
+    .word-tile:disabled {
+      opacity: 0.85;
+      cursor: default;
+    }
+
+    /* Controls */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .ctrl-btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 22px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #ffffff;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-reset {
+      flex: 0.45;
+      background: linear-gradient(90deg, #94a3b8, #64748b);
+      box-shadow: 0 6px 0 #334155;
+    }
+
+    .btn-check {
+      background: linear-gradient(90deg, #10b981, #059669);
+      box-shadow: 0 6px 0 #065f46;
+    }
+
+    .btn-next {
+      background: linear-gradient(90deg, #ec4899, #8b5cf6);
+      box-shadow: 0 6px 0 #5b21b6;
+      display: none;
+    }
+
+    .feedback-box {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      font-size: 1.08rem;
+      font-weight: 900;
+      text-align: center;
+      display: none;
+    }
+
+    .feedback-box.ok {
+      display: block;
+      background: #dcfce7;
+      border: 3px solid #22c55e;
+      color: #166534;
+    }
+
+    .feedback-box.err {
+      display: block;
+      background: #ffe4e6;
+      border: 3px solid #f43f5e;
+      color: #9f1239;
+    }
+
+    /* Floating XP & Confetti */
+    .xp-pop {
+      position: fixed;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #16a34a;
+      text-shadow: 0 3px 0 #ffffff, 0 6px 15px rgba(22, 163, 74, 0.5);
+      pointer-events: none;
+      animation: popUp 0.9s ease-out forwards;
+      z-index: 999;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      font-size: 1.9rem;
+      pointer-events: none;
+      z-index: 998;
+      animation: fallDown 1.35s ease-out forwards;
+    }
+
+    /* Final Victory Screen */
+    .final-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .trophy-big {
+      font-size: 5rem;
+      display: inline-block;
+      animation: bounceSlow 1.3s infinite;
+    }
+
+    .win-title {
+      font-size: 2.15rem;
+      font-weight: 900;
+      color: #8b5cf6;
+      text-shadow: 2px 2px 0 #fde047;
+      margin: 8px 0;
+    }
+
+    .stats-card {
+      display: flex;
+      justify-content: space-around;
+      gap: 12px;
+      background: #f0f9ff;
+      border: 3px solid #38bdf8;
+      border-radius: 22px;
+      padding: 18px;
+      margin: 18px 0;
+    }
+
+    .stats-card h3 {
+      font-size: 1.9rem;
+      color: #0284c7;
+      font-weight: 900;
+    }
+
+    .stats-card p {
+      font-size: 0.95rem;
+      color: #475569;
+      font-weight: 800;
+    }
+
+    .status-text {
+      font-size: 1.05rem;
+      font-weight: 900;
+      min-height: 26px;
+      margin-top: 8px;
+    }
+
+    .replay-btn {
+      margin-top: 18px;
+      padding: 16px 36px;
+      border: none;
+      border-radius: 22px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 7px 0 #4c1d95;
+      transition: transform 0.2s ease;
+    }
+
+    .replay-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes wobble {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px) rotate(-1.5deg); }
+      50% { transform: translateX(8px) rotate(1.5deg); }
+      75% { transform: translateX(-5px); }
+    }
+
+    @keyframes popUp {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
+      100% { opacity: 0; transform: translate(-50%, -75px) scale(1.3); }
+    }
+
+    @keyframes fallDown {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(250px) rotate(360deg); }
+    }
+
+    @keyframes bounceSlow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-9px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+    <!-- BUILDER SCREEN -->
+    <div id="quizScreen">
+      <div class="top-bar">
+        <div class="badge-pill">👾 Body & Pets · Chunk Builder</div>
+        <div class="xp-pill" id="xpPill">⭐ XP: <span id="xpVal">0</span></div>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="meta-row">
+        <span id="stepText">Sentence 1 / 10</span>
+        <span>+10 XP</span>
+      </div>
+
+      <h2 class="title-heading">Put the chunks in the correct order 🧩</h2>
+
+      <div class="clue-stage">
+        <div class="clue-emoji" id="clueEmoji">👾</div>
+        <div class="clue-caption" id="clueCaption">Describe the cute space alien!</div>
+        <button class="speak-btn" onclick="speakHint()">🔊 Hear Hint</button>
+      </div>
+
+      <div class="answer-tray" id="answerTray">
+        <span class="placeholder-hint">Tap the word chunks below...</span>
+      </div>
+
+      <div class="word-bank" id="wordBank"></div>
+
+      <div class="btn-row">
+        <button class="ctrl-btn btn-reset" id="resetBtn" onclick="resetTray()">Reset 🔄</button>
+        <button class="ctrl-btn btn-check" id="checkBtn" onclick="checkOrder()">Check ✅</button>
+        <button class="ctrl-btn btn-next" id="nextBtn" onclick="nextSentence()">Next 🚀</button>
+      </div>
+
+      <div class="feedback-box" id="feedbackBox"></div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="finalScreen" class="final-screen">
+      <div class="trophy-big">🏆</div>
+      <h1 class="win-title">SENTENCE HERO!</h1>
+      <p style="color: #64748b; font-weight: 600; margin-bottom: 10px;">You described the alien and pets perfectly! 🌟</p>
+
+      <div class="stats-card">
+        <div>
+          <h3 id="finalScore">0 / 10</h3>
+          <p>First-Try Wins</p>
+        </div>
+        <div>
+          <h3 id="finalXP">0 XP</h3>
+          <p>Total XP</p>
+        </div>
+      </div>
+
+      <div id="googleStatus" class="status-text">Sending results... ⏳</div>
+
+      <button class="replay-btn" onclick="restartQuiz()">PLAY AGAIN 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const TEST_NAME = "Body Parts & Cute Alien Chunk Builder (Kids)";
+    let userMistakes = [];
+    
+    // 2 words per button chunk for easier tapping!
+    const sentences = [
+      {
+        emoji: "👾💚",
+        caption: "Look at my space alien's head and tail!",
+        hintAudio: "My alien has got a small head and a long tail.",
+        words: ["My alien", "has got", "a small", "head and", "a long", "tail."],
+        correct: "My alien has got a small head and a long tail."
+      },
+      {
+        emoji: "👀👀👀",
+        caption: "Count the alien's eyes and arms!",
+        hintAudio: "It's got three eyes and short arms.",
+        words: ["It's got", "three eyes", "and short", "arms."],
+        correct: "It's got three eyes and short arms."
+      },
+      {
+        emoji: "🦶🦶",
+        caption: "Look at its funny legs and feet!",
+        hintAudio: "It's got four legs and big feet.",
+        words: ["It's got", "four legs", "and big", "feet."],
+        correct: "It's got four legs and big feet."
+      },
+      {
+        emoji: "🚫👃",
+        caption: "What hasn't the alien got?",
+        hintAudio: "It hasn't got a nose.",
+        words: ["It hasn't", "got a", "nose."],
+        correct: "It hasn't got a nose."
+      },
+      {
+        emoji: "🤣✨",
+        caption: "Is the alien scary or funny?",
+        hintAudio: "It is very funny.",
+        words: ["It is", "very funny."],
+        correct: "It is very funny."
+      },
+      {
+        emoji: "🐱🤍",
+        caption: "Riddle 1: A white fluffy cat!",
+        hintAudio: "It has got small ears and a pink nose.",
+        words: ["It has", "got small", "ears and", "a pink", "nose."],
+        correct: "It has got small ears and a pink nose."
+      },
+      {
+        emoji: "🐕🤎",
+        caption: "Riddle 2: A playful brown puppy!",
+        hintAudio: "It has got a big mouth and a short tail.",
+        words: ["It has", "got a", "big mouth", "and a", "short tail."],
+        correct: "It has got a big mouth and a short tail."
+      },
+      {
+        emoji: "🐸💦",
+        caption: "Riddle 3: A green garden frog!",
+        hintAudio: "It has got big eyes and wet legs.",
+        words: ["It has", "got big", "eyes and", "wet legs."],
+        correct: "It has got big eyes and wet legs."
+      },
+      {
+        emoji: "🐵🍌",
+        caption: "Riddle 4: A cheeky jungle monkey!",
+        hintAudio: "It has got long arms and big hands.",
+        words: ["It has", "got long", "arms and", "big hands."],
+        correct: "It has got long arms and big hands."
+      },
+      {
+        emoji: "🐰🥕",
+        caption: "Riddle 5: A cute garden rabbit!",
+        hintAudio: "It has got long ears and small feet.",
+        words: ["It has", "got long", "ears and", "small feet."],
+        correct: "It has got long ears and small feet."
+      }
+    ];
+
+    let currentIdx = 0;
+    let firstTryScore = 0;
+    let xp = 0;
+    let madeMistake = false;
+    let isSolved = false;
+
+    const xpVal = document.getElementById("xpVal");
+    const xpPill = document.getElementById("xpPill");
+    const progressFill = document.getElementById("progressFill");
+    const stepText = document.getElementById("stepText");
+    const clueEmoji = document.getElementById("clueEmoji");
+    const clueCaption = document.getElementById("clueCaption");
+    const answerTray = document.getElementById("answerTray");
+    const wordBank = document.getElementById("wordBank");
+    const resetBtn = document.getElementById("resetBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const feedbackBox = document.getElementById("feedbackBox");
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function speakText(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = 0.88;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function speakHint() {
+      speakText(sentences[currentIdx].hintAudio);
+    }
+
+    function renderSentence() {
+      const item = sentences[currentIdx];
+      madeMistake = false;
+      isSolved = false;
+      stepText.textContent = `Sentence ${currentIdx + 1} / ${sentences.length}`;
+      progressFill.style.width = `${(currentIdx / sentences.length) * 100}%`;
+      clueEmoji.textContent = item.emoji;
+      clueCaption.textContent = item.caption;
+      
+      answerTray.className = "answer-tray";
+      answerTray.innerHTML = `<span class="placeholder-hint">Tap the word chunks below...</span>`;
+      
+      feedbackBox.className = "feedback-box";
+      feedbackBox.style.display = "none";
+      resetBtn.style.display = "block";
+      checkBtn.style.display = "block";
+      nextBtn.style.display = "none";
+      
+      wordBank.innerHTML = "";
+      let shuffled = shuffle(item.words);
+      if (shuffled.join(" ") === item.correct && shuffled.length > 1) {
+        shuffled.reverse();
+      }
+      shuffled.forEach((chunk) => {
+        const tile = document.createElement("button");
+        tile.className = "word-tile";
+        tile.textContent = chunk;
+        tile.onclick = () => moveTile(tile);
+        wordBank.appendChild(tile);
+      });
+    }
+
+    function moveTile(tile) {
+      if (isSolved) return;
+      answerTray.classList.remove("wrong-tray");
+      
+      if (tile.parentElement === wordBank) {
+        const placeholder = answerTray.querySelector(".placeholder-hint");
+        if (placeholder) placeholder.remove();
+        tile.classList.add("in-tray");
+        answerTray.appendChild(tile);
+      } else {
+        tile.classList.remove("in-tray");
+        wordBank.appendChild(tile);
+        if (answerTray.children.length === 0) {
+          answerTray.innerHTML = `<span class="placeholder-hint">Tap the word chunks below...</span>`;
+        }
+      }
+    }
+
+    function resetTray() {
+      if (isSolved) return;
+      const tiles = Array.from(answerTray.querySelectorAll(".word-tile"));
+      tiles.forEach((t) => {
+        t.classList.remove("in-tray");
+        wordBank.appendChild(t);
+      });
+      answerTray.className = "answer-tray";
+      answerTray.innerHTML = `<span class="placeholder-hint">Tap the word chunks below...</span>`;
+      feedbackBox.style.display = "none";
+    }
+
+    function checkOrder() {
+      if (isSolved) return;
+      const item = sentences[currentIdx];
+      const builtWords = Array.from(answerTray.querySelectorAll(".word-tile")).map((t) => t.textContent);
+      
+      if (builtWords.length < item.words.length) {
+        feedbackBox.className = "feedback-box err";
+        feedbackBox.textContent = "🧩 Use all the word chunks first!";
+        return;
+      }
+      
+      const builtSentence = builtWords.join(" ");
+      if (builtSentence === item.correct) {
+        isSolved = true;
+        answerTray.className = "answer-tray correct-tray";
+        answerTray.querySelectorAll(".word-tile").forEach((t) => (t.disabled = true));
+        
+        if (!madeMistake) {
+          firstTryScore++;
+        }
+        xp += 10;
+        xpVal.textContent = xp;
+        xpPill.classList.add("bump");
+        setTimeout(() => xpPill.classList.remove("bump"), 300);
+        
+        feedbackBox.className = "feedback-box ok";
+        feedbackBox.textContent = `🎉 Awesome! "${item.correct}" ⭐`;
+        speakText(item.correct);
+        celebrate(checkBtn);
+        
+        resetBtn.style.display = "none";
+        checkBtn.style.display = "none";
+        nextBtn.textContent = currentIdx === sentences.length - 1 ? "FINISH! 🏆" : "Next 🚀";
+        nextBtn.style.display = "block";
+      } else {
+        madeMistake = true;
+        answerTray.className = "answer-tray wrong-tray";
+        userMistakes.push(builtSentence);
+        feedbackBox.className = "feedback-box err";
+        feedbackBox.textContent = "🙈 Not quite right! Tap a chunk to move it back and try again!";
+      }
+    }
+
+    function celebrate(anchorEl) {
+      const pop = document.createElement("div");
+      pop.className = "xp-pop";
+      pop.textContent = "+10 XP! 🌟";
+      document.body.appendChild(pop);
+      setTimeout(() => pop.remove(), 900);
+      
+      const icons = ["⭐", "🎉", "👾", "✨", "🎈"];
+      const rect = anchorEl.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const conf = document.createElement("div");
+        conf.className = "confetti-piece";
+        conf.textContent = icons[Math.floor(Math.random() * icons.length)];
+        conf.style.left = `${rect.left + rect.width / 2 + (Math.random() * 150 - 75)}px`;
+        conf.style.top = `${rect.top}px`;
+        document.body.appendChild(conf);
+        setTimeout(() => conf.remove(), 1350);
+      }
+    }
+
+    function nextSentence() {
+      currentIdx++;
+      if (currentIdx < sentences.length) {
+        renderSentence();
+      } else {
+        showFinalScreen();
+      }
+    }
+
+    function showFinalScreen() {
+      progressFill.style.width = "100%";
+      document.getElementById("quizScreen").style.display = "none";
+      document.getElementById("finalScreen").style.display = "block";
+      document.getElementById("finalScore").textContent = `${firstTryScore} / ${sentences.length}`;
+      document.getElementById("finalXP").textContent = `${xp} XP`;
+      sendResultsToGoogle();
+    }
+
+    function sendResultsToGoogle() {
+      const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+      const params = new URLSearchParams();
+      params.append("name", TEST_NAME);
+      params.append("score", firstTryScore);
+      params.append("total", sentences.length);
+      params.append("mistakes", userMistakes.join(", "));
+      
+      fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params
+      })
+      .then(() => {
+        const st = document.getElementById("googleStatus");
+        st.textContent = "Results sent successfully! ✅";
+        st.style.color = "#16a34a";
+      })
+      .catch(() => {
+        const st = document.getElementById("googleStatus");
+        st.textContent = "Offline mode: results saved locally.";
+        st.style.color = "#f59e0b";
+      });
+    }
+
+    function restartQuiz() {
+      currentIdx = 0;
+      firstTryScore = 0;
+      xp = 0;
+      userMistakes = [];
+      xpVal.textContent = "0";
+      document.getElementById("finalScreen").style.display = "none";
+      document.getElementById("quizScreen").style.display = "block";
+      renderSentence();
+    }
+
+    renderSentence();
+  </script>
+</body>
+</html>

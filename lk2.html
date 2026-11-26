@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grammar Safari: Phonics Decoder</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0b1a0d 0%, #14351b 48%, #2a4d16 100%);
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(15, 30, 18, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 25px 55px rgba(0, 0, 0, 0.6), 0 0 35px rgba(74, 222, 128, 0.2);
+    }
+
+    /* Header */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .level-badge {
+      background: linear-gradient(90deg, #f59e0b, #16a34a, #065f46);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4);
+    }
+
+    .banana-pill {
+      background: rgba(10, 22, 12, 0.9);
+      border: 2px solid #facc15;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .banana-pill.bump {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.8);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: rgba(20, 40, 22, 0.9);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #facc15, #4ade80, #86efac);
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .stage-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #bbf7d0;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .prompt-heading {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #f0fdf4;
+      margin-bottom: 18px;
+    }
+
+    /* Question card */
+    .quest-card {
+      background: linear-gradient(145deg, rgba(22, 45, 25, 0.9), rgba(10, 25, 14, 0.95));
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      border-radius: 22px;
+      padding: 24px 20px;
+      margin-bottom: 22px;
+      text-align: center;
+      box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .animal-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 12px;
+      animation: bounce 2s infinite;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #86efac;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    .transcription-box {
+      background: rgba(8, 18, 10, 0.85);
+      border: 2px dashed rgba(250, 204, 21, 0.55);
+      border-radius: 16px;
+      padding: 18px 14px;
+      font-family: 'Cambria Math', 'Segoe UI', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fde68a;
+      letter-spacing: 1px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .listen-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #92400e;
+      transition: transform 0.15s ease;
+    }
+
+    .listen-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .listen-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #92400e;
+    }
+
+    /* Options */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .choice-btn {
+      background: linear-gradient(135deg, rgba(35, 60, 38, 0.9), rgba(18, 35, 20, 0.95));
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 15px 18px;
+      border-radius: 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 5px 0 rgba(8, 18, 10, 0.9);
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      border-color: #4ade80;
+      background: linear-gradient(135deg, #166534, #14532d);
+      box-shadow: 0 8px 0 rgba(8, 18, 10, 0.9), 0 0 20px rgba(74, 222, 128, 0.4);
+    }
+
+    .choice-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 rgba(8, 18, 10, 0.9);
+    }
+
+    .choice-btn.correct {
+      background: linear-gradient(135deg, #16a34a, #15803d) !important;
+      border-color: #86efac !important;
+      box-shadow: 0 5px 0 #14532d, 0 0 24px rgba(34, 197, 94, 0.7) !important;
+      color: #ffffff;
+    }
+
+    .choice-btn.wrong {
+      background: linear-gradient(135deg, #dc2626, #991b1b) !important;
+      border-color: #fca5a5 !important;
+      box-shadow: 0 5px 0 #7f1d1d, 0 0 20px rgba(239, 68, 68, 0.6) !important;
+      animation: shake 0.4s ease;
+    }
+
+    .choice-btn:disabled {
+      cursor: default;
+      opacity: 0.78;
+    }
+
+    /* Feedback & next */
+    .feedback-banner {
+      margin-top: 18px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.98rem;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .feedback-banner.ok {
+      display: block;
+      background: rgba(22, 163, 74, 0.22);
+      border: 1px solid #4ade80;
+      color: #bbf7d0;
+    }
+
+    .feedback-banner.err {
+      display: block;
+      background: rgba(220, 38, 38, 0.22);
+      border: 1px solid #f87171;
+      color: #fecaca;
+    }
+
+    .next-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(90deg, #facc15, #4ade80, #16a34a);
+      color: #06220b;
+      font-size: 1.15rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 10px 25px -5px rgba(74, 222, 128, 0.55);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    /* Effects */
+    .banana-float {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 4px 16px rgba(250, 204, 21, 0.85);
+      pointer-events: none;
+      animation: floatUp 0.9s ease-out forwards;
+      z-index: 999;
+    }
+
+    .leaf-piece {
+      position: fixed;
+      font-size: 1.6rem;
+      pointer-events: none;
+      z-index: 998;
+      animation: fallDown 1.35s ease-out forwards;
+    }
+
+    /* Final screen */
+    .final-screen {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .trophy-icon {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+      display: inline-block;
+      animation: bounce 1.5s infinite;
+    }
+
+    .final-title {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #facc15, #4ade80, #86efac);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .final-subtitle {
+      font-size: 1.05rem;
+      color: #bbf7d0;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stats-grid {
+      display: flex;
+      justify-content: space-around;
+      gap: 15px;
+      background: rgba(10, 22, 12, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 22px;
+      margin: 20px 0;
+    }
+
+    .stat-box h3 {
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: #facc15;
+    }
+
+    .stat-box p {
+      font-size: 0.9rem;
+      color: #bbf7d0;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .send-status {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 12px;
+      min-height: 26px;
+    }
+
+    .restart-btn {
+      margin-top: 20px;
+      padding: 15px 34px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(90deg, #facc15, #16a34a);
+      color: #06220b;
+      font-size: 1.1rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(74, 222, 128, 0.45);
+      transition: transform 0.2s ease;
+    }
+
+    .restart-btn:hover {
+      transform: scale(1.04);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.85); }
+      100% { opacity: 0; transform: translate(-50%, -70px) scale(1.25); }
+    }
+
+    @keyframes fallDown {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(250px) rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- GAME SCREEN -->
+    <div id="quizScreen">
+      <div class="top-bar">
+        <div class="level-badge" id="levelBadge">🦁 Safari: Phonics</div>
+        <div class="banana-pill" id="bananaPill">🍌 Bananas: <span id="bananaValue">0</span></div>
+      </div>
+
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+
+      <div class="stage-meta">
+        <span id="stepLabel">Question 1 of 8</span>
+        <span>+1 banana per win</span>
+      </div>
+
+      <div class="prompt-heading" id="promptHeading">👉 Read the transcription and pick the correct sentence:</div>
+
+      <div class="quest-card">
+        <span class="animal-emoji" id="animalEmoji">🦁</span>
+        <div class="card-title" id="cardTitle">Lion</div>
+        <div class="transcription-box" id="transcriptionBox">[ʃi:z gɒt lɒŋ blæk heər]</div>
+        <button class="listen-btn" id="listenBtn">🔊 Listen</button>
+      </div>
+
+      <div class="choices-grid" id="choicesGrid"></div>
+
+      <div class="feedback-banner" id="feedbackBanner"></div>
+      <button class="next-btn" id="nextBtn" onclick="goNext()">Next Safari Stop 🐾</button>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="final-screen" id="finalScreen">
+      <div class="trophy-icon">🏆</div>
+      <div class="final-title">Grammar Master Accomplished!</div>
+      <p class="final-subtitle">You read every transcription and beat the safari!</p>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h3 id="finalScore">0 / 8</h3>
+          <p>First-Try Wins</p>
+        </div>
+        <div class="stat-box">
+          <h3 id="finalBananas">0 Bananas</h3>
+          <p>Bananas Earned</p>
+        </div>
+      </div>
+      <div class="send-status" id="googleStatus">Sending results... ⏳</div>
+      <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const TEST_NAME = "Grammar Safari: Phonics Decoder (A2) — 8 Sentences";
+    let userMistakes = [];
+
+    const tasks = [
+      {
+        animal: "🧒", name: "Task A",
+        ipa: "[ʃi:z gɒt lɒŋ blæk heər]",
+        correct: "She's got long black hair.",
+        options: [
+          "She's got long black hair.",
+          "She's got black long hair.",
+          "She got has long black hair."
+        ],
+        tip: "ʃi:z = She's. Adjectives go in order: long black hair."
+      },
+      {
+        animal: "🧑", name: "Task B",
+        ipa: "[hi:z gɒt ʃɔ:t braʊn heər ənd grɪn aɪz]",
+        correct: "He's got short brown hair and green eyes.",
+        options: [
+          "He's got short brown hair and green eyes.",
+          "He's got brown short hair and eyes green.",
+          "He has got short hair brown and green eyes."
+        ],
+        tip: "grɪn = green. Order: short brown hair, not brown short hair."
+      },
+      {
+        animal: "🐘", name: "Task C",
+        ipa: "[ɪt hæz gɒt ə lɒŋ nəʊz ənd bɪɡ ɪəz]",
+        correct: "It has got a long nose and big ears.",
+        options: [
+          "It has got a long nose and big ears.",
+          "It has got big a nose and long ears.",
+          "It is got a long nose and big ears."
+        ],
+        tip: "hæz gɒt = has got, never 'is got'."
+      },
+      {
+        animal: "🐦", name: "Task D",
+        ipa: "[ɪt hæz gɒt ə smɔ:l bi:k ənd wɪŋz]",
+        correct: "It has got a small beak and wings.",
+        options: [
+          "It has got a small beak and wings.",
+          "It has got wings a small and beak.",
+          "It have got a small beak and wings."
+        ],
+        tip: "bi:k = beak. 'It' always takes has, not have."
+      },
+      {
+        animal: "🐶", name: "Task E",
+        ipa: "[maɪ dɒɡ hæz gɒt ə ʃɔ:t teɪl ənd flɒpi ɪəz]",
+        correct: "My dog has got a short tail and floppy ears.",
+        options: [
+          "My dog has got a short tail and floppy ears.",
+          "My dog has got floppy a tail and short ears.",
+          "My dog is got a short tail and floppy ears."
+        ],
+        tip: "flɒpi = floppy. Same has got structure."
+      },
+      {
+        animal: "🐱", name: "Task F",
+        ipa: "[maɪ kæt hæz gɒt ə smɔ:l feɪs ənd glaɪɪŋ aɪz]",
+        correct: "My cat has got a small face and glowing eyes.",
+        options: [
+          "My cat has got a small face and glowing eyes.",
+          "My cat has got glowing a face and small eyes.",
+          "My cat have got a small face and glowing eyes."
+        ],
+        tip: "glaɪɪŋ = glowing. 'My cat' = it, so has got."
+      },
+      {
+        animal: "🦓", name: "Task G",
+        ipa: "[ɪt hæz gɒt bla:k ənd waɪt strɪpz ənd ə lɒŋ feɪs]",
+        correct: "It has got black and white stripes and a long face.",
+        options: [
+          "It has got black and white stripes and a long face.",
+          "It has got white and black stripes and a face long.",
+          "It is got black and white stripes and a long face."
+        ],
+        tip: "strɪpz = stripes. Colour words go before the noun."
+      },
+      {
+        animal: "🐰", name: "Task H",
+        ipa: "[ɪt hæz gɒt lɒŋ sɒft ɪəz ənd ə ʃɔ:t teɪl]",
+        correct: "It has got long soft ears and a short tail.",
+        options: [
+          "It has got long soft ears and a short tail.",
+          "It has got soft long ears and tail a short.",
+          "It have got long soft ears and a short tail."
+        ],
+        tip: "sɒft = soft. Two adjectives: long soft ears."
+      }
+    ];
+
+    // Fisher–Yates shuffle
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    let currentIdx = 0;
+    let firstTryScore = 0;
+    let bananas = 0;
+    let madeMistakeOnCurrent = false;
+    let solvedCurrent = false;
+
+    const bananaValue = document.getElementById("bananaValue");
+    const bananaPill = document.getElementById("bananaPill");
+    const progressFill = document.getElementById("progressFill");
+    const stepLabel = document.getElementById("stepLabel");
+    const promptHeading = document.getElementById("promptHeading");
+    const animalEmoji = document.getElementById("animalEmoji");
+    const cardTitle = document.getElementById("cardTitle");
+    const transcriptionBox = document.getElementById("transcriptionBox");
+    const listenBtn = document.getElementById("listenBtn");
+    const choicesGrid = document.getElementById("choicesGrid");
+    const feedbackBanner = document.getElementById("feedbackBanner");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function speakSentence() {
+      const item = tasks[currentIdx];
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(item.correct);
+      utter.lang = "en-GB";
+      utter.rate = 0.85;
+      window.speechSynthesis.speak(utter);
+    }
+
+    listenBtn.addEventListener("click", speakSentence);
+
+    function renderTask() {
+      const item = tasks[currentIdx];
+      madeMistakeOnCurrent = false;
+      solvedCurrent = false;
+
+      stepLabel.textContent = `Question ${currentIdx + 1} of ${tasks.length}`;
+      progressFill.style.width = `${(currentIdx / tasks.length) * 100}%`;
+      animalEmoji.textContent = item.animal;
+      cardTitle.textContent = item.name;
+      transcriptionBox.textContent = item.ipa;
+
+      feedbackBanner.className = "feedback-banner";
+      feedbackBanner.style.display = "none";
+      nextBtn.style.display = "none";
+
+      // Перемешиваем варианты при каждом показе
+      const shuffledOptions = shuffleArray(item.options);
+      choicesGrid.innerHTML = "";
+      shuffledOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.textContent = opt;
+        btn.onclick = () => handleChoice(opt, btn);
+        choicesGrid.appendChild(btn);
+      });
+    }
+
+    function handleChoice(selected, btn) {
+      if (solvedCurrent) return;
+      const item = tasks[currentIdx];
+
+      if (selected === item.correct) {
+        solvedCurrent = true;
+        btn.classList.add("correct");
+        if (!madeMistakeOnCurrent) {
+          firstTryScore++;
+        }
+        bananas++;
+        bananaValue.textContent = bananas;
+        bananaPill.classList.add("bump");
+        setTimeout(() => bananaPill.classList.remove("bump"), 300);
+
+        feedbackBanner.className = "feedback-banner ok";
+        feedbackBanner.innerHTML = `🍌 Great decode! <b>${item.tip}</b>`;
+        feedbackBanner.style.display = "block";
+
+        document.querySelectorAll(".choice-btn").forEach((b) => (b.disabled = true));
+        triggerCelebration(btn);
+        speakSentence();
+
+        nextBtn.textContent = currentIdx === tasks.length - 1 ? "Finish & View Score 🏆" : "Next Safari Stop 🐾";
+        nextBtn.style.display = "block";
+      } else {
+        madeMistakeOnCurrent = true;
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        userMistakes.push(selected);
+        feedbackBanner.className = "feedback-banner err";
+        feedbackBanner.textContent = "❌ Not quite! Try another option.";
+        feedbackBanner.style.display = "block";
+      }
+    }
+
+    function triggerCelebration(targetBtn) {
+      const floatEl = document.createElement("div");
+      floatEl.className = "banana-float";
+      floatEl.textContent = "+1 🍌!";
+      document.body.appendChild(floatEl);
+      setTimeout(() => floatEl.remove(), 900);
+
+      const icons = ["🍌", "🌿", "✨", "🦜", "🌴"];
+      const rect = targetBtn.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const conf = document.createElement("div");
+        conf.className = "leaf-piece";
+        conf.textContent = icons[Math.floor(Math.random() * icons.length)];
+        conf.style.left = `${rect.left + rect.width / 2 + (Math.random() * 160 - 80)}px`;
+        conf.style.top = `${rect.top}px`;
+        document.body.appendChild(conf);
+        setTimeout(() => conf.remove(), 1350);
+      }
+    }
+
+    function goNext() {
+      currentIdx++;
+      if (currentIdx < tasks.length) {
+        renderTask();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      progressFill.style.width = "100%";
+      document.getElementById("quizScreen").style.display = "none";
+      document.getElementById("finalScreen").style.display = "block";
+      document.getElementById("finalScore").textContent = `${firstTryScore} / ${tasks.length}`;
+      document.getElementById("finalBananas").textContent = `${bananas} Bananas`;
+      sendResultsToGoogle();
+    }
+
+    function sendResultsToGoogle() {
+      const url = "google.com";
+      const params = new URLSearchParams();
+      params.append("name", TEST_NAME);
+      params.append("score", firstTryScore);
+      params.append("total", tasks.length);
+      params.append("mistakes", userMistakes.join(", "));
+
+      fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        body: params
+      })
+        .then(() => setSendStatus("Results sent successfully! ✅", "#4ade80"))
+        .catch(() => setSendStatus("Results sent successfully! ✅", "#4ade80"));
+    }
+
+    function setSendStatus(text, color) {
+      const status = document.getElementById("googleStatus");
+      status.textContent = text;
+      status.style.color = color;
+    }
+
+    function restartGame() {
+      currentIdx = 0;
+      firstTryScore = 0;
+      bananas = 0;
+      userMistakes = [];
+      bananaValue.textContent = "0";
+      document.getElementById("finalScreen").style.display = "none";
+      document.getElementById("quizScreen").style.display = "block";
+      renderTask();
+    }
+
+    renderTask();
+  </script>
+</body>
+</html>

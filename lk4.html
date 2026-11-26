@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta charset=UTF-8>
+<meta name=viewport content=width=device-width, initial-scale=1.0>
+<title>Have Got and Has Got Story Quest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Comic Sans MS,Chalkboard SE,Segoe UI,Roboto,sans-serif}
+body{min-height:100vh;background:linear-gradient(135deg,#a8edea 0%,#fed6e3 45%,#fbc2eb 75%,#a6c1ee 100%);color:#1e293b;display:flex;justify-content:center;align-items:center;padding:16px;overflow-x:hidden}
+.quest-container{width:100%;max-width:760px;background:#ffffff;border:5px solid #ffbe0b;border-radius:34px;padding:26px;box-shadow:0 22px 45px rgba(255,107,107,0.22),0 10px 0 #fb8500;position:relative}
+.header-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.stage-badge{background:linear-gradient(90deg,#ff006e,#8338ec);color:#fff;padding:9px 18px;border-radius:999px;font-weight:900;font-size:0.95rem;letter-spacing:0.4px;box-shadow:0 4px 0 #560bad}
+.xp-pill{background:#fef08a;border:3px solid #f59e0b;color:#b45309;padding:7px 18px;border-radius:999px;font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:6px;transition:transform 0.25s ease}
+.xp-pill.bump{transform:scale(1.18) rotate(-3deg)}
+.progress-wrap{width:100%;height:16px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:18px;border:2px solid #cbd5e1}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#06d6a0,#3a86ff,#ffbe0b,#ff006e);border-radius:999px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+.title-banner{text-align:center;margin-bottom:18px}
+.title-banner h1{font-size:1.85rem;font-weight:900;color:#3a86ff;text-shadow:2px 2px 0 #fde047;margin-bottom:4px}
+.title-banner p{font-size:1rem;font-weight:800;color:#64748b}
+.story-card{background:linear-gradient(135deg,#f0f9ff,#fdf4ff);border:4px dashed #3a86ff;border-radius:24px;padding:20px;font-size:1.18rem;line-height:2.1;font-weight:800;color:#1e293b;box-shadow:inset 0 4px 12px rgba(58,134,255,0.1)}
+.story-line{margin-bottom:8px;padding:4px 8px;border-radius:12px;transition:background 0.2s ease}
+.story-line:hover{background:rgba(255,255,255,0.7)}
+.story-select{font-family:inherit;font-size:1.1rem;font-weight:900;padding:4px 12px;margin:0 4px;border-radius:14px;border:3px solid #8338ec;background:#ffffff;color:#560bad;cursor:pointer;outline:none;transition:all 0.2s ease;box-shadow:0 3px 0 #8338ec}
+.story-select:hover:not(:disabled){background:#f3e8ff;transform:translateY(-1px)}
+.story-select.correct{background:#dcfce7 !important;border-color:#16a34a !important;color:#15803d !important;box-shadow:0 3px 0 #15803d !important}
+.story-select.wrong{background:#ffe4e6 !important;border-color:#e11d48 !important;color:#be123c !important;box-shadow:0 3px 0 #be123c !important;animation:wobble 0.4s ease}
+.builder-stage{display:none}
+.prompt-card{background:linear-gradient(135deg,#fffbeb,#fef2f2);border:4px dashed #f59e0b;border-radius:24px;padding:20px;text-align:center;margin-bottom:18px}
+.prompt-emoji{font-size:3.4rem;margin-bottom:6px;display:inline-block}
+.prompt-clues{font-size:1.35rem;font-weight:900;color:#b45309;background:#fef3c7;display:inline-block;padding:6px 18px;border-radius:16px;border:2px solid #fbbf24;margin-top:6px}
+.answer-tray{min-height:68px;background:#f8fafc;border:3px solid #38bdf8;border-radius:20px;padding:12px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;margin-bottom:16px;box-shadow:inset 0 3px 8px rgba(56,189,248,0.15)}
+.answer-tray.correct-tray{background:#dcfce7;border-color:#16a34a}
+.answer-tray.wrong-tray{background:#ffe4e6;border-color:#e11d48;animation:wobble 0.4s ease}
+.tray-placeholder{color:#94a3b8;font-weight:800;font-size:1.05rem}
+.word-bank{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:18px}
+.word-chip{background:linear-gradient(180deg,#ffffff,#f1f5f9);border:3px solid #6366f1;color:#312e81;font-size:1.18rem;font-weight:900;padding:10px 18px;border-radius:18px;cursor:pointer;box-shadow:0 5px 0 #4f46e5;transition:all 0.18s ease}
+.word-chip:hover:not(:disabled){transform:translateY(-3px);background:#eef2ff}
+.word-chip:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 #4f46e5}
+.word-chip.in-tray{background:linear-gradient(180deg,#dbeafe,#bfdbfe);border-color:#2563eb;color:#1e3a8a;box-shadow:0 4px 0 #1d4ed8}
+.word-chip:disabled{opacity:0.75;cursor:default}
+.btn-row{display:flex;gap:12px;margin-top:16px}
+.action-btn{flex:1;padding:16px;border:none;border-radius:22px;font-size:1.2rem;font-weight:900;cursor:pointer;color:#ffffff;transition:transform 0.2s ease}
+.action-btn:hover{transform:translateY(-2px)}
+.btn-check{background:linear-gradient(90deg,#06d6a0,#118ab2);box-shadow:0 6px 0 #073b4c}
+.btn-reset{flex:0.45;background:linear-gradient(90deg,#94a3b8,#64748b);box-shadow:0 6px 0 #334155}
+.btn-next{background:linear-gradient(90deg,#ff006e,#ffbe0b);box-shadow:0 6px 0 #b5179e;display:none}
+.feedback-banner{margin-top:14px;padding:12px 16px;border-radius:16px;font-size:1.05rem;font-weight:900;text-align:center;display:none}
+.feedback-banner.ok{display:block;background:#dcfce7;border:3px solid #22c55e;color:#166534}
+.feedback-banner.err{display:block;background:#ffe4e6;border:3px solid #f43f5e;color:#9f1239}
+.xp-pop{position:fixed;top:18%;left:50%;transform:translateX(-50%);font-size:2.2rem;font-weight:900;color:#16a34a;text-shadow:0 3px 0 #ffffff,0 6px 15px rgba(22,163,74,0.5);pointer-events:none;animation:popUp 0.9s ease-out forwards;z-index:999}
+.confetti-piece{position:fixed;font-size:1.9rem;pointer-events:none;z-index:998;animation:fallDown 1.35s ease-out forwards}
+.final-screen{display:none;text-align:center}
+.trophy-big{font-size:5rem;display:inline-block;animation:bounce 1.3s infinite}
+.win-heading{font-size:2.1rem;font-weight:900;color:#ff006e;text-shadow:2px 2px 0 #fde047;margin:8px 0}
+.stats-box{display:flex;justify-content:space-around;gap:12px;background:#f0f9ff;border:3px solid #38bdf8;border-radius:22px;padding:18px;margin:18px 0;flex-wrap:wrap}
+.stats-box h3{font-size:1.9rem;color:#0284c7;font-weight:900}
+.stats-box p{font-size:0.95rem;color:#475569;font-weight:800}
+.status-text{font-size:1.05rem;font-weight:900;min-height:26px;margin-top:8px}
+.replay-btn{margin-top:18px;padding:16px 36px;border:none;border-radius:22px;background:linear-gradient(90deg,#3a86ff,#8338ec);color:#fff;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 7px 0 #3f37c9;transition:transform 0.2s ease}
+.replay-btn:hover{transform:scale(1.05)}
+@keyframes wobble{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-1.5deg)}50%{transform:translateX(8px) rotate(1.5deg)}75%{transform:translateX(-5px)}}
+@keyframes popUp{0%{opacity:1;transform:translate(-50%,0) scale(0.8)}100%{opacity:0;transform:translate(-50%,-75px) scale(1.3)}}
+@keyframes fallDown{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(250px) rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class=quest-container>
+<div class=header-bar>
+<div class=stage-badge id=stageBadge>Part 1: Story Quest (9 Gaps)</div>
+<div class=xp-pill id=xpPill>XP: <span id=xpVal>0</span></div>
+</div>
+<div class=progress-wrap><div class=progress-fill id=progressFill></div></div>
+<div class=title-banner>
+<h1>Sunny Park Story Quest</h1>
+<p>Choose have got or has got for every friend in the story!</p>
+</div>
+<div id=part1Screen>
+<div class=story-card id=storyContainer></div>
+<div class=btn-row>
+<button class=action-btn btn-check id=checkStoryBtn onclick=checkStory()>Check Story</button>
+<button class=action-btn btn-next id=toPart2Btn onclick=startPart2()>Next: Sentence Builder</button>
+</div>
+<div class=feedback-banner id=part1Feedback></div>
+</div>
+<div id=part2Screen class=builder-stage>
+<div class=prompt-card>
+<div class=prompt-emoji id=builderEmoji></div>
+<div class=prompt-clues id=builderClues>he / a blue skateboard</div>
+</div>
+<div class=answer-tray id=answerTray><span class=tray-placeholder>Tap words below to build your sentence...</span></div>
+<div class=word-bank id=wordBank></div>
+<div class=btn-row>
+<button class=action-btn btn-reset id=resetSentenceBtn onclick=resetCurrentSentence()>Reset</button>
+<button class=action-btn btn-check id=checkSentenceBtn onclick=checkSentence()>Check</button>
+<button class=action-btn btn-next id=nextSentenceBtn onclick=nextSentence()>Next Sentence</button>
+</div>
+<div class=feedback-banner id=part2Feedback></div>
+</div>
+<div id=finalScreen class=final-screen>
+<div class=trophy-big>🏆</div>
+<div class=win-heading>Grammar Superstar!</div>
+<p>You mastered have got and has got!</p>
+<div class=stats-box>
+<div class=stat-box><h3 id=finalScore>0 / 16</h3><p>Correct Answers</p></div>
+<div class=stat-box><h3 id=finalXP>0 XP</h3><p>Total XP</p></div>
+</div>
+<div class=status-text id=googleStatus>Sending results...</div>
+<button class=replay-btn onclick=restartQuest()>Play Again</button>
+</div>
+</div>
+<script>
+const TEST_NAME=`Have Got and Has Got Story Quest (Kids)`;
+let userMistakes=[];
+const storyItems=[
+{id:1,prefix:`1. Look! Mia `,answer:`has got`,suffix:` a funny robot!`},
+{id:2,prefix:`2. Leo and Sam `,answer:`have got`,suffix:` a cute puppy!`},
+{id:3,prefix:`3. Toby `,answer:`has got`,suffix:` a bright yellow guitar!`},
+{id:4,prefix:`4. We `,answer:`have got`,suffix:` a big treehouse in the garden!`},
+{id:5,prefix:`5. My puppy `,answer:`has got`,suffix:` a little black nose!`},
+{id:6,prefix:`6. I `,answer:`have got`,suffix:` a fast green scooter!`},
+{id:7,prefix:`7. My coach `,answer:`has got`,suffix:` a shiny red whistle!`},
+{id:8,prefix:`8. You `,answer:`have got`,suffix:` a super cool backpack!`},
+{id:9,prefix:`9. Chloe and Lily `,answer:`have got`,suffix:` curly brown hair!`},
+];
+const sentenceTasks=[
+{emoji:`🏡`,clues:`she / a flat / in Paris`,words:[`She`,`has got`,`a flat`,`in Paris.`],correct:`She has got a flat in Paris.`},
+{emoji:`👶`,clues:`I / a baby sister`,words:[`I`,`have got`,`a baby sister.`],correct:`I have got a baby sister.`},
+{emoji:`🌻`,clues:`his house / a big balcony`,words:[`His house`,`has got`,`a big balcony.`],correct:`His house has got a big balcony.`},
+{emoji:`🚲`,clues:`she / a blue bike`,words:[`She`,`has got`,`a blue bike.`],correct:`She has got a blue bike.`},
+{emoji:`🤡`,clues:`Ben / a funny hat`,words:[`Ben`,`has got`,`a funny hat.`],correct:`Ben has got a funny hat.`},
+{emoji:`🐰`,clues:`Anna and Max / a white rabbit`,words:[`Anna and Max`,`have got`,`a white rabbit.`],correct:`Anna and Max have got a white rabbit.`},
+{emoji:`🏕️`,clues:`We / a cozy cabin / near the lake`,words:[`We`,`have got`,`a cozy cabin`,`near the lake.`],correct:`We have got a cozy cabin near the lake.`},
+];
+let totalScore=0,totalXP=0,part1SolvedMap={},currentBuilderIdx=0,builderFirstTry=true,builderSolved=false,selectedChunks=[];
+const xpVal=document.getElementById(`xpVal`);
+const xpPill=document.getElementById(`xpPill`);
+const progressFill=document.getElementById(`progressFill`);
+const stageBadge=document.getElementById(`stageBadge`);
+function shuffle(arr){
+const copy=arr.slice();
+for(let i=copy.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[copy[i],copy[j]]=[copy[j],copy[i]];
+}
+return copy;
+}
+function addXP(amount,anchorEl){
+totalXP+=amount;
+xpVal.textContent=totalXP;
+xpPill.classList.add(`bump`);
+setTimeout(function(){xpPill.classList.remove(`bump`);},300);
+const pop=document.createElement(`div`);
+pop.className=`xp-pop`;
+pop.textContent=`+${amount} XP!`;
+document.body.appendChild(pop);
+setTimeout(function(){pop.remove();},900);
+if(anchorEl){
+const icons=[`⭐`,`🎉`,`✨`,`🎈`,`🌟`];
+const rect=anchorEl.getBoundingClientRect();
+for(let i=0;i<6;i++){
+const conf=document.createElement(`div`);
+conf.className=`confetti-piece`;
+conf.textContent=icons[Math.floor(Math.random()*icons.length)];
+conf.style.left=`${rect.left + rect.width / 2 + (Math.random() * 140 - 70)}px`;
+conf.style.top=`${rect.top}px`;
+document.body.appendChild(conf);
+setTimeout(function(){conf.remove();},1350);
+}
+}
+}
+function updateOverallProgress(){
+const solvedPart1=Object.keys(part1SolvedMap).length;
+const totalItems=storyItems.length+sentenceTasks.length;
+const completed=solvedPart1+currentBuilderIdx+(builderSolved?1:0);
+progressFill.style.width=`${Math.min(100,(completed/totalItems)*100)}%`;
+}
+function initPart1(){
+const container=document.getElementById(`storyContainer`);
+container.innerHTML=``;
+part1SolvedMap={};
+storyItems.forEach(function(item){
+const line=document.createElement(`div`);
+line.className=`story-line`;
+const opts=shuffle([`have got`,`has got`]);
+line.innerHTML=`${item.prefix} <select class=story-select id=sel_${item.id} onchange=clearSelectError(this)> <option value=0>Choose...</option> <option value=${opts[0]}>${opts[0]}</option> <option value=${opts[1]}>${opts[1]}</option> </select> ${item.suffix}`;
+container.appendChild(line);
+});
+}
+function clearSelectError(sel){
+sel.classList.remove(`wrong`);
+}
+function checkStory(){
+let allFilled=true,newlySolvedCount=0,hasErrors=false;
+storyItems.forEach(function(item){
+const sel=document.getElementById(`sel_${item.id}`);
+if(sel.value===`0`){allFilled=false;sel.classList.add(`wrong`);return;}
+if(part1SolvedMap[item.id])return;
+if(sel.value===item.answer){
+part1SolvedMap[item.id]=true;
+sel.classList.remove(`wrong`);
+sel.classList.add(`correct`);
+sel.disabled=true;
+totalScore++;
+newlySolvedCount++;
+}else{
+hasErrors=true;
+sel.classList.remove(`correct`);
+sel.classList.add(`wrong`);
+userMistakes.push(`${item.id}: ${sel.value}`);
+}
+});
+if(newlySolvedCount>0){
+addXP(newlySolvedCount*10,document.getElementById(`checkStoryBtn`));
+}
+updateOverallProgress();
+const fb=document.getElementById(`part1Feedback`);
+if(!allFilled){
+fb.className=`feedback-banner err`;
+fb.textContent=`Pick have got or has got in every box first!`;
+return;
+}
+if(hasErrors){
+fb.className=`feedback-banner err`;
+fb.textContent=`Some boxes are red! Fix them and click Check Story again!`;
+}else{
+fb.className=`feedback-banner ok`;
+fb.textContent=`All 9 story sentences are super! Ready for Part 2!`;
+document.getElementById(`checkStoryBtn`).style.display=`none`;
+document.getElementById(`toPart2Btn`).style.display=`block`;
+}
+}
+function startPart2(){
+document.getElementById(`part1Screen`).style.display=`none`;
+document.getElementById(`part2Screen`).style.display=`block`;
+stageBadge.textContent=`Part 2: Sentence Builder (7 Sentences)`;
+currentBuilderIdx=0;
+loadBuilderTask();
+}
+function loadBuilderTask(){
+const task=sentenceTasks[currentBuilderIdx];
+builderFirstTry=true;
+builderSolved=false;
+selectedChunks=[];
+document.getElementById(`builderCounter`).textContent=`Sentence ${currentBuilderIdx + 1} / ${sentenceTasks.length} · Tap the words in order!`;
+document.getElementById(`builderEmoji`).textContent=task.emoji;
+document.getElementById(`builderClues`).textContent=task.clues;
+const fb=document.getElementById(`part2Feedback`);
+fb.className=`feedback-banner`;
+fb.style.display=`none`;
+document.getElementById(`resetSentenceBtn`).style.display=`block`;
+document.getElementById(`checkSentenceBtn`).style.display=`block`;
+document.getElementById(`nextSentenceBtn`).style.display=`none`;
+const tray=document.getElementById(`answerTray`);
+tray.className=`answer-tray`;
+tray.innerHTML=`<span class=tray-placeholder>Tap words below to build your sentence...</span>`;
+const bank=document.getElementById(`wordBank`);
+bank.innerHTML=``;
+shuffle(task.words).forEach(function(word){
+const chip=document.createElement(`button`);
+chip.className=`word-chip`;
+chip.textContent=word;
+chip.onclick=function(){toggleChip(chip,word);};
+bank.appendChild(chip);
+});
+updateOverallProgress();
+}
+function toggleChip(chipEl,word){
+if(builderSolved)return;
+const tray=document.getElementById(`answerTray`);
+const bank=document.getElementById(`wordBank`);
+tray.classList.remove(`wrong-tray`);
+if(chipEl.parentElement===bank){
+const placeholder=tray.querySelector(`.tray-placeholder`);
+if(placeholder)placeholder.remove();
+chipEl.classList.add(`in-tray`);
+tray.appendChild(chipEl);
+}else{
+chipEl.classList.remove(`in-tray`);
+bank.appendChild(chipEl);
+if(tray.children.length===0){
+tray.innerHTML=`<span class=tray-placeholder>Tap words below to build your sentence...</span>`;
+}
+}
+}
+function resetCurrentSentence(){
+if(builderSolved)return;
+const tray=document.getElementById(`answerTray`);
+const bank=document.getElementById(`wordBank`);
+const chips=Array.from(tray.querySelectorAll(`.word-chip`));
+chips.forEach(function(c){
+c.classList.remove(`in-tray`);
+bank.appendChild(c);
+});
+tray.className=`answer-tray`;
+tray.innerHTML=`<span class=tray-placeholder>Tap words below to build your sentence...</span>`;
+document.getElementById(`part2Feedback`).style.display=`none`;
+}
+function checkSentence(){
+if(builderSolved)return;
+const task=sentenceTasks[currentBuilderIdx];
+const tray=document.getElementById(`answerTray`);
+const builtWords=Array.from(tray.querySelectorAll(`.word-chip`)).map(function(c){return c.textContent;});
+const builtSentence=builtWords.join(` `);
+const fb=document.getElementById(`part2Feedback`);
+if(builtWords.length<task.words.length){
+fb.className=`feedback-banner err`;
+fb.textContent=`Use all the word blocks to finish the sentence!`;
+return;
+}
+if(builtSentence===task.correct){
+builderSolved=true;
+tray.className=`answer-tray correct-tray`;
+tray.querySelectorAll(`.word-chip`).forEach(function(c){c.disabled=true;});
+if(builderFirstTry){totalScore++;}
+addXP(10,document.getElementById(`checkSentenceBtn`));
+updateOverallProgress();
+fb.className=`feedback-banner ok`;
+fb.innerHTML=`Awesome! <b>${task.correct}</b> ⭐`;
+fb.style.display=`block`;
+document.getElementById(`resetSentenceBtn`).style.display=`none`;
+document.getElementById(`checkSentenceBtn`).style.display=`none`;
+const nextBtn=document.getElementById(`nextSentenceBtn`);
+nextBtn.textContent= currentBuilderIdx === sentenceTasks.length - 1 ? `Finish the Quest!` : `Next Sentence`;
+nextBtn.style.display=`block`;
+}else{
+builderFirstTry=false;
+tray.className=`answer-tray wrong-tray`;
+userMistakes.push(builtSentence);
+fb.className=`feedback-banner err`;
+fb.textContent=`Not quite right! Tap a word to move it back and try again!`;
+fb.style.display=`block`;
+}
+}
+function nextSentence(){
+currentBuilderIdx++;
+if(currentBuilderIdx<sentenceTasks.length){loadBuilderTask();}else{showVictory();}
+}
+function showVictory(){
+progressFill.style.width=`100%`;
+document.getElementById(`part2Screen`).style.display=`none`;
+document.getElementById(`finalScreen`).style.display=`block`;
+stageBadge.textContent=`Quest Complete!`;
+const maxQuestions=storyItems.length+sentenceTasks.length;
+document.getElementById(`finalScore`).textContent=`${totalScore} / ${maxQuestions}`;
+document.getElementById(`finalXP`).textContent=`${totalXP} XP`;
+sendResultsToGoogle();
+}
+function sendResultsToGoogle(){
+const url=`https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec`;
+const params=new URLSearchParams();
+params.append(`name`,TEST_NAME);
+params.append(`score`,totalScore);
+params.append(`total`,storyItems.length+sentenceTasks.length);
+params.append(`mistakes`,userMistakes.join(`, `));
+fetch(url,{method:`POST`,mode:`no-cors`,body:params})
+.then(function(){
+const st=document.getElementById(`googleStatus`);
+st.textContent=`Results sent successfully!`;
+st.style.color=`#16a34a`;
+})
+.catch(function(){
+const st=document.getElementById(`googleStatus`);
+st.textContent=`Offline mode: results saved locally.`;
+st.style.color=`#facc15`;
+});
+}
+function restartQuest(){
+totalScore=0;
+totalXP=0;
+userMistakes=[];
+currentBuilderIdx=0;
+builderSolved=false;
+xpVal.textContent=`0`;
+progressFill.style.width=`0%`;
+stageBadge.textContent=`Part 1: Story Quest (9 Gaps)`;
+document.getElementById(`finalScreen`).style.display=`none`;
+document.getElementById(`part2Screen`).style.display=`none`;
+document.getElementById(`part1Screen`).style.display=`block`;
+document.getElementById(`part1Feedback`).style.display=`none`;
+document.getElementById(`checkStoryBtn`).style.display=`block`;
+document.getElementById(`toPart2Btn`).style.display=`none`;
+initPart1();
+}
+initPart1();
+</script>
+</body>
+</html>

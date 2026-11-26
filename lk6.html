@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toy & Birthday Hero! 🎉</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 30%, #a1c4fd 70%, #c2e9fb 100%);
+      color: #1e293b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .game-box {
+      width: 100%;
+      max-width: 720px;
+      background: #ffffff;
+      border: 5px solid #ffd166;
+      border-radius: 34px;
+      padding: 26px;
+      box-shadow: 0 20px 45px rgba(255, 107, 107, 0.25), 0 10px 0 #f4a261;
+      position: relative;
+    }
+
+    /* Top Header */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .level-tag {
+      background: linear-gradient(90deg, #ff6b6b, #ff9f1c);
+      color: #ffffff;
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 0 #d62828;
+    }
+
+    .xp-badge {
+      background: #fff3b0;
+      border: 3px solid #ffbe0b;
+      color: #d97706;
+      padding: 7px 18px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.25s ease;
+    }
+
+    .xp-badge.bump {
+      transform: scale(1.18) rotate(-3deg);
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 16px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 2px solid #cbd5e1;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #06d6a0, #118ab2, #ffbe0b, #ef476f);
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .q-counter {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .instruction {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #0f172a;
+      margin-bottom: 16px;
+    }
+
+    /* Visual Scene Card */
+    .visual-stage {
+      background: linear-gradient(135deg, #e0fbfc, #edf2fb);
+      border: 3px dashed #3a86ff;
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: inset 0 4px 10px rgba(58, 134, 255, 0.1);
+    }
+
+    .emoji-showcase {
+      font-size: 3.6rem;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .distance-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .dist-near {
+      background: #d8f3dc;
+      color: #1b4332;
+      border: 2px solid #52b788;
+    }
+
+    .dist-far {
+      background: #ffe5ec;
+      color: #800f2f;
+      border: 2px solid #ff758f;
+    }
+
+    .sentence-display {
+      font-size: 1.38rem;
+      font-weight: 800;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    .blank-pill {
+      display: inline-block;
+      min-width: 92px;
+      padding: 2px 14px;
+      margin: 0 4px;
+      border-bottom: 4px dashed #ff6b6b;
+      color: #ff6b6b;
+      background: #fff0f3;
+      border-radius: 12px;
+      font-weight: 900;
+    }
+
+    .blank-pill.done {
+      border-bottom: 4px solid #06d6a0;
+      color: #047857;
+      background: #d1fae5;
+    }
+
+    /* Buttons Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .options-grid.one-col {
+      grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 500px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+      .sentence-display {
+        font-size: 1.2rem;
+      }
+    }
+
+    .opt-btn {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border: 3px solid #94a3b8;
+      color: #1e293b;
+      font-size: 1.2rem;
+      font-weight: 900;
+      padding: 16px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 6px 0 #94a3b8;
+    }
+
+    .opt-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      border-color: #3a86ff;
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+      color: #0369a1;
+      box-shadow: 0 9px 0 #3a86ff;
+    }
+
+    .opt-btn:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 #3a86ff;
+    }
+
+    .opt-btn.correct {
+      background: linear-gradient(180deg, #34d399 0%, #10b981 100%) !important;
+      border-color: #047857 !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 0 #065f46 !important;
+    }
+
+    .opt-btn.wrong {
+      background: linear-gradient(180deg, #fb7185 0%, #e11d48 100%) !important;
+      border-color: #9f1239 !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 0 #881337 !important;
+      animation: wobble 0.4s ease;
+    }
+
+    .opt-btn:disabled {
+      cursor: default;
+      opacity: 0.8;
+    }
+
+    /* Feedback & Next Button */
+    .feedback-msg {
+      margin-top: 18px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: none;
+      text-align: center;
+    }
+
+    .feedback-msg.win {
+      display: block;
+      background: #d1fae5;
+      border: 3px solid #10b981;
+      color: #065f46;
+    }
+
+    .feedback-msg.lose {
+      display: block;
+      background: #ffe4e6;
+      border: 3px solid #f43f5e;
+      color: #9f1239;
+    }
+
+    .next-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 22px;
+      background: linear-gradient(90deg, #ff6b6b, #ff9f1c, #06d6a0);
+      color: #ffffff;
+      font-size: 1.25rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 7px 0 #d97706;
+      transition: transform 0.2s ease;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Floating XP & Confetti */
+    .xp-pop {
+      position: fixed;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #10b981;
+      text-shadow: 0 3px 0 #ffffff, 0 6px 15px rgba(16, 185, 129, 0.5);
+      pointer-events: none;
+      animation: popUp 0.9s ease-out forwards;
+      z-index: 999;
+    }
+
+    .confetti-star {
+      position: fixed;
+      font-size: 2rem;
+      pointer-events: none;
+      z-index: 998;
+      animation: dropConfetti 1.35s ease-out forwards;
+    }
+
+    /* Final Victory Screen */
+    .final-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .trophy-big {
+      font-size: 5rem;
+      display: inline-block;
+      animation: bounce 1.3s infinite;
+    }
+
+    .hero-heading {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #ff6b6b;
+      text-shadow: 2px 2px 0 #ffd166;
+      margin: 8px 0;
+    }
+
+    .can-do-card {
+      background: #fffbeb;
+      border: 3px solid #fcd34d;
+      border-radius: 22px;
+      padding: 16px 20px;
+      text-align: left;
+      margin: 16px 0;
+    }
+
+    .can-do-card h4 {
+      color: #d97706;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .can-do-card ul {
+      list-style: none;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1.65;
+    }
+
+    .score-summary {
+      display: flex;
+      justify-content: space-around;
+      gap: 12px;
+      background: #f0f9ff;
+      border: 3px solid #7dd3fc;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .score-summary h3 {
+      font-size: 1.8rem;
+      color: #0284c7;
+      font-weight: 900;
+    }
+
+    .score-summary p {
+      font-size: 0.9rem;
+      color: #475569;
+      font-weight: 800;
+    }
+
+    .status-text {
+      font-size: 1.05rem;
+      font-weight: 900;
+      min-height: 26px;
+      margin-top: 8px;
+    }
+
+    .replay-btn {
+      margin-top: 16px;
+      padding: 16px 36px;
+      border: none;
+      border-radius: 22px;
+      background: linear-gradient(90deg, #3a86ff, #8338ec);
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 7px 0 #3f37c9;
+      transition: transform 0.2s ease;
+    }
+
+    .replay-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes wobble {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px) rotate(-2deg); }
+      50% { transform: translateX(8px) rotate(2deg); }
+      75% { transform: translateX(-5px); }
+    }
+
+    @keyframes popUp {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
+      100% { opacity: 0; transform: translate(-50%, -75px) scale(1.3); }
+    }
+
+    @keyframes dropConfetti {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(250px) rotate(360deg); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-box">
+    <!-- QUIZ SCREEN -->
+    <div id="quizScreen">
+      <div class="top-bar">
+        <div class="level-tag" id="levelTag">🧸 Level 1: Toy Shop</div>
+        <div class="xp-badge" id="xpBadge">⭐ XP: <span id="xpVal">0</span></div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="q-counter">
+        <span id="stepText">Question 1 / 17</span>
+        <span>+10 XP</span>
+      </div>
+
+      <div class="instruction" id="instructionText">Look and choose the right toy!</div>
+
+      <div class="visual-stage">
+        <div class="emoji-showcase" id="emojiBox">🧸</div>
+        <div id="distanceHolder"></div>
+        <div class="sentence-display" id="sentenceText">Loading...</div>
+      </div>
+
+      <div class="options-grid" id="optionsGrid"></div>
+
+      <div class="feedback-msg" id="feedbackMsg"></div>
+
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT! 🚀</button>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="finalScreen" class="final-screen">
+      <div class="trophy-big">🏆</div>
+      <h1 class="hero-heading">TOY & BIRTHDAY HERO!</h1>
+      
+      <div class="score-summary">
+        <div>
+          <h3 id="finalScore">0 / 17</h3>
+          <p>First-Try Stars</p>
+        </div>
+        <div>
+          <h3 id="finalXP">0 XP</h3>
+          <p>Total XP</p>
+        </div>
+      </div>
+
+      <div class="can-do-card">
+        <h4>🌟 Now I can:</h4>
+        <ul>
+          <li>✅ say the names of some toys</li>
+          <li>✅ use this, these, that & those</li>
+          <li>✅ count from 1 to 50</li>
+          <li>✅ wish Happy Birthday & give presents</li>
+        </ul>
+      </div>
+
+      <div id="googleStatus" class="status-text">Sending results... ⏳</div>
+
+      <button class="replay-btn" onclick="restartQuiz()">NEW MISSION 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const TEST_NAME = "Toys, Demonstratives & Numbers Quiz (Kids)";
+    let userMistakes = [];
+    const tasks = [
+      // PART 1: Look and choose the toy (5 questions)
+      {
+        level: "🧸 Level 1: Toy Words",
+        instruction: "👀 Look at the picture and pick the right word!",
+        emoji: "🥁",
+        distance: "",
+        sentence: "Look! It's a yellow ___!",
+        correct: "drum",
+        options: ["drum", "puppet", "kite", "robot"],
+        layout: "two"
+      },
+      {
+        level: "🧸 Level 1: Toy Words",
+        instruction: "👀 Look at the picture and pick the right word!",
+        emoji: "🚀",
+        distance: "",
+        sentence: "Fly up high in a space ___!",
+        correct: "rocket",
+        options: ["rocket", "helicopter", "boat", "train"],
+        layout: "two"
+      },
+      {
+        level: "🧸 Level 1: Toy Words",
+        instruction: "👀 Look at the picture and pick the right word!",
+        emoji: "🛴",
+        distance: "",
+        sentence: "I ride my fast ___ in the park!",
+        correct: "scooter",
+        options: ["scooter", "bus", "lorry", "car"],
+        layout: "two"
+      },
+      {
+        level: "🧸 Level 1: Toy Words",
+        instruction: "👀 Look at the picture and pick the right word!",
+        emoji: "⛵",
+        distance: "",
+        sentence: "Look at the blue ___ on the water!",
+        correct: "boat",
+        options: ["boat", "train", "plane", "bike"],
+        layout: "two"
+      },
+      {
+        level: "🧸 Level 1: Toy Words",
+        instruction: "👀 Look at the picture and pick the right word!",
+        emoji: "🤖",
+        distance: "",
+        sentence: "My new toy ___ can walk and talk!",
+        correct: "robot",
+        options: ["robot", "doll", "guitar", "teddy"],
+        layout: "two"
+      },
+      // PART 2: this, these, that, those (5 questions)
+      {
+        level: "👉 Level 2: This / These / That / Those",
+        instruction: "👀 Look! Near or far? One or many?",
+        emoji: "🧸🧸",
+        distance: "near",
+        distanceText: "👇 -->",
+        sentence: "___ teddy bears are for my little sister!",
+        correct: "These",
+        options: ["These", "This", "That", "Those"],
+        layout: "two"
+      },
+      {
+        level: "👉 Level 2: This / These / That / Those",
+        instruction: "👀 Look! Near or far? One or many?",
+        emoji: "⚽⚽⚽",
+        distance: "far",
+        distanceText: "👉 ------------->",
+        sentence: "___ footballs are for my big brother!",
+        correct: "Those",
+        options: ["Those", "These", "This", "That"],
+        layout: "two"
+      },
+      {
+        level: "👉 Level 2: This / These / That / Those",
+        instruction: "👀 Look! Near or far? One or many?",
+        emoji: "🛹",
+        distance: "near",
+        distanceText: "👇 -->",
+        sentence: "___ skateboard is super cool!",
+        correct: "This",
+        options: ["This", "These", "That", "Those"],
+        layout: "two"
+      },
+      {
+        level: "👉 Level 2: This / These / That / Those",
+        instruction: "👀 Look! Near or far? One or many?",
+        emoji: "🪁🪁",
+        distance: "far",
+        distanceText: "👉 ------------->",
+        sentence: "___ kites in the sky are super!",
+        correct: "Those",
+        options: ["Those", "This", "That", "These"],
+        layout: "two"
+      },
+      {
+        level: "👉 Level 2: This / These / That / Those",
+        instruction: "👀 Look! Near or far? One or many?",
+        emoji: "🏰",
+        distance: "far",
+        distanceText: "👉 -------------->",
+        sentence: "___ toy castle is great!",
+        correct: "That",
+        options: ["That", "This", "These", "Those"],
+        layout: "two"
+      },
+      // PART 3: Count and find the numbers (3 questions)
+      {
+        level: "🔢 Level 3: Number Magic (1–50)",
+        instruction: "🧮 Count and find the right number!",
+        emoji: "🔢➕✨",
+        distance: "",
+        sentence: "thirty + seven = ___",
+        correct: "37",
+        options: ["37", "33", "47", "27"],
+        layout: "two"
+      },
+      {
+        level: "🔢 Level 3: Number Magic (1–50)",
+        instruction: "🧮 Count and find the right number!",
+        emoji: "🧮🎈✨",
+        distance: "",
+        sentence: "twenty-six + fifteen = ___",
+        correct: "41",
+        options: ["41", "31", "45", "39"],
+        layout: "two"
+      },
+      {
+        level: "🔢 Level 3: Number Magic (1–50)",
+        instruction: "🧮 Count and find the right number!",
+        emoji: "🎲🎯✨",
+        distance: "",
+        sentence: "nineteen + seventeen = ___",
+        correct: "36",
+        options: ["36", "34", "26", "46"],
+        layout: "two"
+      },
+      // PART 4: Match exchanges (4 questions)
+      {
+        level: "🎂 Level 4: Birthday Party Chat",
+        instruction: "💬 Pick the best answer!",
+        emoji: "🎁🎁",
+        distance: "",
+        sentence: "🗣️ \"What are those?\"",
+        correct: "They're toy cars!",
+        options: [
+          "They're toy cars!",
+          "Open it and see!",
+          "Oh, thank you!"
+        ],
+        layout: "one"
+      },
+      {
+        level: "🎂 Level 4: Birthday Party Chat",
+        instruction: "💬 Pick the best answer!",
+        emoji: "🚲✨",
+        distance: "",
+        sentence: "🗣️ \"Look at this new bike!\"",
+        correct: "It's really cool!",
+        options: [
+          "It's really cool!",
+          "They're teddy bears!",
+          "Open it and see!"
+        ],
+        layout: "one"
+      },
+      {
+        level: "🎂 Level 4: Birthday Party Chat",
+        instruction: "💬 Pick the best answer!",
+        emoji: "🎂🎉",
+        distance: "",
+        sentence: "🗣️ \"Happy Birthday! Here's your present!\"",
+        correct: "Oh, thank you!",
+        options: [
+          "Oh, thank you!",
+          "They're really cool!",
+          "Open it and see!"
+        ],
+        layout: "one"
+      },
+      {
+        level: "🎂 Level 4: Birthday Party Chat",
+        instruction: "💬 Pick the best answer!",
+        emoji: "📦❓",
+        distance: "",
+        sentence: "🗣️ \"What's in the box?\"",
+        correct: "Open it and see!",
+        options: [
+          "Open it and see!",
+          "Oh, thank you!",
+          "They're really cool!"
+        ],
+        layout: "one"
+      }
+    ];
+
+    let currentIdx = 0;
+    let firstTryScore = 0;
+    let xp = 0;
+    let hadMistake = false;
+    let isSolved = false;
+
+    const levelTag = document.getElementById("levelTag");
+    const xpVal = document.getElementById("xpVal");
+    const xpBadge = document.getElementById("xpBadge");
+    const progressBar = document.getElementById("progressBar");
+    const stepText = document.getElementById("stepText");
+    const instructionText = document.getElementById("instructionText");
+    const emojiBox = document.getElementById("emojiBox");
+    const distanceHolder = document.getElementById("distanceHolder");
+    const sentenceText = document.getElementById("sentenceText");
+    const optionsGrid = document.getElementById("optionsGrid");
+    const feedbackMsg = document.getElementById("feedbackMsg");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function renderQuestion() {
+      const q = tasks[currentIdx];
+      hadMistake = false;
+      isSolved = false;
+      levelTag.textContent = q.level;
+      stepText.textContent = `Question ${currentIdx + 1} / ${tasks.length}`;
+      progressBar.style.width = `${(currentIdx / tasks.length) * 100}%`;
+      instructionText.textContent = q.instruction;
+      emojiBox.textContent = q.emoji;
+      
+      if (q.distance === "near") {
+        distanceHolder.innerHTML = `<div class="distance-badge dist-near">${q.distanceText}</div>`;
+      } else if (q.distance === "far") {
+        distanceHolder.innerHTML = `<div class="distance-badge dist-far">${q.distanceText}</div>`;
+      } else {
+        distanceHolder.innerHTML = "";
+      }
+      
+      sentenceText.innerHTML = q.sentence.replace("___", `<span class="blank-pill" id="blankSlot">?</span>`);
+      feedbackMsg.className = "feedback-msg";
+      feedbackMsg.style.display = "none";
+      nextBtn.style.display = "none";
+      optionsGrid.className = q.layout === "one" ? "options-grid one-col" : "options-grid";
+      optionsGrid.innerHTML = "";
+      
+      shuffle(q.options).forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt, btn);
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(chosen, btn) {
+      if (isSolved) return;
+      const q = tasks[currentIdx];
+      if (chosen === q.correct) {
+        isSolved = true;
+        btn.classList.add("correct");
+        if (!hadMistake) {
+          firstTryScore++;
+        }
+        xp += 10;
+        xpVal.textContent = xp;
+        xpBadge.classList.add("bump");
+        setTimeout(() => xpBadge.classList.remove("bump"), 300);
+        
+        const blankSlot = document.getElementById("blankSlot");
+        if (blankSlot) {
+          blankSlot.textContent = chosen;
+          blankSlot.classList.add("done");
+        }
+        
+        feedbackMsg.className = "feedback-msg win";
+        feedbackMsg.textContent = "🎉 Super! Great job! ⭐";
+        feedbackMsg.style.display = "block";
+        document.querySelectorAll(".opt-btn").forEach((b) => (b.disabled = true));
+        celebrate(btn);
+        
+        nextBtn.textContent = currentIdx === tasks.length - 1 ? "FINISH MISSION! 🏆" : "NEXT! 🚀";
+        nextBtn.style.display = "block";
+      } else {
+        hadMistake = true;
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        userMistakes.push(chosen);
+        feedbackMsg.className = "feedback-msg lose";
+        feedbackMsg.textContent = "🙈 Oops! Try again!";
+        feedbackMsg.style.display = "block";
+      }
+    }
+
+    function celebrate(btn) {
+      const pop = document.createElement("div");
+      pop.className = "xp-pop";
+      pop.textContent = "+10 XP! 🌟";
+      document.body.appendChild(pop);
+      setTimeout(() => pop.remove(), 900);
+      
+      const icons = ["🎈", "🎉", "⭐", "🎁", "✨"];
+      const rect = btn.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const star = document.createElement("div");
+        star.className = "confetti-star";
+        star.textContent = icons[Math.floor(Math.random() * icons.length)];
+        star.style.left = `${rect.left + rect.width / 2 + (Math.random() * 160 - 80)}px`;
+        star.style.top = `${rect.top}px`;
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 1350);
+      }
+    }
+
+    function nextQuestion() {
+      currentIdx++;
+      if (currentIdx < tasks.length) {
+        renderQuestion();
+      } else {
+        showFinalScreen();
+      }
+    }
+
+    function showFinalScreen() {
+      progressBar.style.width = "100%";
+      document.getElementById("quizScreen").style.display = "none";
+      document.getElementById("finalScreen").style.display = "block";
+      document.getElementById("finalScore").textContent = `${firstTryScore} / ${tasks.length}`;
+      document.getElementById("finalXP").textContent = `${xp} XP`;
+      sendResultsToGoogle();
+    }
+
+    function sendResultsToGoogle() {
+      const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+      const params = new URLSearchParams();
+      params.append("name", TEST_NAME);
+      params.append("score", firstTryScore);
+      params.append("total", tasks.length);
+      params.append("mistakes", userMistakes.join(", "));
+      
+      fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params
+      })
+      .then(() => {
+        const st = document.getElementById("googleStatus");
+        st.textContent = "Results sent successfully! ✅";
+        st.style.color = "#16a34a";
+      })
+      .catch(() => {
+        const st = document.getElementById("googleStatus");
+        st.textContent = "Offline mode: results saved locally.";
+        st.style.color = "#f59e0b";
+      });
+    }
+
+    function restartQuiz() {
+      currentIdx = 0;
+      firstTryScore = 0;
+      xp = 0;
+      userMistakes = [];
+      xpVal.textContent = "0";
+      document.getElementById("finalScreen").style.display = "none";
+      document.getElementById("quizScreen").style.display = "block";
+      renderQuestion();
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
