@@ -1,800 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grammar Hero · Word Formation & Past Perfect</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop Dialogue: English Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #1a202c;
+            --accent-green: #38a169;
+            --accent-red: #e53e3e;
+            --accent-yellow: #d69e2e;
+            --accent-blue: #3182ce;
+            --bg-light: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border-color: #cbd5e0;
+        }
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 50%, #fce7f3 100%);
-      color: #1e293b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 18px;
-      overflow-x: hidden;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .app-card {
-      width: 100%;
-      max-width: 720px;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 2px solid #ffffff;
-      border-radius: 30px;
-      padding: 28px;
-      box-shadow: 0 24px 50px rgba(99, 102, 241, 0.18), 0 8px 20px rgba(236, 72, 153, 0.12);
-      position: relative;
-      transition: all 0.3s ease;
-    }
+        body {
+            background-color: var(--bg-light);
+            background-image: radial-gradient(circle at 50% 0%, #ffffff 0%, #e2e8f0 100%);
+            color: var(--text-main);
+            font-family: 'Exo 2', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-    /* Top Bar */
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
+        .tablet {
+            width: 100%;
+            max-width: 680px;
+            border: 8px solid var(--primary-dark);
+            border-radius: 16px;
+            background: var(--card-bg);
+            padding: 28px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
 
-    .level-pill {
-      background: linear-gradient(90deg, #6366f1, #ec4899);
-      color: #ffffff;
-      padding: 8px 18px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 0.9rem;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
-    }
+        .tablet::before {
+            content: 'WORKSHOP COMMS v3.1';
+            position: absolute;
+            top: -14px;
+            left: 20px;
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 2px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border-radius: 4px;
+        }
 
-    .xp-pill {
-      background: #ffffff;
-      border: 2px solid #38bdf8;
-      color: #0284c7;
-      padding: 7px 18px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
+        h1 {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-    .xp-pill.bump {
-      transform: scale(1.15);
-      box-shadow: 0 0 22px rgba(56, 189, 248, 0.65);
-    }
+        /* ===== STATS BAR ===== */
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
 
-    .progress-track {
-      width: 100%;
-      height: 14px;
-      background: #e2e8f0;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
-    }
+        .progress-container {
+            flex-grow: 1;
+            background: #e2e8f0;
+            height: 14px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #cbd5e0;
+        }
 
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #06b6d4, #6366f1, #ec4899);
-      border-radius: 999px;
-      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--accent-green);
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
 
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 8px;
-    }
+        .stat-item {
+            font-weight: 800;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
 
-    .task-instruction {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 18px;
-    }
+        .stat-hp { color: var(--accent-red); }
+        .stat-xp { color: var(--accent-yellow); }
 
-    /* Sentence Card */
-    .sentence-box {
-      background: linear-gradient(145deg, #f8fafc, #eef2ff);
-      border: 2px solid #c7d2fe;
-      border-radius: 22px;
-      padding: 24px 20px;
-      font-size: 1.3rem;
-      line-height: 1.65;
-      font-weight: 600;
-      color: #1e293b;
-      margin-bottom: 22px;
-      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.08);
-    }
+        /* ===== QUIZ CARD ===== */
+        .quest-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 26px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            animation: slideIn 0.3s ease-out;
+        }
 
-    .root-tag {
-      display: inline-block;
-      margin-left: 8px;
-      padding: 3px 12px;
-      background: linear-gradient(90deg, #f59e0b, #f97316);
-      color: #ffffff;
-      font-weight: 900;
-      font-size: 0.95rem;
-      border-radius: 10px;
-      letter-spacing: 0.6px;
-      vertical-align: middle;
-      box-shadow: 0 3px 10px rgba(249, 115, 22, 0.35);
-    }
+        @keyframes slideIn {
+            0%   { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
 
-    .gap-slot {
-      display: inline-block;
-      min-width: 95px;
-      padding: 2px 14px;
-      margin: 0 4px;
-      text-align: center;
-      border-bottom: 3px dashed #6366f1;
-      color: #4f46e5;
-      background: rgba(99, 102, 241, 0.12);
-      border-radius: 10px;
-      font-weight: 800;
-      transition: all 0.3s ease;
-    }
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 22px;
+            line-height: 1.5;
+            color: var(--text-main);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 18px;
+        }
 
-    .gap-slot.solved {
-      border-bottom: 3px solid #16a34a;
-      color: #15803d;
-      background: #dcfce7;
-    }
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
 
-    /* Options Grid */
-    .options-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
+        .option-btn {
+            background: #ffffff;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
 
-    @media (max-width: 520px) {
-      .options-grid {
-        grid-template-columns: 1fr;
-      }
-      .sentence-box {
-        font-size: 1.15rem;
-      }
-    }
+        .option-btn:hover:not(:disabled) {
+            background: #ebf8ff;
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
 
-    .option-btn {
-      background: #ffffff;
-      border: 2px solid #cbd5e1;
-      color: #1e293b;
-      font-size: 1.12rem;
-      font-weight: 800;
-      padding: 16px 18px;
-      border-radius: 18px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 5px 0 #cbd5e1;
-    }
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
 
-    .option-btn:hover:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #6366f1;
-      background: linear-gradient(135deg, #eef2ff, #fae8ff);
-      color: #4338ca;
-      box-shadow: 0 8px 0 #818cf8, 0 10px 20px rgba(99, 102, 241, 0.2);
-    }
+        .correct {
+            background: #f0fff4 !important;
+            border-color: var(--accent-green) !important;
+            color: #22543d !important;
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2) !important;
+        }
 
-    .option-btn:active:not(:disabled) {
-      transform: translateY(2px);
-      box-shadow: 0 3px 0 #818cf8;
-    }
+        .wrong {
+            background: #fff5f5 !important;
+            border-color: var(--accent-red) !important;
+            color: #742a2a !important;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2) !important;
+        }
 
-    .option-btn.correct {
-      background: linear-gradient(135deg, #22c55e, #16a34a) !important;
-      border-color: #15803d !important;
-      color: #ffffff !important;
-      box-shadow: 0 5px 0 #14532d, 0 0 22px rgba(34, 197, 94, 0.55) !important;
-    }
+        #feedback {
+            height: 24px;
+            margin-top: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-align: center;
+            font-size: 1rem;
+        }
 
-    .option-btn.wrong {
-      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-      border-color: #b91c1c !important;
-      color: #ffffff !important;
-      box-shadow: 0 5px 0 #7f1d1d, 0 0 18px rgba(239, 68, 68, 0.5) !important;
-      animation: shake 0.4s ease;
-    }
-
-    .option-btn:disabled {
-      cursor: default;
-      opacity: 0.75;
-    }
-
-    /* Feedback & Next Button */
-    .feedback-bar {
-      margin-top: 18px;
-      padding: 14px 18px;
-      border-radius: 16px;
-      font-weight: 700;
-      font-size: 0.98rem;
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .feedback-bar.ok {
-      display: block;
-      background: #dcfce7;
-      border: 2px solid #4ade80;
-      color: #166534;
-    }
-
-    .feedback-bar.err {
-      display: block;
-      background: #fee2e2;
-      border: 2px solid #f87171;
-      color: #991b1b;
-    }
-
-    .next-btn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 18px;
-      background: linear-gradient(90deg, #06b6d4, #6366f1, #ec4899);
-      color: #ffffff;
-      font-size: 1.15rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: none;
-      box-shadow: 0 10px 24px rgba(99, 102, 241, 0.38);
-      transition: transform 0.2s ease, filter 0.2s ease;
-    }
-
-    .next-btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.07);
-    }
-
-    /* Floating Pop-ups & Confetti */
-    .xp-float {
-      position: fixed;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      font-weight: 900;
-      color: #16a34a;
-      text-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
-      pointer-events: none;
-      animation: floatUp 0.9s ease-out forwards;
-      z-index: 999;
-    }
-
-    .confetti-emoji {
-      position: fixed;
-      font-size: 1.8rem;
-      pointer-events: none;
-      z-index: 998;
-      animation: fallDown 1.35s ease-out forwards;
-    }
-
-    /* Final Screen */
-    .final-screen {
-      display: none;
-      text-align: center;
-      animation: fadeIn 0.5s ease;
-    }
-
-    .trophy-emoji {
-      font-size: 4.8rem;
-      display: inline-block;
-      margin-bottom: 10px;
-      animation: bounce 1.5s infinite;
-    }
-
-    .hero-title {
-      font-size: 2.1rem;
-      font-weight: 900;
-      background: linear-gradient(90deg, #4f46e5, #db2777);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .stats-row {
-      display: flex;
-      justify-content: space-around;
-      gap: 15px;
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
-      border-radius: 22px;
-      padding: 22px;
-      margin: 20px 0;
-    }
-
-    .stat-card h3 {
-      font-size: 1.95rem;
-      font-weight: 900;
-      color: #4f46e5;
-    }
-
-    .stat-card p {
-      font-size: 0.92rem;
-      color: #64748b;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-
-    .google-status {
-      font-size: 1.05rem;
-      font-weight: 800;
-      margin-top: 12px;
-      min-height: 26px;
-    }
-
-    .restart-btn {
-      margin-top: 20px;
-      padding: 15px 34px;
-      border: none;
-      border-radius: 18px;
-      background: linear-gradient(90deg, #6366f1, #ec4899);
-      color: #ffffff;
-      font-size: 1.12rem;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 22px rgba(236, 72, 153, 0.35);
-      transition: transform 0.2s ease;
-    }
-
-    .restart-btn:hover {
-      transform: scale(1.04);
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-6px); }
-      80% { transform: translateX(6px); }
-    }
-
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translate(-50%, 0) scale(0.85); }
-      100% { opacity: 0; transform: translate(-50%, -70px) scale(1.25); }
-    }
-
-    @keyframes fallDown {
-      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-      100% { opacity: 0; transform: translateY(250px) rotate(360deg); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-  </style>
+        /* ===== MOBILE ===== */
+        @media (max-width: 500px) {
+            .tablet { padding: 18px; }
+            h1 { font-size: 1.3rem; }
+            .question-text { font-size: 1rem; }
+            .option-btn { font-size: 0.95rem; padding: 14px; }
+            .header-stats { flex-wrap: wrap; justify-content: center; }
+            .progress-container { order: 3; width: 100%; flex-basis: 100%; }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="app-card">
-    <!-- QUIZ VIEW -->
-    <div id="quizScreen">
-      <div class="header-bar">
-        <div class="level-pill" id="levelBadge">🚀 Level 1: Word Formation</div>
-        <div class="xp-pill" id="xpPill">⭐ XP: <span id="xpValue">0</span></div>
-      </div>
+<div class="tablet">
+    <h1>WORKSHOP DIALOGUE</h1>
 
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-
-      <div class="meta-row">
-        <span id="questionCounter">Question 1 / 15</span>
-        <span id="pointsTag">+4 XP</span>
-      </div>
-
-      <div class="task-instruction" id="instructionText">👉 Derive the correct verb from the word in orange:</div>
-
-      <div class="sentence-box" id="sentenceBox">Loading...</div>
-
-      <div class="options-grid" id="optionsGrid"></div>
-
-      <div class="feedback-bar" id="feedbackBar"></div>
-
-      <button class="next-btn" id="nextBtn" onclick="nextStep()">Next Challenge ⚡</button>
+    <div class="header-stats">
+        <span class="stat-item stat-hp">HP: <span id="lives">3</span></span>
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <span class="stat-item stat-xp">XP: <span id="score">0</span></span>
     </div>
 
-    <!-- FINAL VIEW -->
-    <div id="finalScreen" class="final-screen">
-      <div class="trophy-emoji">🏆</div>
-      <h1 class="hero-title">GRAMMAR HERO!</h1>
-      <p style="color: #64748b; font-weight: 600; margin-bottom: 10px;">You conquered Word Formation & Past Perfect!</p>
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <h3 id="finalScore">0 / 15</h3>
-          <p>First-Try Wins</p>
-        </div>
-        <div class="stat-card">
-          <h3 id="finalXP">0 XP</h3>
-          <p>Total XP</p>
-        </div>
-      </div>
-
-      <div id="googleStatus" class="google-status">Sending results... ⏳</div>
-
-      <button class="restart-btn" onclick="restartMission()">NEW MISSION 🚀</button>
+    <div class="quest-card" id="quiz-box">
+        <div class="question-text" id="question">Initialising Workshop Protocols...</div>
+        <div class="options-grid" id="options"></div>
+        <div id="feedback"></div>
     </div>
-  </div>
+</div>
 
-  <script>
-    const TEST_NAME = "Word Formation & Past Perfect Hero (A2)";
+<script>
+    // ========== MANDATORY TRACKING DATA ==========
+    const TEST_NAME = "Workshop Dialogue: Future & Suggestions";
     let userMistakes = [];
+
+    // Adapted questions based on the photo's dialogue and grammar rules
     const questions = [
-      // LEVEL 1: Word Formation (-ise / -ize verbs) - 5 items (4 XP each = 20 XP)
-      {
-        level: "🚀 Level 1: Verb Builder",
-        instruction: "👉 Choose the correct verb form of the word in orange:",
-        before: "Can you ",
-        after: " the main plot of that sci-fi movie for me?",
-        rootWord: "SUMMARY",
-        xpReward: 4,
-        correct: "summarise",
-        options: ["summarise", "summary", "summarising", "summarisation"],
-        tip: "Noun 'summary' → Verb 'summarise' (or 'summarize')."
-      },
-      {
-        level: "🚀 Level 1: Verb Builder",
-        instruction: "👉 Choose the correct verb form of the word in orange:",
-        before: "Jake refused to ",
-        after: " for spoiling the ending of the new game in our group chat.",
-        rootWord: "APOLOGY",
-        xpReward: 4,
-        correct: "apologise",
-        options: ["apologise", "apology", "apologetic", "apologies"],
-        tip: "Noun 'apology' → Verb 'apologise' (or 'apologize')."
-      },
-      {
-        level: "🚀 Level 1: Verb Builder",
-        instruction: "👉 Choose the correct verb form of the word in orange:",
-        before: "Maya often ",
-        after: " about launching her own streetwear brand one day.",
-        rootWord: "FANTASY",
-        xpReward: 4,
-        correct: "fantasises",
-        options: ["fantasises", "fantasy", "fantasies", "fantastic"],
-        tip: "3rd person singular: 'fantasy' → 'fantasises'."
-      },
-      {
-        level: "🚀 Level 1: Verb Builder",
-        instruction: "👉 Choose the correct verb form of the word in orange:",
-        before: "Does the new teen series ",
-        after: " high school athletes as super competitive?",
-        rootWord: "CHARACTER",
-        xpReward: 4,
-        correct: "characterise",
-        options: ["characterise", "character", "characteristic", "characters"],
-        tip: "Noun 'character' → Verb 'characterise' (describe qualities)."
-      },
-      {
-        level: "🚀 Level 1: Verb Builder",
-        instruction: "👉 Choose the correct verb form of the word in orange:",
-        before: "Everyone ",
-        after: " with Leo when his phone screen cracked right before the trip.",
-        rootWord: "SYMPATHY",
-        xpReward: 4,
-        correct: "sympathised",
-        options: ["sympathised", "sympathy", "sympathetic", "sympathies"],
-        tip: "Past simple verb: 'sympathy' → 'sympathised'."
-      },
-      // LEVEL 2: Past Perfect vs Past Perfect Continuous - 10 items (2 XP each = 20 XP)
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "I ",
-        after: " (wait) outside the concert venue for an hour before Mia finally showed up.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had been waiting",
-        options: ["had been waiting", "had waited", "was waiting", "have waited"],
-        tip: "Duration before a past action ('for an hour before...') → Past Perfect Continuous."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "Grandma ",
-        after: " (go) to the bakery before we got back from basketball practice.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had gone",
-        options: ["had gone", "had been going", "went", "has gone"],
-        tip: "Completed action before another past event → Past Perfect."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "They ",
-        after: " (skate) at the park all afternoon, so their legs were super tired in the evening.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had been skating",
-        options: ["had been skating", "had skated", "skated", "were skated"],
-        tip: "Ongoing activity ('all afternoon') explaining a past result ('were tired') → Past Perfect Continuous."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "The café barista gave us two iced lattes that we ",
-        after: " (not / order).",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had not ordered",
-        options: ["had not ordered", "had not been ordering", "did not order", "have not ordered"],
-        tip: "Action that didn't happen before a past moment → Past Perfect."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "",
-        after: " (he / finish) editing the TikTok vlog when his friends arrived?",
-        rootWord: "",
-        xpReward: 2,
-        correct: "Had he finished",
-        options: ["Had he finished", "Had he been finishing", "Did he finished", "Was he finishing"],
-        tip: "Asking if an action was complete before a past moment → Past Perfect."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "The school rock band ",
-        after: " (rehearse) for forty minutes when the Wi-Fi and lights suddenly went out.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had been rehearsing",
-        options: ["had been rehearsing", "had rehearsed", "rehearsed", "has been rehearsing"],
-        tip: "Action in progress for a period of time ('for forty minutes') interrupted in the past → Past Perfect Continuous."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "Noah ",
-        after: " (look) for limited-edition sneakers for two months before he found a pair online.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had been looking",
-        options: ["had been looking", "had looked", "looked", "was looked"],
-        tip: "Continuous effort over time ('for two months') before a past event → Past Perfect Continuous."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "Chloe logged off Discord right after she ",
-        after: " (upload) the group science slides.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had uploaded",
-        options: ["had uploaded", "had been uploading", "uploads", "was uploading"],
-        tip: "Completed action ('after she...') before another past action → Past Perfect."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "Sofia ",
-        after: " (learn) Spanish for three years before she went on an exchange trip to Madrid.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had been learning",
-        options: ["had been learning", "had learnt", "learns", "is learning"],
-        tip: "Duration ('for three years') leading up to a past move → Past Perfect Continuous."
-      },
-      {
-        level: "⏳ Level 2: Time Master",
-        instruction: "👉 Choose Past Perfect or Past Perfect Continuous:",
-        before: "Liam ",
-        after: " (already / eat) pizza by the time we got to the gaming lounge.",
-        rootWord: "",
-        xpReward: 2,
-        correct: "had already eaten",
-        options: ["had already eaten", "had already been eating", "already eats", "was already eaten"],
-        tip: "'By the time' + completed action → Past Perfect."
-      }
+        { 
+            q: "Complete the greeting: 'How are you?'", 
+            a: ["Fine, and you?", "Yes, sure.", "No, that's not true.", "Shall we work?"], 
+            correct: 0 
+        },
+        { 
+            q: "You need to buy gloves:", 
+            a: ["How about buying new gloves?", "Can we meet up at the garage?", "He will be busy.", "When would Lewis like to see it?"], 
+            correct: 0 
+        },
+        { 
+            q: "You want to meet:", 
+            a: ["Can we meet up at the garage?", "Yes, but when? I am fixing the car now.", "Lewis says he doesn't like dirty road.", "How are you?"], 
+            correct: 0 
+        },
+        { 
+            q: "You want to do it:", 
+            a: ["Yes, but when? I am fixing the car now.", "Fine, and you?", "No, that's not true. He will cook.", "How about buying new gloves?"], 
+            correct: 0 
+        },
+        { 
+            q: "You don't want this", 
+            a: ["No, that's not true. He will cook. He will be busy.", "Shall we work at 8 o'clock on the road?", "How are you?", "Can we meet up at the garage?"], 
+            correct: 0 
+        },
+        { 
+            q: "You need new clothes", 
+            a: ["When would Lewis like to see his new uniform?", "How about buying new gloves?", "Yes, sure. Lewis says he doesn't like dirty road.", "Fine, and you?"], 
+            correct: 0 
+        },
+        { 
+            q: "You need clean road", 
+            a: ["Yes, sure. Lewis says he doesn't like dirty road.", "He will be busy cooking.", "Shall we work at 8 o'clock?", "Can we meet up at the garage?"], 
+            correct: 0 
+        },
+        { 
+            q: "Tomorrow it's your work day?", 
+            a: ["Shall we work at 8 o'clock on the road?", "When would Lewis like to see his new uniform?", "Fine, and you?", "No, that's not true."], 
+            correct: 0 
+        }
     ];
 
-    let currentIndex = 0;
-    let firstTryWins = 0;
-    let totalXP = 0;
-    let wrongOnCurrent = false;
-    let solvedCurrent = false;
+    let current = 0;
+    let score = 0;
+    let lives = 3;
+    let busy = false;
 
-    const levelBadge = document.getElementById("levelBadge");
-    const xpValue = document.getElementById("xpValue");
-    const xpPill = document.getElementById("xpPill");
-    const progressFill = document.getElementById("progressFill");
-    const questionCounter = document.getElementById("questionCounter");
-    const pointsTag = document.getElementById("pointsTag");
-    const instructionText = document.getElementById("instructionText");
-    const sentenceBox = document.getElementById("sentenceBox");
-    const optionsGrid = document.getElementById("optionsGrid");
-    const feedbackBar = document.getElementById("feedbackBar");
-    const nextBtn = document.getElementById("nextBtn");
-
-    function shuffleArray(array) {
-      const copy = [...array];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    }
-
-    function renderQuestion() {
-      const q = questions[currentIndex];
-      wrongOnCurrent = false;
-      solvedCurrent = false;
-      levelBadge.textContent = q.level;
-      questionCounter.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
-      pointsTag.textContent = `+${q.xpReward} XP`;
-      progressFill.style.width = `${(currentIndex / questions.length) * 100}%`;
-      instructionText.textContent = q.instruction;
-      
-      const rootBadgeHTML = q.rootWord ? `<span class="root-tag">${q.rootWord}</span>` : "";
-      sentenceBox.innerHTML = `${q.before}<span class="gap-slot" id="gapSlot">_____</span>${q.after}${rootBadgeHTML}`;
-      
-      feedbackBar.className = "feedback-bar";
-      feedbackBar.style.display = "none";
-      nextBtn.style.display = "none";
-      optionsGrid.innerHTML = "";
-      
-      const shuffledOptions = shuffleArray(q.options);
-      shuffledOptions.forEach((opt) => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.textContent = opt;
-        btn.onclick = () => checkChoice(opt, btn);
-        optionsGrid.appendChild(btn);
-      });
-    }
-
-    function checkChoice(selected, btn) {
-      if (solvedCurrent) return;
-      const q = questions[currentIndex];
-      
-      if (selected === q.correct) {
-        solvedCurrent = true;
-        btn.classList.add("correct");
-        
-        if (!wrongOnCurrent) {
-          firstTryWins++;
+    function startMission() {
+        if (current >= questions.length) {
+            document.getElementById('quiz-box').innerHTML = `
+                <h2 style="color:var(--accent-green); text-align:center; font-size:2rem;">🏁 MISSION COMPLETE</h2>
+                <p style="text-align:center; font-size:1.2rem; margin-top:10px;">Workshop dialogue test finished!</p>
+                <p style="text-align:center; font-size:1.5rem; color:var(--accent-yellow); font-weight:800; margin-top:10px;">FINAL SCORE: ${score}</p>
+                <div id="send-status" style="text-align:center; margin-top:15px; font-weight:bold; min-height:24px;"></div>
+                <button onclick="location.reload()" class="option-btn" style="text-align:center; width:100%; margin-top:20px; background:var(--accent-blue); color:white; border-color:var(--accent-blue);">RESTART TERMINAL</button>
+            `;
+            sendResultsToGoogle();
+            return;
         }
-        
-        totalXP += q.xpReward;
-        xpValue.textContent = totalXP;
-        xpPill.classList.add("bump");
-        setTimeout(() => xpPill.classList.remove("bump"), 300);
-        
-        const gapSlot = document.getElementById("gapSlot");
-        gapSlot.textContent = selected;
-        gapSlot.classList.add("solved");
-        
-        feedbackBar.className = "feedback-bar ok";
-        feedbackBar.innerHTML = `🎉 Awesome! <span>${q.tip}</span>`;
-        feedbackBar.style.display = "block";
-        
-        document.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
-        celebrate(btn, q.xpReward);
-        
-        nextBtn.textContent = currentIndex === questions.length - 1 ? "Complete Mission 🏆" : "Next Challenge ⚡";
-        nextBtn.style.display = "block";
-        
-      } else {
-        wrongOnCurrent = true;
-        btn.classList.add("wrong");
-        btn.disabled = true;
-        userMistakes.push(selected);
-        
-        feedbackBar.className = "feedback-bar err";
-        feedbackBar.textContent = "❌ Oops! Try another option.";
-        feedbackBar.style.display = "block";
-      }
+
+        busy = false;
+        const data = questions[current];
+        document.getElementById('question').innerText = `>> QUESTION ${current + 1}: ${data.q}`;
+        const container = document.getElementById('options');
+        container.innerHTML = '';
+        document.getElementById('feedback').innerText = '';
+
+        // Shuffle options
+        const shuffledOptions = [...data.a].sort(() => Math.random() - 0.5);
+        const correctAnswer = data.a[data.correct];
+
+        shuffledOptions.forEach((opt) => {
+            const b = document.createElement('button');
+            b.className = 'option-btn';
+            b.innerText = `> ${opt}`;
+            b.onclick = () => {
+                if (busy) return;
+                busy = true;
+                
+                // Disable all buttons
+                document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+                if (opt === correctAnswer) {
+                    b.classList.add('correct');
+                    score += 100;
+                    document.getElementById('score').innerText = score;
+                    document.getElementById('feedback').innerText = "✅ CORRECT!";
+                    document.getElementById('feedback').style.color = "var(--accent-green)";
+                    setTimeout(() => { current++; startMission(); }, 800);
+                } else {
+                    b.classList.add('wrong');
+                    // Track mistake
+                    userMistakes.push(opt);
+                    
+                    // Highlight correct answer
+                    document.querySelectorAll('.option-btn').forEach(btn => {
+                        if (btn.innerText.includes(correctAnswer)) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                    lives--;
+                    document.getElementById('lives').innerText = lives;
+                    document.getElementById('feedback').innerText = "❌ WRONG!";
+                    document.getElementById('feedback').style.color = "var(--accent-red)";
+                    if (lives <= 0) { 
+                        setTimeout(() => {
+                            alert("SYSTEM OVERRIDE: You ran out of lives. Restarting...");
+                            location.reload();
+                        }, 1000);
+                    } else { 
+                        setTimeout(() => { current++; startMission(); }, 1800); 
+                    }
+                }
+            };
+            container.appendChild(b);
+        });
+
+        document.getElementById('progress-bar').style.width = (current / questions.length * 100) + "%";
     }
 
-    function celebrate(anchorBtn, xpEarned) {
-      const floatEl = document.createElement("div");
-      floatEl.className = "xp-float";
-      floatEl.textContent = `+${xpEarned} XP! ✨`;
-      document.body.appendChild(floatEl);
-      setTimeout(() => floatEl.remove(), 900);
-      
-      const emojis = ["✨", "🎉", "⭐", "🚀", "🔥"];
-      const rect = anchorBtn.getBoundingClientRect();
-      
-      for (let i = 0; i < 8; i++) {
-        const conf = document.createElement("div");
-        conf.className = "confetti-emoji";
-        conf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        conf.style.left = `${rect.left + rect.width / 2 + (Math.random() * 160 - 80)}px`;
-        conf.style.top = `${rect.top}px`;
-        document.body.appendChild(conf);
-        setTimeout(() => conf.remove(), 1350);
-      }
-    }
-
-    function nextStep() {
-      currentIndex++;
-      if (currentIndex < questions.length) {
-        renderQuestion();
-      } else {
-        finishQuiz();
-      }
-    }
-
-    function finishQuiz() {
-      progressFill.style.width = "100%";
-      document.getElementById("quizScreen").style.display = "none";
-      document.getElementById("finalScreen").style.display = "block";
-      document.getElementById("finalScore").textContent = `${firstTryWins} / ${questions.length}`;
-      document.getElementById("finalXP").textContent = `${totalXP} XP`;
-      sendResultsToGoogle();
-    }
-
+    // ========== MANDATORY GOOGLE SHEETS SENDING FUNCTION ==========
     function sendResultsToGoogle() {
-      const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
-      const params = new URLSearchParams();
-      params.append("name", TEST_NAME);
-      params.append("score", firstTryWins);
-      params.append("total", questions.length);
-      params.append("mistakes", userMistakes.join(", "));
-      
-      fetch(url, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params
-      })
-      .then(() => {
-        const status = document.getElementById("googleStatus");
-        status.textContent = "Results sent successfully! ✅";
-        status.style.color = "#16a34a";
-      })
-      .catch(() => {
-        const status = document.getElementById("googleStatus");
-        status.textContent = "Offline mode: results saved locally.";
-        status.style.color = "#f59e0b";
-      });
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        const params = new URLSearchParams();
+        params.append("name", TEST_NAME);
+        params.append("score", score / 100); // Convert XP back to number of correct answers
+        params.append("total", questions.length);
+        params.append("mistakes", userMistakes.join(', '));
+        
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending telemetry data...";
+        
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(() => {
+            // Display the required success message in green
+            statusEl.style.color = '#38a169';
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e53e3e';
+            statusEl.innerText = "Failed to send results ❌.";
+        });
     }
 
-    function restartMission() {
-      currentIndex = 0;
-      firstTryWins = 0;
-      totalXP = 0;
-      userMistakes = [];
-      xpValue.textContent = "0";
-      document.getElementById("finalScreen").style.display = "none";
-      document.getElementById("quizScreen").style.display = "block";
-      renderQuestion();
-    }
-
-    renderQuestion();
-  </script>
+    startMission();
+</script>
 </body>
 </html>

@@ -1,247 +1,504 @@
 <!DOCTYPE html>
-<html lang=en>
+<html lang="en">
 <head>
-<meta charset=UTF-8>
-<meta name=viewport content=width=device-width, initial-scale=1.0>
-<title>Phrasal Verb Quest · BRING with Grammar</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Formula 1: Grammar & Vocabulary Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Arial,sans-serif}
-body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#311042 100%);color:#f8fafc;display:flex;justify-content:center;align-items:center;padding:20px;overflow-x:hidden}
-.app-container{width:100%;max-width:720px;background:rgba(30,41,59,0.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:28px;padding:28px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.6),0 0 30px rgba(139,92,246,0.25);position:relative}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px;flex-wrap:wrap}
-.badge{background:linear-gradient(90deg,#ec4899,#8b5cf6);padding:8px 16px;border-radius:999px;font-weight:800;font-size:0.9rem;letter-spacing:0.5px;text-transform:uppercase;box-shadow:0 4px 15px rgba(236,72,153,0.4)}
-.xp-counter{background:rgba(15,23,42,0.85);border:2px solid #38bdf8;padding:8px 18px;border-radius:999px;font-weight:800;font-size:1rem;color:#38bdf8;display:flex;align-items:center;gap:6px;transition:transform 0.2s ease,box-shadow 0.2s ease}
-.xp-counter.bump{transform:scale(1.15);box-shadow:0 0 20px rgba(56,189,248,0.8)}
-.progress-wrapper{width:100%;height:12px;background:rgba(15,23,42,0.8);border-radius:999px;overflow:hidden;margin-bottom:24px;border:1px solid rgba(255,255,255,0.08)}
-.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#06b6d4,#8b5cf6,#ec4899);border-radius:999px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1)}
-.step-indicator{font-size:0.9rem;color:#94a3b8;font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between}
-.prompt-title{font-size:1.15rem;color:#e2e8f0;margin-bottom:18px;font-weight:700}
-.sentence-card{background:linear-gradient(145deg,rgba(15,23,42,0.9),rgba(30,27,75,0.9));border:1px solid rgba(139,92,246,0.35);border-radius:22px;padding:26px 22px;font-size:1.35rem;line-height:1.65;font-weight:600;margin-bottom:24px;box-shadow:inset 0 2px 10px rgba(0,0,0,0.4);transition:all 0.3s ease}
-.gap-slot{display:inline-block;min-width:90px;padding:2px 14px;margin:0 4px;text-align:center;border-bottom:3px dashed #38bdf8;color:#38bdf8;font-weight:800;border-radius:8px;background:rgba(56,189,248,0.12);transition:all 0.3s ease}
-.gap-slot.filled{border-bottom:3px solid #22c55e;color:#4ade80;background:rgba(34,197,94,0.18)}
-.options-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media(max-width:480px){.options-grid{grid-template-columns:1fr}.sentence-card{font-size:1.18rem}}
-.option-btn{background:linear-gradient(135deg,rgba(51,65,85,0.8),rgba(30,41,59,0.95));border:2px solid rgba(255,255,255,0.12);color:#f8fafc;font-size:1.15rem;font-weight:800;padding:16px 20px;border-radius:18px;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 6px 0 rgba(15,23,42,0.8);text-transform:lowercase}
-.option-btn:hover:not(:disabled){transform:translateY(-3px);border-color:#a855f7;background:linear-gradient(135deg,#4c1d95,#312e81);box-shadow:0 9px 0 rgba(15,23,42,0.8),0 0 20px rgba(168,85,247,0.45)}
-.option-btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 3px 0 rgba(15,23,42,0.8)}
-.option-btn.correct{background:linear-gradient(135deg,#16a34a,#15803d) !important;border-color:#86efac !important;box-shadow:0 6px 0 #14532d,0 0 25px rgba(34,197,94,0.7) !important;color:#ffffff}
-.option-btn.wrong{background:linear-gradient(135deg,#dc2626,#991b1b) !important;border-color:#fca5a5 !important;box-shadow:0 6px 0 #7f1d1d,0 0 20px rgba(239,68,68,0.6) !important;animation:shake 0.4s ease}
-.option-btn:disabled{cursor:default;opacity:0.75}
-.feedback-box{margin-top:20px;padding:14px 18px;border-radius:16px;font-weight:700;font-size:1rem;display:none;align-items:center;justify-content:space-between;gap:12px;animation:fadeIn 0.3s ease}
-.feedback-box.success{display:flex;background:rgba(22,163,74,0.22);border:1px solid #4ade80;color:#bbf7d0}
-.feedback-box.error{display:flex;background:rgba(220,38,38,0.22);border:1px solid #f87171;color:#fecaca}
-.next-btn{margin-top:22px;width:100%;padding:16px;border:none;border-radius:18px;background:linear-gradient(90deg,#06b6d4,#8b5cf6,#ec4899);color:white;font-size:1.15rem;font-weight:800;cursor:pointer;display:none;box-shadow:0 10px 25px -5px rgba(139,92,246,0.6);transition:transform 0.2s ease,filter 0.2s ease}
-.next-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
-.start-btn{margin-top:16px;width:100%;padding:18px;border:none;border-radius:18px;background:linear-gradient(90deg,#06b6d4,#8b5cf6,#ec4899);color:white;font-size:1.2rem;font-weight:800;cursor:pointer;box-shadow:0 10px 25px -5px rgba(139,92,246,0.6);transition:transform 0.2s ease}
-.start-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
-.grammar-screen{display:flex;flex-direction:column;gap:14px}
-.grammar-title{font-size:1.5rem;font-weight:900;color:#e2e8f0;text-align:center}
-.grammar-sub{text-align:center;color:#94a3b8;font-size:0.95rem;font-weight:600}
-.grammar-list{display:flex;flex-direction:column;gap:10px}
-.grammar-item{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:rgba(15,23,42,0.55);border:1px solid rgba(139,92,246,0.28);border-radius:14px;padding:12px 16px}
-.grammar-en{font-weight:800;color:#38bdf8;font-size:1.05rem}
-.grammar-ru{color:#cbd5e1;font-size:0.98rem;text-align:right}
-.hint-line{text-align:center;color:#a5b4fc;font-size:0.9rem;font-weight:600}
-.xp-popup{position:fixed;top:22%;left:50%;transform:translateX(-50%);font-size:2rem;font-weight:900;color:#4ade80;text-shadow:0 4px 15px rgba(34,197,94,0.8);pointer-events:none;animation:floatUp 0.9s ease-out forwards;z-index:999}
-.confetti{position:fixed;font-size:1.8rem;pointer-events:none;z-index:998;animation:fall 1.4s ease-out forwards}
-.final-screen{display:none;text-align:center;animation:fadeIn 0.5s ease}
-.trophy{font-size:4.5rem;margin-bottom:12px;display:inline-block;animation:bounce 1.5s infinite}
-.final-title{font-size:2rem;font-weight:900;background:linear-gradient(90deg,#38bdf8,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
-.stats-card{background:rgba(15,23,42,0.75);border:1px solid rgba(255,255,255,0.12);border-radius:22px;padding:22px;margin:20px 0;display:flex;justify-content:space-around;gap:15px}
-.stat-item h3{font-size:1.9rem;font-weight:900;color:#38bdf8}
-.stat-item p{font-size:0.9rem;color:#94a3b8;font-weight:600;margin-top:4px}
-.status-msg{margin-top:14px;font-size:1.05rem;font-weight:700;min-height:26px}
-.restart-btn{margin-top:20px;padding:15px 32px;border:none;border-radius:16px;background:linear-gradient(90deg,#8b5cf6,#ec4899);color:#fff;font-size:1.1rem;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(236,72,153,0.45);transition:transform 0.2s ease}
-.restart-btn:hover{transform:scale(1.04)}
-#quizScreen{display:none}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
-@keyframes floatUp{0%{opacity:1;transform:translate(-50%,0) scale(0.8)}100%{opacity:0;transform:translate(-50%,-70px) scale(1.2)}}
-@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(260px) rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  :root {
+    --bg-color: #f7f9fa;
+    --card-bg: #ffffff;
+    --text-dark: #3c3c3c;
+    --text-muted: #afafaf;
+    --primary-color: #58cc02;
+    --primary-dark: #46a302;
+    --warning-color: #f39c12;
+    --border-color: #e5e5e5;
+    --font-heading: 'Fredoka', sans-serif;
+    --font-body: 'Quicksand', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px 10px;
+  }
+
+  .quiz-wrapper {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 650px;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 0 var(--border-color);
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .progress-track {
+    flex-grow: 1;
+    height: 16px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  .counter-display {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .screen {
+    display: none;
+    animation: slideUpFade 0.4s ease forwards;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hint-box {
+    background: #e1f5fe;
+    border: 2px solid #b3e5fc;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0288d1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+    background: #f1f5f9;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .question-sentence {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 25px;
+    color: var(--text-dark);
+    text-align: left;
+  }
+
+  .blank-space {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px dashed var(--text-dark);
+    text-align: center;
+    color: var(--primary-color);
+    padding: 0 4px;
+  }
+
+  .options-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 5px;
+  }
+
+  .option-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-bottom: 4px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s;
+    user-select: none;
+    outline: none;
+  }
+
+  .option-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  .option-btn.state-correct {
+    background-color: #d7ffb8 !important;
+    border-color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-dark) !important;
+    color: #527e02 !important;
+  }
+
+  .option-btn.state-incorrect {
+    background-color: #fff3cd !important;
+    border-color: var(--warning-color) !important;
+    border-bottom-color: #b45309 !important;
+    color: #b45309 !important;
+  }
+
+  .finish-layout {
+    text-align: center;
+    padding: 15px 0;
+  }
+
+  .award-icon {
+    font-size: 5.5rem;
+    margin-bottom: 15px;
+    animation: scalePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes scalePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .finish-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffc800;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 0 #e6b400;
+  }
+
+  .finish-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 35px;
+  }
+
+  .success-msg {
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    display: none;
+    background: #d7ffb8;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--primary-color);
+  }
+
+  .action-trigger {
+    width: 100%;
+    background-color: var(--primary-color);
+    border: none;
+    border-bottom: 4px solid var(--primary-dark);
+    border-radius: 14px;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .action-trigger:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 10px 5px; }
+    .quiz-wrapper { border-radius: 16px; padding: 18px; }
+    .question-sentence { font-size: 1.15rem; }
+    .option-btn { font-size: 1.05rem; padding: 14px; }
+    .image-container { height: 150px; }
+  }
 </style>
 </head>
 <body>
-<div class=app-container>
-<div id=grammarScreen class=grammar-screen>
-<div class=grammar-title>Grammar: BRING + particle</div>
-<div class=grammar-sub>Learn the 8 meanings first, then start the quiz</div>
-<div class=grammar-list>
-<div class=grammar-item><span class=grammar-en>bring back</span><span class=grammar-ru>напоминать о прошлом, возвращать</span></div>
-<div class=grammar-item><span class=grammar-en>bring round</span><span class=grammar-ru>приводить в сознание</span></div>
-<div class=grammar-item><span class=grammar-en>bring up</span><span class=grammar-ru>растить ребёнка, поднять тему</span></div>
-<div class=grammar-item><span class=grammar-en>bring out</span><span class=grammar-ru>выпускать (продукт, альбом)</span></div>
-<div class=grammar-item><span class=grammar-en>bring in</span><span class=grammar-ru>приносить доход</span></div>
-<div class=grammar-item><span class=grammar-en>bring about</span><span class=grammar-ru>вызывать, приводить к</span></div>
-<div class=grammar-item><span class=grammar-en>bring down</span><span class=grammar-ru>снижать (цену, температуру)</span></div>
-<div class=grammar-item><span class=grammar-en>bring together</span><span class=grammar-ru>сближать людей</span></div>
+
+<div class="quiz-wrapper" id="masterContainer">
+  <div class="quiz-header" id="trackerHeader">
+    <div class="progress-track">
+      <div class="progress-fill" id="statusBar"></div>
+    </div>
+    <div class="counter-display" id="indexCounter">1/8</div>
+  </div>
+
+  <div class="screen active" id="gameboard">
+    <div class="hint-box">
+      <span>💡</span>
+      <span id="translationHint">Choose the correct option for the sentence.</span>
+    </div>
+    <div class="image-container" id="imageBox">
+      <img src="" id="taskImage" alt="Context Image">
+    </div>
+    <div class="question-sentence" id="sentencePrompt">
+      Loading item...
+    </div>
+    <div class="options-stack" id="buttonGrid"></div>
+  </div>
+
+  <div class="screen" id="summaryBoard">
+    <div class="finish-layout">
+      <div class="award-icon" id="badgeIcon">🏆</div>
+      <div class="finish-title" id="performanceTitle">Quiz Complete!</div>
+      <div class="finish-score" id="scoreOverview">Your score: 0/8</div>
+      <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+      <button class="action-trigger" id="resetAction">Start Again</button>
+    </div>
+  </div>
 </div>
-<div class=hint-line>8 sentences · +2 XP for each correct answer</div>
-<button class=start-btn onclick=startQuiz()>Start the Quiz ⚡</button>
-</div>
-<div id=quizScreen>
-<div class=top-bar>
-<div class=badge>🎧 Phrasal Verb Quest: BRING</div>
-<div class=xp-counter id=xpCounter>⭐ POINTS: <span id=xpValue>0</span></div>
-</div>
-<div class=progress-wrapper><div class=progress-fill id=progressFill></div></div>
-<div class=step-indicator><span id=questionNumber>Question 1 of 8</span><span>+2 XP per win</span></div>
-<div class=prompt-title>👉 Complete the gap with the correct particle:</div>
-<div class=sentence-card><p id=sentenceText></p></div>
-<div class=options-grid id=optionsGrid></div>
-<div class=feedback-box id=feedbackBox></div>
-<button class=next-btn id=nextBtn onclick=nextQuestion()>Next Challenge ⚡</button>
-</div>
-<div id=finalScreen class=final-screen>
-<div class=trophy>🏆</div>
-<div class=final-title>Quest Completed!</div>
-<p>You mastered the phrasal verb BRING!</p>
-<div class=stats-card>
-<div class=stat-item><h3 id=finalScore>0 / 8</h3><p>Correct Answers</p></div>
-<div class=stat-item><h3 id=finalXP>0 XP</h3><p>Total Points</p></div>
-</div>
-<div class=status-msg id=googleStatus>Sending results... ⏳</div>
-<button class=restart-btn onclick=restartQuiz()>Play Again 🔄</button>
-</div>
-</div>
+
 <script>
-const TEST_NAME=`Phrasal Verb Bring Quiz (A2, 8 sentences)`;
-let userMistakes=[];
-const questions=[
-{before:`Listening to this old playlist brings `,after:` so many fun memories from summer camp.`,correct:`back`,options:[`back`,`up`,`out`,`in`],hint:`bring back = remind you of the past, напоминать о прошлом`},
-{before:`Mark felt dizzy after basketball practice, so the coach used cold water to bring him `,after:`.`,correct:`round`,options:[`round`,`up`,`back`,`in`],hint:`bring round = make someone conscious again, приводить в сознание`},
-{before:`Maya was brought `,after:` by her grandparents in a small coastal town before moving to London for high school.`,correct:`up`,options:[`up`,`out`,`round`,`in`],hint:`bring up = raise a child, растить ребёнка`},
-{before:`My favorite indie band brought `,after:` a brand-new album on Spotify last Friday.`,correct:`out`,options:[`out`,`back`,`up`,`round`],hint:`bring out = release a new product or song, выпускать`},
-{before:`The weekend job at the gaming cafe brings `,after:` about 350 euros a month.`,correct:`in`,options:[`in`,`out`,`back`,`up`],hint:`bring in = earn money, приносить доход`},
-{before:`The new city bike plan brought `,after:` fewer cars in the centre this year.`,correct:`about`,options:[`about`,`down`,`up`,`out`],hint:`bring about = cause to happen, вызывать`},
-{before:`Fresh phone competition brought `,after:` prices for mobile plans last spring.`,correct:`down`,options:[`down`,`about`,`forward`,`in`],hint:`bring down = make lower, снижать`},
-{before:`The school project brought `,after:` students from three different countries.`,correct:`together`,options:[`together`,`back`,`out`,`up`],hint:`bring together = unite people, сближать`}
-];
-let currentIndex=0,score=0,points=0,answeredCurrent=false;
-const sentenceText=document.getElementById(`sentenceText`);
-const optionsGrid=document.getElementById(`optionsGrid`);
-const feedbackBox=document.getElementById(`feedbackBox`);
-const nextBtn=document.getElementById(`nextBtn`);
-const xpValue=document.getElementById(`xpValue`);
-const xpCounter=document.getElementById(`xpCounter`);
-const progressFill=document.getElementById(`progressFill`);
-const questionNumber=document.getElementById(`questionNumber`);
-function startQuiz(){
-document.getElementById(`grammarScreen`).style.display=`none`;
-document.getElementById(`quizScreen`).style.display=`block`;
-loadQuestion();
-}
-function loadQuestion(){
-answeredCurrent=false;
-if(currentIndex>=questions.length){showFinalScreen();return;}
-const q=questions[currentIndex];
-questionNumber.textContent=`Question ${currentIndex + 1} of ${questions.length}`;
-progressFill.style.width=`${(currentIndex / questions.length) * 100}%`;
-sentenceText.innerHTML=`${q.before}<span class=gap-slot id=gapSlot>_____</span>${q.after}`;
-feedbackBox.className=`feedback-box`;
-feedbackBox.style.display=`none`;
-nextBtn.style.display=`none`;
-optionsGrid.innerHTML=``;
-q.options.forEach(function(opt){
-const btn=document.createElement(`button`);
-btn.className=`option-btn`;
-btn.textContent=opt;
-btn.onclick=function(){checkAnswer(opt,btn);};
-optionsGrid.appendChild(btn);
-});
-}
-function checkAnswer(selected,btnElement){
-if(answeredCurrent)return;
-const q=questions[currentIndex];
-const gapSlot=document.getElementById(`gapSlot`);
-if(selected===q.correct){
-answeredCurrent=true;
-score++;
-points+=2;
-btnElement.classList.add(`correct`);
-gapSlot.textContent=selected;
-gapSlot.classList.add(`filled`);
-xpValue.textContent=points;
-xpCounter.classList.add(`bump`);
-setTimeout(function(){xpCounter.classList.remove(`bump`);},300);
-feedbackBox.className=`feedback-box success`;
-feedbackBox.innerHTML=`<span>🔥 Nailed it! <b>bring ${q.correct}</b> — ${q.hint}</span>`;
-feedbackBox.style.display=`flex`;
-disableAllButtons();
-spawnCelebration(btnElement);
-nextBtn.textContent= currentIndex === questions.length - 1 ? `See Final Results 🏆` : `Next Challenge ⚡`;
-nextBtn.style.display=`block`;
-}else{
-btnElement.classList.add(`wrong`);
-btnElement.disabled=true;
-userMistakes.push(selected);
-feedbackBox.className=`feedback-box error`;
-feedbackBox.innerHTML=`<span>❌ Not quite! Try another particle.</span>`;
-feedbackBox.style.display=`flex`;
-}
-}
-function disableAllButtons(){
-document.querySelectorAll(`.option-btn`).forEach(function(b){b.disabled=true;});
-}
-function spawnCelebration(originEl){
-const popup=document.createElement(`div`);
-popup.className=`xp-popup`;
-popup.textContent=`+2 XP! ⚡`;
-document.body.appendChild(popup);
-setTimeout(function(){popup.remove();},900);
-const emojis=[`✨`,`🔥`,`🎉`,`⭐`,`🚀`];
-const rect=originEl.getBoundingClientRect();
-for(let i=0;i<8;i++){
-const conf=document.createElement(`div`);
-conf.className=`confetti`;
-conf.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-conf.style.left=`${rect.left + rect.width / 2 + (Math.random() * 140 - 70)}px`;
-conf.style.top=`${rect.top}px`;
-document.body.appendChild(conf);
-setTimeout(function(){conf.remove();},1400);
-}
-}
-function nextQuestion(){
-currentIndex++;
-if(currentIndex<questions.length){loadQuestion();}else{showFinalScreen();}
-}
-function showFinalScreen(){
-progressFill.style.width=`100%`;
-document.getElementById(`quizScreen`).style.display=`none`;
-document.getElementById(`finalScreen`).style.display=`block`;
-document.getElementById(`finalScore`).textContent=`${score} / ${questions.length}`;
-document.getElementById(`finalXP`).textContent=`${points} XP`;
-sendResultsToGoogle();
-}
-function sendResultsToGoogle(){
-const url=`https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec`;
-const params=new URLSearchParams();
-params.append(`name`,TEST_NAME);
-params.append(`score`,score);
-params.append(`total`,questions.length);
-params.append(`mistakes`,userMistakes.join(`, `));
-fetch(url,{method:`POST`,mode:`no-cors`,body:params})
-.then(function(){
-const statusEl=document.getElementById(`googleStatus`);
-statusEl.textContent=`Results sent successfully! ✅`;
-statusEl.style.color=`#4ade80`;
-})
-.catch(function(){
-const statusEl=document.getElementById(`googleStatus`);
-statusEl.textContent=`Offline mode: results saved locally.`;
-statusEl.style.color=`#facc15`;
-});
-}
-function restartQuiz(){
-currentIndex=0;
-score=0;
-points=0;
-userMistakes=[];
-xpValue.textContent=`0`;
-document.getElementById(`finalScreen`).style.display=`none`;
-document.getElementById(`quizScreen`).style.display=`none`;
-document.getElementById(`grammarScreen`).style.display=`flex`;
-}
+  // ================================================================
+  //  CONFIGURATION & RESULTS TRACKING
+  // ================================================================
+  const TEST_NAME = "Formula 1 Grammar & Vocabulary Challenge";
+  let userMistakes = [];
+  let currentStep = 0;
+  let score = 0;
+  let inputLocked = false;
+
+  // Data adapted from the grammar rules and Formula 1 context in the photos
+  const quizData = [
+    { 
+      hint: "Choose the correct adjective.", 
+      img: "https://avatars.mds.yandex.net/i?id=07c58f89d7c5881eba16c3acc7913bf8_l-5875681-images-thumbs&n=13",
+      en: "The new racing suit is very good, so it is very <span class='blank-space'>______</span> to wear.", 
+      correct: "comfortable", 
+      pool: ["heavy", "boring", "slow"] 
+    },
+    { 
+      hint: "Choose the correct adjective.", 
+      img: "https://www.hi-fi.ru/upload/medialibrary/cc8/jojjqkrr0wt3v2t10kdi1ldmcs674qlz.jpg",
+      en: "They always watch a sports channel in the garage. It's really interesting, it's not <span class='blank-space'>______</span>.", 
+      correct: "boring", 
+      pool: ["exciting", "funny", "loud"] 
+    },
+    { 
+      hint: "Choose the correct auxiliary verb.", 
+      img: "https://www.racefans.net/wp-content/uploads/2025/12/racefansdotnet-24-12-07-13-24-44-6-SI202512070158.jpg",
+      en: "During the race, drivers <span class='blank-space'>______</span> use their mobile phones.", 
+      correct: "don't", 
+      pool: ["doesn't", "isn't", "aren't"] 
+    },
+    { 
+      hint: "Choose the correct auxiliary verb.", 
+      img: "https://i.pinimg.com/originals/e3/ea/cf/e3eacf4be53d8957d799fd0518db7f5f.jpg",
+      en: "What time <span class='blank-space'>______</span> the driver leave for the track in the morning?", 
+      correct: "does", 
+      pool: ["do", "is", "are"] 
+    },
+    { 
+      hint: "Choose the correct preposition of time.", 
+      img: "https://static.vecteezy.com/system/resources/previews/032/048/651/non_2x/digital-clock-time-at-2-00-am-digital-clock-12-hour-format-free-png.png",
+      en: "The race starts <span class='blank-space'>______</span> 2 pm.", 
+      correct: "at", 
+      pool: ["on", "in", "by"] 
+    },
+    { 
+      hint: "Choose the correct verb form.", 
+      img: "https://photobooth.cdn.sports.ru/preset/post/e/e6/b41ce27c8404a8aafdca80764f28f.jpeg?f=webp&q=90&s=2x&w=730",
+      en: "The mechanic <span class='blank-space'>______</span> the car on Saturday during the pit stop.", 
+      correct: "checks", 
+      pool: ["check", "checking", "checked"] 
+    },
+    { 
+      hint: "Choose the correct negative form.", 
+      img: "https://formula1.wordpress.com/wp-content/uploads/2016/04/season2016_race4_wednesday_5.jpg",
+      en: "The driver <span class='blank-space'>______</span> stand on the podium on Sunday evening if he doesn't win.", 
+      correct: "doesn't", 
+      pool: ["don't", "isn't", "aren't"] 
+    },
+    { 
+      hint: "Choose the correct sequence word.", 
+      img: "https://yandex-images.clstorage.net/v4uwN7285/01649eRHo2/y939mLNZaop3sXbru4lC07XueyNIOmEIm7d-JSzAVwnda1ZC7Iwe_makvhMJqNRznPegMdDjcA8gI6KiYV43Z9-OvNTwGnDWJvJoo_eOS9eqpWZrSH19WpCgZSBwgQ9fhjkGKtKsO4oK39Rte9n4bpvgsHXp2mEcVjfl9WoxOhLWxdqprWAIpGKAEdq4hV_Mg7NUIkhna3O2nxQJbqR1a-NKQhD7qQmeGsjidUz3_UOSqJdmwcI3Ckkw5uFoMi04zsrsg4hiJbZCgyLnrYN18bWjexNpU3J9h5chMne4ZWfBQ08WxKQgqTv26EJsyd5FjY-vePrUBARpJPHmdw4zBvHI552STjGOS6oS9J6qT-Cir2cLSEBPUbi5MANLuW5E2HJ6F9m5FaIU6NNLWubaWoy_gGL75jUNfBHi0EoBMhvUxvO9j281kFKTL_Gsskjdi41bBEV2UWWGgAQbTKVAd-1DZxD-lQmbAd_rXmXA4GW1iaxB9_AsMnIP-NlLEjIF-MbgroxnHqRalSHRs65H2I-FUzZFXWZmq6EhFXugckXjRn0_1ZUemxrp6FZv-eROu7-Kd8fkKDh5COr4ST0QJsTX7KyMeAeCf4sK172IV8efoU8xSFp5drSlJzB8v1B2wVF5PMSeEo4l3stxfsXTTZKIim_X4yMjWzjH3Hw8OgPKzMeQqHojt3uFO8WKjWf4rpFzHFtlcnWlthQQUrBNYvNrYxfohCqPL_vKXnrZxHCzgotZ9_MqM1oh8tBoPwEB1d7flLdDKapAkD72qrVE-aOEUyN9YXFklZcSI2yGUHfrW10XzJ0xviLe6UF149tQsYWvZt_RAiBSKtraSygTLtHT562jaQeuR7gQx7mCbcaBhnc2U1xhQ5WaCxBygltezUNwH-WgFZIR3_x-XfjHXamqoEHA8AcuWzX0-F8kFzrx3uuwkEw1rVWQKPCJrX7_opFBIkVQQVC6ty4ue7Y",
+      en: "In the evening, he usually watches TV <span class='blank-space'>______</span> he goes to bed.", 
+      correct: "before", 
+      pool: ["then", "after", "when"] 
+    }
+  ];
+
+  // ================================================================
+  //  GAME LOGIC
+  // ================================================================
+  function initGame() {
+    currentStep = 0;
+    score = 0;
+    inputLocked = false;
+    userMistakes = [];
+    document.getElementById('gameboard').classList.add('active');
+    document.getElementById('summaryBoard').classList.remove('active');
+    document.getElementById('trackerHeader').style.display = 'flex';
+    document.getElementById('success-msg').style.display = 'none';
+    loadTask();
+  }
+
+  function loadTask() {
+    if (currentStep >= quizData.length) {
+      showResults();
+      return;
+    }
+
+    inputLocked = false;
+    const task = quizData[currentStep];
+
+    document.getElementById('indexCounter').innerText = `${currentStep + 1}/${quizData.length}`;
+    const percent = (currentStep / quizData.length) * 100;
+    document.getElementById('statusBar').style.width = `${percent}%`;
+
+    document.getElementById('translationHint').innerText = task.hint;
+    document.getElementById('sentencePrompt').innerHTML = task.en;
+    
+    // Load the image
+    document.getElementById('taskImage').src = task.img;
+
+    const allOptions = [task.correct, ...task.pool].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById('buttonGrid');
+    grid.innerHTML = '';
+    allOptions.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      btn.addEventListener('click', () => checkAnswer(opt, btn));
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedText, btn) {
+    if (inputLocked) return;
+    inputLocked = true;
+
+    const task = quizData[currentStep];
+    const correct = task.correct;
+    const allBtns = document.querySelectorAll('#buttonGrid .option-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    const isCorrect = selectedText === correct;
+    if (isCorrect) {
+      btn.classList.add('state-correct');
+      score++;
+    } else {
+      btn.classList.add('state-incorrect');
+      
+      // MANDATORY: Track the wrong word every time
+      userMistakes.push(selectedText);
+
+      allBtns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('state-correct');
+      });
+    }
+
+    document.getElementById('statusBar').style.width = `${((currentStep + 1) / quizData.length) * 100}%`;
+
+    setTimeout(() => {
+      currentStep++;
+      loadTask();
+    }, 1500);
+  }
+
+  // ================================================================
+  //  RESULTS & GOOGLE SHEETS
+  // ================================================================
+  function showResults() {
+    document.getElementById('gameboard').classList.remove('active');
+    document.getElementById('summaryBoard').classList.add('active');
+    document.getElementById('statusBar').style.width = '100%';
+    document.getElementById('scoreOverview').innerText = `Your score: ${score}/${quizData.length}`;
+
+    let title = 'Quiz Complete!';
+    let icon = '🏆';
+    if (score === quizData.length) {
+      title = 'Perfect Score! 👑';
+      icon = '🏁';
+    } else if (score >= 5) {
+      title = 'Great Effort! 🏎️';
+      icon = '🏅';
+    } else {
+      title = 'Keep Practicing! 🔧';
+      icon = '⚙️';
+    }
+    document.getElementById('performanceTitle').innerText = title;
+    document.getElementById('badgeIcon').innerText = icon;
+
+    sendResultsToGoogle();
+  }
+
+  // ========== MANDATORY GOOGLE SHEETS SENDING FUNCTION ==========
+  async function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams({
+      name: TEST_NAME,
+      score: score,
+      total: quizData.length,
+      mistakes: userMistakes.join(', ')
+    });
+
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+      
+      // Display the required success message in green
+      const msgEl = document.getElementById('success-msg');
+      if (msgEl) msgEl.style.display = 'block';
+    } catch (error) {
+      console.error("Error sending results:", error);
+    }
+  }
+
+  document.getElementById('resetAction').addEventListener('click', initGame);
+  window.addEventListener('DOMContentLoaded', initGame);
 </script>
+
 </body>
 </html>
