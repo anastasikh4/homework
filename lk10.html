@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Racing Master Terminal — Present Simple Quest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #fef3f2 0%, #eff6ff 50%, #f0fdf4 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px 12px;
+    }
+    .terminal {
+      width: 100%;
+      max-width: 780px;
+      background: #ffffff;
+      border: 2px solid #ef4444;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.18);
+      overflow: hidden;
+    }
+    .top-banner {
+      background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .top-banner h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      letter-spacing: 1px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .sys-bar {
+      background: #f1f5f9;
+      padding: 8px 24px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      color: #0284c7;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .score-pill {
+      background: #facc15;
+      color: #000;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 12px;
+    }
+    .content {
+      padding: 24px;
+    }
+    .level-box {
+      background: #f8fafc;
+      border-left: 5px solid #0ea5e9;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .level-box h2 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+      color: #0369a1;
+      text-transform: uppercase;
+    }
+    .q-block {
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .q-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .q-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 1.02rem;
+      color: #0f172a;
+    }
+    .options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .opt-btn {
+      background: #ffffff;
+      color: #1e293b;
+      border: 2px solid #cbd5e1;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .opt-btn:hover:not(:disabled) {
+      border-color: #0ea5e9;
+      background: #f0f9ff;
+    }
+    .opt-btn.correct {
+      background: #16a34a !important;
+      border-color: #22c55e !important;
+      color: #fff !important;
+    }
+    .opt-btn.wrong {
+      background: #dc2626 !important;
+      border-color: #f87171 !important;
+      color: #fff !important;
+    }
+
+    /* Уровень 3: встроенные пропуски в тексте */
+    .word-bank {
+      background: #f0f9ff;
+      border: 1px solid #0ea5e9;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+      color: #075985;
+    }
+    .log-text {
+      line-height: 2.2;
+      font-size: 1.02rem;
+      color: #1e293b;
+    }
+    .inline-group {
+      display: inline-flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      margin: 0 3px;
+      vertical-align: middle;
+    }
+    .mini-btn {
+      background: transparent;
+      color: #334155;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .mini-btn:hover:not(:disabled) {
+      background: #e2e8f0;
+    }
+    .mini-btn.correct {
+      background: #16a34a;
+      color: #fff;
+    }
+    .mini-btn.wrong {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* Финальный экран */
+    .finish-panel {
+      text-align: center;
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+      display: none;
+    }
+    .finish-panel h2 {
+      color: #15803d;
+      margin: 0 0 10px;
+    }
+    #finalSummary {
+      color: #166534;
+      font-weight: 700;
+    }
+    #sendStatus {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 12px 0;
+    }
+    .restart-btn {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .restart-btn:hover {
+      background: #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="top-banner">
+      <h1>🏎️ Racing Master Terminal 🏁</h1>
+      <div class="score-pill">SCORE: <span id="scoreVal">0</span> / 11</div>
+    </div>
+
+    <div class="sys-bar">
+      <span>SYSTEM ONLINE | DRIVER TELEMETRY</span>
+      <span id="progressText">COMPLETED: 0 / 11</span>
+    </div>
+
+    <div class="content">
+      <!-- LEVEL 1: Vocabulary & Locations -->
+      <div class="level-box">
+        <h2>Level 1 · Track Zones &amp; Briefing Subjects</h2>
+
+        <div class="q-block" data-qid="1">
+          <div class="q-title">1. Engineers study maps of circuits, countries, and weather in G_________.</div>
+          <div class="options-row">
+            <button class="opt-btn" onclick="checkOption(this, true)">Geography</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">History</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">Music</button>
+          </div>
+        </div>
+
+        <div class="q-block" data-qid="2">
+          <div class="q-title">2. Mechanics test car's chemistry and tires in S_________.</div>
+          <div class="options-row">
+            <button class="opt-btn" onclick="checkOption(this, false)">Art</button>
+            <button class="opt-btn" onclick="checkOption(this, true)">Science</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">Drama</button>
+          </div>
+        </div>
+
+        <div class="q-block" data-qid="3">
+          <div class="q-title">3. Where do mechanics repair and park the Formula 1 cars between races?</div>
+          <div class="options-row">
+            <button class="opt-btn" onclick="checkOption(this, false)">canteen</button>
+            <button class="opt-btn" onclick="checkOption(this, true)">garage</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">library</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEVEL 2: Adverbs of Frequency Word Order -->
+      <div class="level-box">
+        <h2>Level 2 · Driver Routine Protocol (Word Order)</h2>
+
+        <div class="q-block" data-qid="4">
+          <div class="q-title">4. Put the words in the right order: <em>wakes up / Max / at 7 a.m. / usually</em></div>
+          <div class="options-row">
+            <button class="opt-btn" onclick="checkOption(this, false)">Max wakes up usually at 7 a.m.</button>
+            <button class="opt-btn" onclick="checkOption(this, true)">Max usually wakes up at 7 a.m.</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">Usually Max wakes up at 7 a.m.</button>
+          </div>
+        </div>
+
+        <div class="q-block" data-qid="5">
+          <div class="q-title">5. Put the words in the right order (verb <em>to be</em>!): <em>late / Charles / never / is</em></div>
+          <div class="options-row">
+            <button class="opt-btn" onclick="checkOption(this, false)">Charles never is late for the race.</button>
+            <button class="opt-btn" onclick="checkOption(this, true)">Charles is never late for the race.</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">Charles is late never for the race.</button>
+          </div>
+        </div>
+
+        <div class="q-block" data-qid="6">
+          <div class="q-title">6. Put the words in the right order: <em>in the simulator / often / trains / he</em></div>
+          <div class="options-row">
+            <button class="opt-btn" onclick="checkOption(this, true)">He often trains in the simulator.</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">He trains often in the simulator.</button>
+            <button class="opt-btn" onclick="checkOption(this, false)">He trains in the simulator oftenly.</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEVEL 3: Interview Data Entry -->
+      <div class="level-box">
+        <h2>Level 3 · Pit-Lane Interview (Click the right word in each gap)</h2>
+        <div class="word-bank">
+          📋 <strong>WORD BANK:</strong> Do · don't · Does · doesn't
+        </div>
+        <div class="log-text">
+          <strong>Reporter:</strong> "
+          <span class="inline-group" data-qid="7">
+            <button class="mini-btn" onclick="checkInline(this, true)">Do</button>
+            <button class="mini-btn" onclick="checkInline(this, false)">Does</button>
+          </span>
+          you practice on the track every day, Charles?"<br>
+
+          <strong>Charles:</strong> "Yes, I
+          <span class="inline-group" data-qid="8">
+            <button class="mini-btn" onclick="checkInline(this, true)">do</button>
+            <button class="mini-btn" onclick="checkInline(this, false)">does</button>
+          </span>
+          . But I
+          <span class="inline-group" data-qid="9">
+            <button class="mini-btn" onclick="checkInline(this, false)">doesn't</button>
+            <button class="mini-btn" onclick="checkInline(this, true)">don't</button>
+          </span>
+          drive at night. I sleep early."<br>
+
+          <strong>Reporter:</strong> "
+          <span class="inline-group" data-qid="10">
+            <button class="mini-btn" onclick="checkInline(this, false)">Do</button>
+            <button class="mini-btn" onclick="checkInline(this, true)">Does</button>
+          </span>
+          your teammate Max train with you?"<br>
+
+          <strong>Charles:</strong> "No, he
+          <span class="inline-group" data-qid="11">
+            <button class="mini-btn" onclick="checkInline(this, false)">don't</button>
+            <button class="mini-btn" onclick="checkInline(this, true)">doesn't</button>
+          </span>
+          . He works in the gym in the morning!"
+        </div>
+      </div>
+
+      <!-- ФИНАЛЬНЫЙ ЭКРАН -->
+      <div class="finish-panel" id="finishPanel">
+        <h2>🏁 GREAT JOB! ALL 3 LEVELS COMPLETE! 🏁</h2>
+        <p id="finalSummary">Final Score: 0 out of 11 correct!</p>
+        <div id="sendStatus">Sending results to telemetry server... ⏳</div>
+        <button class="restart-btn" onclick="restartGame()">PLAY AGAIN 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TEST_NAME = "Racing Master Terminal: Present Simple & Routines";
+    const TOTAL_QUESTIONS = 11;
+    let userMistakes = [];
+    let score = 0;
+    let completedSet = new Set();
+
+    function updateHUD() {
+      document.getElementById("scoreVal").textContent = score;
+      document.getElementById("progressText").textContent = `COMPLETED: ${completedSet.size} / ${TOTAL_QUESTIONS}`;
+      if (completedSet.size === TOTAL_QUESTIONS) {
+        const panel = document.getElementById("finishPanel");
+        panel.style.display = "block";
+        document.getElementById("finalSummary").textContent = `Final Score: ${score} out of ${TOTAL_QUESTIONS} correct!`;
+        panel.scrollIntoView({ behavior: "smooth" });
+        sendResultsToGoogle();
+      }
+    }
+
+    function checkOption(btn, isCorrect) {
+      const block = btn.closest(".q-block");
+      const qid = block.getAttribute("data-qid");
+      if (completedSet.has(qid)) return;
+      if (isCorrect) {
+        btn.classList.add("correct");
+        block.querySelectorAll(".opt-btn").forEach(b => (b.disabled = true));
+        completedSet.add(qid);
+        score++;
+        updateHUD();
+      } else {
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        userMistakes.push(btn.textContent.trim());
+      }
+    }
+
+    function checkInline(btn, isCorrect) {
+      const group = btn.closest(".inline-group");
+      const qid = group.getAttribute("data-qid");
+      if (completedSet.has(qid)) return;
+      if (isCorrect) {
+        btn.classList.add("correct");
+        group.querySelectorAll(".mini-btn").forEach(b => (b.disabled = true));
+        completedSet.add(qid);
+        score++;
+        updateHUD();
+      } else {
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        userMistakes.push(btn.textContent.trim());
+      }
+    }
+
+    function sendResultsToGoogle() {
+      const statusEl = document.getElementById("sendStatus");
+      const url = "google.com"; // замени на URL своего Google Apps Script
+      const params = new URLSearchParams();
+      params.append("name", TEST_NAME);
+      params.append("score", score);
+      params.append("total", TOTAL_QUESTIONS);
+      params.append("mistakes", userMistakes.join(", "));
+      fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        body: params
+      })
+        .then(() => {
+          statusEl.style.color = "#15803d";
+          statusEl.textContent = "Results sent successfully! ✅";
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          statusEl.style.color = "#dc2626";
+          statusEl.textContent = "Error sending results.";
+        });
+    }
+
+    function restartGame() {
+      score = 0;
+      userMistakes = [];
+      completedSet = new Set();
+      document.getElementById("finishPanel").style.display = "none";
+      document.querySelectorAll(".opt-btn, .mini-btn").forEach(b => {
+        b.disabled = false;
+        b.classList.remove("correct", "wrong");
+      });
+      updateHUD();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>
